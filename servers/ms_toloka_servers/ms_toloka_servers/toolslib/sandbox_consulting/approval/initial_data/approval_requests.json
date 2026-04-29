@@ -1,0 +1,74 @@
+[
+  {
+    "id": "APR-1000001",
+    "request_type": "software_access",
+    "requester_email": "jennifer.patel@msg.com",
+    "approver_email": "sarah.johnson@msg.com",
+    "amount": 1200,
+    "engagement_code": "ENG-0012345",
+    "status": "approved"
+  },
+  {
+    "id": "APR-1000002",
+    "request_type": "hardware_replacement",
+    "requester_email": "marcus.bennett@msg.com",
+    "approver_email": "michael.chen@msg.com",
+    "amount": null,
+    "engagement_code": "ENG-0067890",
+    "status": "pending"
+  },
+  {
+    "id": "APR-1000003",
+    "request_type": "client_access",
+    "requester_email": "alice.jones@msg.com",
+    "approver_email": "richard.williams@msg.com",
+    "amount": null,
+    "engagement_code": "ENG-0012345",
+    "status": "approved"
+  },
+  {
+    "id": "APR-1000004",
+    "request_type": "training_cost",
+    "requester_email": "robert.nguyen@msg.com",
+    "approver_email": "sarah.johnson@msg.com",
+    "amount": 2500,
+    "engagement_code": null,
+    "status": "rejected"
+  },
+  {
+    "id": "APR-1000005",
+    "request_type": "expense_override",
+    "requester_email": "stephanie.rivera@msg.com",
+    "approver_email": "michael.chen@msg.com",
+    "amount": 350,
+    "engagement_code": "ENG-0012345",
+    "status": "approved"
+  },
+  {
+    "id": "APR-1000006",
+    "request_type": "travel",
+    "requester_email": "michael.harrison@msg.com",
+    "approver_email": "sarah.johnson@msg.com",
+    "amount": 1800,
+    "engagement_code": "ENG-0067890",
+    "status": "pending"
+  },
+  {
+    "id": "APR-1000007",
+    "request_type": "document_access",
+    "requester_email": "emily.davis@msg.com",
+    "approver_email": "richard.williams@msg.com",
+    "amount": null,
+    "engagement_code": "ENG-0012345",
+    "status": "approved"
+  },
+  {
+    "id": "APR-1000008",
+    "request_type": "training_engagement_coordination",
+    "requester_email": "david.garcia@msg.com",
+    "approver_email": "sarah.johnson@msg.com",
+    "amount": null,
+    "engagement_code": "ENG-0012345",
+    "status": "pending"
+  }
+]

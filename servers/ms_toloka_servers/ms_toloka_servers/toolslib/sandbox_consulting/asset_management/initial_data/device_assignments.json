@@ -1,0 +1,20 @@
+[
+  {
+    "id": "ASMT-1000001",
+    "asset_id": "MSG00001003",
+    "employee_email": "marcus.bennett@msg.com",
+    "returned_at": null
+  },
+  {
+    "id": "ASMT-1000002",
+    "asset_id": "MSG00002001",
+    "employee_email": "jennifer.patel@msg.com",
+    "returned_at": null
+  },
+  {
+    "id": "ASMT-1000003",
+    "asset_id": "MSG00003001",
+    "employee_email": "bob.taylor@msg.com",
+    "returned_at": "2024-10-01T00:00:00Z"
+  }
+]

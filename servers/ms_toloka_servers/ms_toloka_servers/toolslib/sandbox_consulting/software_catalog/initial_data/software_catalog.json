@@ -1,0 +1,92 @@
+[
+  {
+    "id": "CAT-0012345",
+    "name": "Fiddler AI Explainability Platform",
+    "annual_cost": 840,
+    "pool_type": "standard"
+  },
+  {
+    "id": "CAT-0023456",
+    "name": "Qdrant Vector Database Enterprise",
+    "annual_cost": 1680,
+    "pool_type": "standard"
+  },
+  {
+    "id": "CAT-0034567",
+    "name": "Kaleido Blockchain Platform",
+    "annual_cost": 120,
+    "pool_type": "enterprise"
+  },
+  {
+    "id": "CAT-0045678",
+    "name": "Blender Studio Enterprise",
+    "annual_cost": 600,
+    "pool_type": "standard"
+  },
+  {
+    "id": "CAT-0056789",
+    "name": "Collibra Data Governance Suite",
+    "annual_cost": 1800,
+    "pool_type": "enterprise"
+  },
+  {
+    "id": "CAT-0067890",
+    "name": "Linear Project Management",
+    "annual_cost": 840,
+    "pool_type": "enterprise"
+  },
+  {
+    "id": "CAT-0078901",
+    "name": "Notion Enterprise",
+    "annual_cost": 600,
+    "pool_type": "enterprise"
+  },
+  {
+    "id": "CAT-0089012",
+    "name": "Penpot Open Source Design",
+    "annual_cost": 144,
+    "pool_type": "standard"
+  },
+  {
+    "id": "CAT-0090123",
+    "name": "Excalidraw Plus Enterprise",
+    "annual_cost": 192,
+    "pool_type": "standard"
+  },
+  {
+    "id": "CAT-0101234",
+    "name": "Zulip Enterprise Cloud",
+    "annual_cost": 150,
+    "pool_type": "enterprise"
+  },
+  {
+    "id": "CAT-0112345",
+    "name": "Jitsi Meet Enterprise",
+    "annual_cost": 199,
+    "pool_type": "enterprise"
+  },
+  {
+    "id": "CAT-0123456",
+    "name": "Plane.so Project Tracker",
+    "annual_cost": 360,
+    "pool_type": "standard"
+  },
+  {
+    "id": "CAT-0134567",
+    "name": "Eraser.io Technical Diagrams",
+    "annual_cost": 108,
+    "pool_type": "standard"
+  },
+  {
+    "id": "CAT-0145678",
+    "name": "Orchest Pipeline Orchestration",
+    "annual_cost": 5195,
+    "pool_type": "standard"
+  },
+  {
+    "id": "CAT-0156789",
+    "name": "n8n Workflow Automation Enterprise",
+    "annual_cost": 180,
+    "pool_type": "enterprise"
+  }
+]

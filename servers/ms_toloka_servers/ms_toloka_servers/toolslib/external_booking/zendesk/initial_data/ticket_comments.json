@@ -1,0 +1,90 @@
+[
+  {
+    "id": 23118465221916,
+    "ticket_id": 1,
+    "author_id": 22677105199388,
+    "body": "Customer wants to change check-in date from Jan 15 to Jan 20 due to flight delay",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Customer wants to change check-in date from Jan 15 to Jan 20 due to flight delay</p></div>",
+    "public": true,
+    "created_at": "2025-01-15T10:00:00Z",
+    "ItemInternalId": "123d7175-2bb9-41d9-9131-d5f2e57af9f7",
+    "key": "23118465221916"
+  },
+  {
+    "id": 23118465221917,
+    "ticket_id": 2,
+    "author_id": 22677105199389,
+    "body": "Customer cancelled booking due to emergency and requesting full refund",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Customer cancelled booking due to emergency and requesting full refund</p></div>",
+    "public": true,
+    "created_at": "2025-01-14T14:30:00Z",
+    "ItemInternalId": "223d7175-2bb9-41d9-9131-d5f2e57af9f8",
+    "key": "23118465221917"
+  },
+  {
+    "id": 23118465221918,
+    "ticket_id": 3,
+    "author_id": 22677105199390,
+    "body": "Customer wants to know if they can upgrade from standard to deluxe room",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Customer wants to know if they can upgrade from standard to deluxe room</p></div>",
+    "public": true,
+    "created_at": "2025-01-10T08:00:00Z",
+    "ItemInternalId": "323d7175-2bb9-41d9-9131-d5f2e57af9f9",
+    "key": "23118465221918"
+  },
+  {
+    "id": 23118465221919,
+    "ticket_id": 4,
+    "author_id": 22677105199391,
+    "body": "Corporate client needs to add 5 more rooms to existing group booking",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Corporate client needs to add 5 more rooms to existing group booking</p></div>",
+    "public": true,
+    "created_at": "2025-01-13T09:00:00Z",
+    "ItemInternalId": "423d7175-2bb9-41d9-9131-d5f2e57af9fa",
+    "key": "23118465221919"
+  },
+  {
+    "id": 23118465221920,
+    "ticket_id": 5,
+    "author_id": 22677105199392,
+    "body": "Same-day booking needs immediate hotel confirmation for early check-in",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Same-day booking needs immediate hotel confirmation for early check-in</p></div>",
+    "public": true,
+    "created_at": "2025-01-12T11:30:00Z",
+    "ItemInternalId": "523d7175-2bb9-41d9-9131-d5f2e57af9fb",
+    "key": "23118465221920"
+  },
+  {
+    "id": 23118465221921,
+    "ticket_id": 6,
+    "author_id": 22677105199393,
+    "body": "Guest requires wheelchair accessible room with roll-in shower",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Guest requires wheelchair accessible room with roll-in shower</p></div>",
+    "public": true,
+    "created_at": "2025-01-11T15:00:00Z",
+    "ItemInternalId": "623d7175-2bb9-41d9-9131-d5f2e57af9fc",
+    "key": "23118465221921"
+  },
+  {
+    "id": 23118465221922,
+    "ticket_id": 7,
+    "author_id": 22677105199394,
+    "body": "Customer was charged $500 extra on their booking invoice",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Customer was charged $500 extra on their booking invoice</p></div>",
+    "public": true,
+    "created_at": "2025-01-09T10:20:00Z",
+    "ItemInternalId": "723d7175-2bb9-41d9-9131-d5f2e57af9fd",
+    "key": "23118465221922"
+  },
+  {
+    "id": 23118465221923,
+    "ticket_id": 8,
+    "author_id": 22677105199395,
+    "body": "Guest complained about room cleanliness during their stay",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Guest complained about room cleanliness during their stay</p></div>",
+    "public": true,
+    "created_at": "2025-01-08T09:00:00Z",
+    "ItemInternalId": "823d7175-2bb9-41d9-9131-d5f2e57af9fe",
+    "key": "23118465221923"
+  }
+]

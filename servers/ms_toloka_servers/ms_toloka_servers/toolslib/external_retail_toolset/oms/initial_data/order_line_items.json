@@ -1,0 +1,32 @@
+[
+  {
+    "id": "LIN-10000001",
+    "order_id": "ORD-10000001",
+    "sku": "SKU-10000001",
+    "product_name": "Samsung 28 cu ft French Door Refrigerator",
+    "quantity": 1,
+    "base_price": 899.99,
+    "discount_amount": 90.00,
+    "final_price": 809.99
+  },
+  {
+    "id": "LIN-10000002",
+    "order_id": "ORD-10000002",
+    "sku": "SKU-10000002",
+    "product_name": "LG 65 inch OLED 4K Smart TV",
+    "quantity": 1,
+    "base_price": 1299.99,
+    "discount_amount": 0.00,
+    "final_price": 1299.99
+  },
+  {
+    "id": "LIN-10000003",
+    "order_id": "ORD-10000003",
+    "sku": "SKU-10000003",
+    "product_name": "Dyson V15 Detect Cordless Vacuum",
+    "quantity": 1,
+    "base_price": 549.99,
+    "discount_amount": 0.00,
+    "final_price": 549.99
+  }
+]

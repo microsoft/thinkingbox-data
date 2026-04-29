@@ -1,0 +1,27 @@
+[
+  {
+    "catalog_id": "CAT-1000001",
+    "pool_type": "standard",
+    "total_licenses": 10
+  },
+  {
+    "catalog_id": "CAT-1000002",
+    "pool_type": "enterprise",
+    "total_licenses": null
+  },
+  {
+    "catalog_id": "CAT-1000003",
+    "pool_type": "standard",
+    "total_licenses": 5
+  },
+  {
+    "catalog_id": "CAT-1000004",
+    "pool_type": "enterprise",
+    "total_licenses": null
+  },
+  {
+    "catalog_id": "CAT-1000005",
+    "pool_type": "standard",
+    "total_licenses": 3
+  }
+]

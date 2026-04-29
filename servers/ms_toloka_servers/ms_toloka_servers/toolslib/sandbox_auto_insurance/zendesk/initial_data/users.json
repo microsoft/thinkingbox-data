@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "name": "Robert Chen",
+    "email": "robert.chen@outlook.com",
+    "role": "end-user",
+    "organization_id": "1",
+    "phone": "310-555-0101",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "2",
+    "name": "Sarah Miller",
+    "email": "sarah.miller@outlook.com",
+    "role": "agent",
+    "organization_id": "1",
+    "phone": "800-555-0199",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "3",
+    "name": "David Wilson",
+    "email": "david.wilson@outlook.com",
+    "role": "end-user",
+    "organization_id": "1",
+    "phone": "713-555-0123",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-06-15T00:00:00Z",
+    "updated_at": "2024-06-15T00:00:00Z"
+  },
+  {
+    "id": "4",
+    "name": "Emily Davis",
+    "email": "emily.davis@techsolutions.com",
+    "role": "end-user",
+    "organization_id": "1",
+    "phone": "212-555-0125",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-03-20T00:00:00Z",
+    "updated_at": "2024-03-20T00:00:00Z"
+  },
+  {
+    "id": "5",
+    "name": "Maria Rodriguez",
+    "email": "maria.rodriguez@outlook.com",
+    "role": "admin",
+    "organization_id": "1",
+    "phone": "800-555-0100",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+]

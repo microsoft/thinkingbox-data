@@ -1,0 +1,74 @@
+[
+  {
+    "id": "ENR-1000001",
+    "employee_email": "jennifer.patel@msg.com",
+    "course_id": "CRS-1000001",
+    "completion_date": "2024-11-15T00:00:00Z"
+  },
+  {
+    "id": "ENR-1000002",
+    "employee_email": "jennifer.patel@msg.com",
+    "course_id": "CRS-1000003",
+    "completion_date": "2024-10-20T00:00:00Z"
+  },
+  {
+    "id": "ENR-1000003",
+    "employee_email": "marcus.bennett@msg.com",
+    "course_id": "CRS-1000001",
+    "completion_date": "2024-09-10T00:00:00Z"
+  },
+  {
+    "id": "ENR-1000004",
+    "employee_email": "marcus.bennett@msg.com",
+    "course_id": "CRS-1000002",
+    "completion_date": null
+  },
+  {
+    "id": "ENR-1000005",
+    "employee_email": "alice.jones@msg.com",
+    "course_id": "CRS-1000006",
+    "completion_date": "2024-08-05T00:00:00Z"
+  },
+  {
+    "id": "ENR-1000006",
+    "employee_email": "alice.jones@msg.com",
+    "course_id": "CRS-1000009",
+    "completion_date": "2024-09-12T00:00:00Z"
+  },
+  {
+    "id": "ENR-1000007",
+    "employee_email": "robert.nguyen@msg.com",
+    "course_id": "CRS-1000012",
+    "completion_date": "2024-07-22T00:00:00Z"
+  },
+  {
+    "id": "ENR-1000008",
+    "employee_email": "robert.nguyen@msg.com",
+    "course_id": "CRS-1000004",
+    "completion_date": null
+  },
+  {
+    "id": "ENR-1000009",
+    "employee_email": "stephanie.rivera@msg.com",
+    "course_id": "CRS-1000003",
+    "completion_date": "2024-10-18T00:00:00Z"
+  },
+  {
+    "id": "ENR-1000010",
+    "employee_email": "stephanie.rivera@msg.com",
+    "course_id": "CRS-1000011",
+    "completion_date": null
+  },
+  {
+    "id": "ENR-1000011",
+    "employee_email": "michael.harrison@msg.com",
+    "course_id": "CRS-1000001",
+    "completion_date": "2024-11-05T00:00:00Z"
+  },
+  {
+    "id": "ENR-1000012",
+    "employee_email": "michael.harrison@msg.com",
+    "course_id": "CRS-1000007",
+    "completion_date": null
+  }
+]

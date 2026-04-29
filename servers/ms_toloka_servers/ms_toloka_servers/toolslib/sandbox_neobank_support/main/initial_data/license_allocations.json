@@ -1,0 +1,74 @@
+[
+  {
+    "id": "LAL-24719583",
+    "license_id": "LIC-29471863",
+    "employee_id": "WD-294817",
+    "allocated_at": "2024-01-15T09:00:00Z",
+    "allocated_by": "system",
+    "is_active": true,
+    "deallocated_at": null
+  },
+  {
+    "id": "LAL-53826947",
+    "license_id": "LIC-29471863",
+    "employee_id": "WD-573926",
+    "allocated_at": "2024-02-01T10:00:00Z",
+    "allocated_by": "system",
+    "is_active": true,
+    "deallocated_at": null
+  },
+  {
+    "id": "LAL-67194238",
+    "license_id": "LIC-68149527",
+    "employee_id": "WD-681453",
+    "allocated_at": "2024-03-10T11:00:00Z",
+    "allocated_by": "system",
+    "is_active": true,
+    "deallocated_at": null
+  },
+  {
+    "id": "LAL-81473956",
+    "license_id": "LIC-19263875",
+    "employee_id": "WD-294817",
+    "allocated_at": "2024-01-20T09:30:00Z",
+    "allocated_by": "system",
+    "is_active": true,
+    "deallocated_at": null
+  },
+  {
+    "id": "LAL-19582637",
+    "license_id": "LIC-19263875",
+    "employee_id": "WD-573926",
+    "allocated_at": "2024-01-20T09:30:00Z",
+    "allocated_by": "system",
+    "is_active": true,
+    "deallocated_at": null
+  },
+  {
+    "id": "LAL-46739812",
+    "license_id": "LIC-73918564",
+    "employee_id": "WD-847291",
+    "allocated_at": "2024-04-01T08:00:00Z",
+    "allocated_by": "system",
+    "is_active": true,
+    "deallocated_at": null
+  },
+  {
+    "id": "LAL-72865194",
+    "license_id": "LIC-31854792",
+    "employee_id": "WD-192638",
+    "allocated_at": "2025-09-17T10:00:00Z",
+    "allocated_by": "system",
+    "is_active": true,
+    "deallocated_at": null
+  },
+  {
+    "id": "LAL-38947261",
+    "license_id": "LIC-29471863",
+    "employee_id": "WD-465782",
+    "allocated_at": "2024-06-01T09:00:00Z",
+    "allocated_by": "system",
+    "is_active": false,
+    "deallocated_at": "2024-11-01T10:00:00Z"
+  }
+]

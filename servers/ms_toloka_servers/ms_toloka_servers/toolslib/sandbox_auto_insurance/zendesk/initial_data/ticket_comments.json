@@ -1,0 +1,57 @@
+[
+  {
+    "id": 23118465221916,
+    "ticket_id": 1,
+    "author_id": 1,
+    "body": "I recently purchased a new vehicle and need to add it to my policy. Can you help me with this?",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">I recently purchased a new vehicle and need to add it to my policy. Can you help me with this?</p></div>",
+    "public": true,
+    "created_at": "2025-01-15T10:00:00Z",
+    "ItemInternalId": "123d7175-2bb9-41d9-9131-d5f2e57af9f7",
+    "key": "23118465221916"
+  },
+  {
+    "id": 23118465221917,
+    "ticket_id": 2,
+    "author_id": 3,
+    "body": "I filed a claim last week (CLM-1000000002) and wondering what the current status is. When can I expect an update?",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">I filed a claim last week (CLM-1000000002) and wondering what the current status is. When can I expect an update?</p></div>",
+    "public": true,
+    "created_at": "2025-01-14T14:30:00Z",
+    "ItemInternalId": "223d7175-2bb9-41d9-9131-d5f2e57af9f8",
+    "key": "23118465221917"
+  },
+  {
+    "id": 23118465221918,
+    "ticket_id": 3,
+    "author_id": 4,
+    "body": "I'm experiencing financial difficulty and need more time to make my payment. Can you help with a payment extension?",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">I'm experiencing financial difficulty and need more time to make my payment. Can you help with a payment extension?</p></div>",
+    "public": true,
+    "created_at": "2025-01-10T08:00:00Z",
+    "ItemInternalId": "323d7175-2bb9-41d9-9131-d5f2e57af9f9",
+    "key": "23118465221918"
+  },
+  {
+    "id": 23118465221919,
+    "ticket_id": 4,
+    "author_id": 1,
+    "body": "I need a digital copy of my insurance ID card to provide proof of insurance. Can you email it to me?",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">I need a digital copy of my insurance ID card to provide proof of insurance. Can you email it to me?</p></div>",
+    "public": true,
+    "created_at": "2025-01-13T09:00:00Z",
+    "ItemInternalId": "423d7175-2bb9-41d9-9131-d5f2e57af9fa",
+    "key": "23118465221919"
+  },
+  {
+    "id": 23118465221920,
+    "ticket_id": 5,
+    "author_id": 3,
+    "body": "I need to remove a driver from my policy. The driver is John Smith and my policy number is POL-0012345678.",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">I need to remove a driver from my policy. The driver is John Smith and my policy number is POL-0012345678.</p></div>",
+    "public": true,
+    "created_at": "2025-01-12T11:30:00Z",
+    "ItemInternalId": "523d7175-2bb9-41d9-9131-d5f2e57af9fb",
+    "key": "23118465221920"
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "CSA-1000001",
+    "employee_email": "jennifer.patel@msg.com",
+    "client_id": "CLT-0012345",
+    "system_name": "Client Salesforce",
+    "access_type": "full_access",
+    "revoked_at": null
+  },
+  {
+    "id": "CSA-1000002",
+    "employee_email": "marcus.bennett@msg.com",
+    "client_id": "CLT-0012345",
+    "system_name": "Client Portal",
+    "access_type": "read_only",
+    "revoked_at": null
+  },
+  {
+    "id": "CSA-1000003",
+    "employee_email": "alice.jones@msg.com",
+    "client_id": "CLT-0012345",
+    "system_name": "Client Salesforce",
+    "access_type": "contributor",
+    "revoked_at": null
+  },
+  {
+    "id": "CSA-1000004",
+    "employee_email": "alice.jones@msg.com",
+    "client_id": "CLT-0012345",
+    "system_name": "Client Database",
+    "access_type": "admin",
+    "revoked_at": null
+  },
+  {
+    "id": "CSA-1000005",
+    "employee_email": "robert.nguyen@msg.com",
+    "client_id": "CLT-0067890",
+    "system_name": "Client Portal",
+    "access_type": "full_access",
+    "revoked_at": "2024-10-15T00:00:00Z"
+  },
+  {
+    "id": "CSA-1000006",
+    "employee_email": "stephanie.rivera@msg.com",
+    "client_id": "CLT-0067890",
+    "system_name": "Client Analytics",
+    "access_type": "read_only",
+    "revoked_at": null
+  },
+  {
+    "id": "CSA-1000007",
+    "employee_email": "emily.davis@msg.com",
+    "client_id": "CLT-0012345",
+    "system_name": "Client Portal",
+    "access_type": "contributor",
+    "revoked_at": null
+  }
+]

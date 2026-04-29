@@ -1,0 +1,80 @@
+[
+  {
+    "id": "HW-ORDER-2947185",
+    "device_type": "laptop_premium",
+    "device_model": "MacBook Pro 16",
+    "quantity": 1,
+    "ship_to_location": "350 Mission St, San Francisco, CA 94105",
+    "requester_id": "WD-294817",
+    "ticket_id": "1",
+    "status": "delivered",
+    "created_at": "2025-09-01T10:00:00+00:00",
+    "expected_delivery_date": "2025-09-11",
+    "delivered_at": "2025-09-10T15:30:00+00:00"
+  },
+  {
+    "id": "HW-ORDER-5739264",
+    "device_type": "monitor",
+    "device_model": "Dell UltraSharp 27",
+    "quantity": 2,
+    "ship_to_location": "789 Broadway, New York, NY 10003",
+    "requester_id": "WD-573926",
+    "ticket_id": "2",
+    "status": "shipped",
+    "created_at": "2025-09-05T09:30:00+00:00",
+    "expected_delivery_date": "2025-09-15",
+    "delivered_at": null
+  },
+  {
+    "id": "HW-ORDER-6814539",
+    "device_type": "headset",
+    "device_model": "Sony WH-1000XM5",
+    "quantity": 1,
+    "ship_to_location": "100 Pine St, Seattle, WA 98101",
+    "requester_id": "WD-681453",
+    "ticket_id": null,
+    "status": "pending",
+    "created_at": "2025-09-10T14:20:00+00:00",
+    "expected_delivery_date": "2025-09-15",
+    "delivered_at": null
+  },
+  {
+    "id": "HW-ORDER-8472916",
+    "device_type": "laptop_standard",
+    "device_model": "Dell Latitude 5430",
+    "quantity": 3,
+    "ship_to_location": "200 Congress Ave, Austin, TX 78701",
+    "requester_id": "WD-192638",
+    "ticket_id": "3",
+    "status": "pending",
+    "created_at": "2025-09-12T11:00:00+00:00",
+    "expected_delivery_date": "2025-09-22",
+    "delivered_at": null
+  },
+  {
+    "id": "HW-ORDER-1926387",
+    "device_type": "docking_station",
+    "device_model": "CalDigit TS4",
+    "quantity": 5,
+    "ship_to_location": "300 Boylston St, Boston, MA 02116",
+    "requester_id": "WD-847291",
+    "ticket_id": "4",
+    "status": "shipped",
+    "created_at": "2025-09-08T08:45:00+00:00",
+    "expected_delivery_date": "2025-09-18",
+    "delivered_at": null
+  },
+  {
+    "id": "HW-ORDER-4657821",
+    "device_type": "keyboard",
+    "device_model": "Logitech MX Keys",
+    "quantity": 10,
+    "ship_to_location": "575 Market St, San Francisco, CA 94105",
+    "requester_id": "WD-495826",
+    "ticket_id": "5",
+    "status": "pending",
+    "created_at": "2025-09-18T13:00:00+00:00",
+    "expected_delivery_date": "2025-09-25",
+    "delivered_at": null
+  }
+]

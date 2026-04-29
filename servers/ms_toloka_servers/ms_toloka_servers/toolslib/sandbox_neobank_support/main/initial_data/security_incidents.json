@@ -1,0 +1,80 @@
+[
+  {
+    "id": "SEC-26184759",
+    "employee_id": "WD-847291",
+    "severity": "SEV1",
+    "incident_type": "database_outage",
+    "description": "Production database outage - primary node failure",
+    "status": "open",
+    "is_active": true,
+    "reported_at": "2025-09-17T14:30:00Z",
+    "reported_by": "monitoring_system",
+    "resolved_at": null,
+    "resolution_notes": null
+  },
+  {
+    "id": "SEC-43827196",
+    "employee_id": "WD-753918",
+    "severity": "SEV2",
+    "incident_type": "security_breach_attempt",
+    "description": "Multiple failed login attempts detected from suspicious IP",
+    "status": "investigating",
+    "is_active": true,
+    "reported_at": "2025-09-17T16:45:00Z",
+    "reported_by": "security_system",
+    "resolved_at": null,
+    "resolution_notes": null
+  },
+  {
+    "id": "SEC-59671283",
+    "employee_id": "WD-218647",
+    "severity": "SEV1",
+    "incident_type": "service_degradation",
+    "description": "API gateway experiencing high latency and timeouts",
+    "status": "open",
+    "is_active": true,
+    "reported_at": "2025-09-17T18:15:00Z",
+    "reported_by": "WD-218647",
+    "resolved_at": null,
+    "resolution_notes": null
+  },
+  {
+    "id": "SEC-71938462",
+    "employee_id": "WD-681453",
+    "severity": "SEV2",
+    "incident_type": "data_integrity_issue",
+    "description": "Discrepancy detected in transaction reconciliation",
+    "status": "closed",
+    "is_active": false,
+    "reported_at": "2025-09-16T10:00:00Z",
+    "reported_by": "WD-671392",
+    "resolved_at": "2025-09-16T22:30:00Z",
+    "resolution_notes": "Data sync issue resolved, reconciliation completed successfully"
+  },
+  {
+    "id": "SEC-84752619",
+    "employee_id": "WD-753918",
+    "severity": "SEV1",
+    "incident_type": "unauthorized_access_attempt",
+    "description": "Emergency: Unauthorized access attempt to customer PII database",
+    "status": "open",
+    "is_active": true,
+    "reported_at": "2025-09-17T20:00:00Z",
+    "reported_by": "security_system",
+    "resolved_at": null,
+    "resolution_notes": null
+  },
+  {
+    "id": "SEC-92513748",
+    "employee_id": "WD-926473",
+    "severity": "SEV2",
+    "incident_type": "compliance_violation",
+    "description": "Audit log retention policy violation detected",
+    "status": "closed",
+    "is_active": false,
+    "reported_at": "2025-09-17T08:00:00Z",
+    "reported_by": "compliance_system",
+    "resolved_at": "2025-09-17T19:45:00Z",
+    "resolution_notes": "Logs restored from backup, retention policy updated"
+  }
+]

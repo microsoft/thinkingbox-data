@@ -1,0 +1,47 @@
+[
+  {
+    "id": "ORG-10000001",
+    "name": "BookingPlatform Support",
+    "domain_names": ["bookingplatform.com"],
+    "details": "Main customer support organization for the booking platform",
+    "notes": "Internal support team",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "ORG-10000002",
+    "name": "Travelers United",
+    "domain_names": ["travelers.com"],
+    "details": "Individual travelers and families",
+    "notes": "B2C customers - standard support tier",
+    "created_at": "2024-03-15T00:00:00Z",
+    "updated_at": "2024-03-15T00:00:00Z"
+  },
+  {
+    "id": "ORG-10000003",
+    "name": "Corporate Travel Solutions",
+    "domain_names": ["corporatetravel.com", "ctstravel.io"],
+    "details": "Corporate clients with group booking needs",
+    "notes": "Enterprise customer - premium support tier",
+    "created_at": "2024-05-10T00:00:00Z",
+    "updated_at": "2024-05-10T00:00:00Z"
+  },
+  {
+    "id": "ORG-10000004",
+    "name": "Global Events Management",
+    "domain_names": ["globalevents.com"],
+    "details": "Large-scale event and conference booking organization",
+    "notes": "Enterprise account - dedicated support manager",
+    "created_at": "2024-06-20T00:00:00Z",
+    "updated_at": "2024-06-20T00:00:00Z"
+  },
+  {
+    "id": "ORG-10000005",
+    "name": "Group Travel Agency",
+    "domain_names": ["grouptravel.com"],
+    "details": "Travel agency specializing in group bookings",
+    "notes": "Business partner account",
+    "created_at": "2024-08-01T00:00:00Z",
+    "updated_at": "2024-08-01T00:00:00Z"
+  }
+]

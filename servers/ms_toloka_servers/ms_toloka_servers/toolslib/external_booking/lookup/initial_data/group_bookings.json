@@ -1,0 +1,72 @@
+[
+  {
+    "id": "GRP-00000001",
+    "group_booking_id": "GRP-00000001",
+    "coordinator_name": "Maria Lopez",
+    "coordinator_email": "maria@company.com",
+    "coordinator_phone": "+1-305-777-8888",
+    "total_rooms": 2,
+    "check_in_date": "2025-12-10T12:00:00Z",
+    "check_out_date": "2025-12-15T12:00:00Z",
+    "hotel_id": "HTL-00000002",
+    "booking_references": ["BKG-00000001", "BKG-00000002"],
+    "created_at": "2025-11-10T10:00:00Z",
+    "updated_at": "2025-11-10T10:00:00Z"
+  },
+  {
+    "id": "GRP-00000002",
+    "group_booking_id": "GRP-00000002",
+    "coordinator_name": "Alex Johnson",
+    "coordinator_email": "alex@grouptravel.com",
+    "coordinator_phone": "+1-212-847-9999",
+    "total_rooms": 2,
+    "check_in_date": "2025-12-15T12:00:00Z",
+    "check_out_date": "2025-12-18T12:00:00Z",
+    "hotel_id": "HTL-00000001",
+    "booking_references": ["BKG-00000003", "BKG-00000004"],
+    "created_at": "2025-11-15T08:00:00Z",
+    "updated_at": "2025-11-15T08:00:00Z"
+  },
+  {
+    "id": "GRP-00000003",
+    "group_booking_id": "GRP-00000003",
+    "coordinator_name": "Sarah Lee",
+    "coordinator_email": "sarah@events.com",
+    "coordinator_phone": "+1-415-444-2222",
+    "total_rooms": 1,
+    "check_in_date": "2025-12-20T12:00:00Z",
+    "check_out_date": "2025-12-23T12:00:00Z",
+    "hotel_id": "HTL-00000004",
+    "booking_references": ["BKG-00000005"],
+    "created_at": "2025-11-18T09:00:00Z",
+    "updated_at": "2025-11-18T09:00:00Z"
+  },
+  {
+    "id": "GRP-00000004",
+    "group_booking_id": "GRP-00000004",
+    "coordinator_name": "David Kim",
+    "coordinator_email": "david@company.com",
+    "coordinator_phone": "+1-312-123-9090",
+    "total_rooms": 3,
+    "check_in_date": "2025-12-22T12:00:00Z",
+    "check_out_date": "2025-12-27T12:00:00Z",
+    "hotel_id": "HTL-00000001",
+    "booking_references": ["BKG-00000003", "BKG-00000004"],
+    "created_at": "2025-11-20T11:00:00Z",
+    "updated_at": "2025-11-20T11:00:00Z"
+  },
+  {
+    "id": "GRP-00000005",
+    "group_booking_id": "GRP-00000005",
+    "coordinator_name": "Emily Carter",
+    "coordinator_email": "emily@travel.com",
+    "coordinator_phone": "+1-720-888-1111",
+    "total_rooms": 1,
+    "check_in_date": "2025-12-25T13:00:00Z",
+    "check_out_date": "2025-12-30T10:00:00Z",
+    "hotel_id": "HTL-00000004",
+    "booking_references": ["BKG-00000005"],
+    "created_at": "2025-11-25T12:00:00Z",
+    "updated_at": "2025-11-25T12:00:00Z"
+  }
+]

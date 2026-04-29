@@ -1,0 +1,58 @@
+[
+  {
+    "id": "RMA-10000001",
+    "order_id": "ORD-10012345",
+    "line_item_id": "LIN-10012345",
+    "customer_id": "CUS-10000001",
+    "return_reason": "defective",
+    "is_defective": true,
+    "status": "approved",
+    "created_date": "2024-10-20T09:15:00Z",
+    "refund_amount": 899.99,
+    "restocking_fee": 0.00,
+    "return_shipping_cost": 0.00,
+    "removal_fee": 0.00
+  },
+  {
+    "id": "RMA-10000002",
+    "order_id": "ORD-10012346",
+    "line_item_id": "LIN-10012346",
+    "customer_id": "CUS-10000002",
+    "return_reason": "changed_mind",
+    "is_defective": false,
+    "status": "refunded",
+    "created_date": "2024-10-18T14:30:00Z",
+    "refund_amount": 416.01,
+    "restocking_fee": 75.00,
+    "return_shipping_cost": 8.99,
+    "removal_fee": 0.00
+  },
+  {
+    "id": "RMA-10000003",
+    "order_id": "ORD-10012347",
+    "line_item_id": "LIN-10012347",
+    "customer_id": "CUS-10000003",
+    "return_reason": "damaged_in_transit",
+    "is_defective": true,
+    "status": "shipped_to_warehouse",
+    "created_date": "2024-10-21T11:45:00Z",
+    "refund_amount": 1299.99,
+    "restocking_fee": 0.00,
+    "return_shipping_cost": 0.00,
+    "removal_fee": 0.00
+  },
+  {
+    "id": "RMA-10000004",
+    "order_id": "ORD-10012348",
+    "line_item_id": "LIN-10012348",
+    "customer_id": "CUS-10000001",
+    "return_reason": "not_as_expected",
+    "is_defective": false,
+    "status": "approved",
+    "created_date": "2024-10-22T10:00:00Z",
+    "refund_amount": 1614.99,
+    "restocking_fee": 285.00,
+    "return_shipping_cost": 0.00,
+    "removal_fee": 50.00
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "FAL-1000001",
+    "folder_id": "FLD-1000002",
+    "employee_email": "marcus.bennett@msg.com",
+    "permission_level": "viewer"
+  },
+  {
+    "id": "FAL-1000002",
+    "folder_id": "FLD-1000002",
+    "employee_email": "sarah.johnson@msg.com",
+    "permission_level": "co_owner"
+  },
+  {
+    "id": "FAL-1000003",
+    "folder_id": "FLD-1000003",
+    "employee_email": "michael.chen@msg.com",
+    "permission_level": "co_owner"
+  },
+  {
+    "id": "FAL-1000004",
+    "folder_id": "FLD-1000003",
+    "employee_email": "alice.wong@msg.com",
+    "permission_level": "editor"
+  },
+  {
+    "id": "FAL-1000005",
+    "folder_id": "FLD-1000006",
+    "employee_email": "david.martinez@msg.com",
+    "permission_level": "co_owner"
+  },
+  {
+    "id": "FAL-1000006",
+    "folder_id": "FLD-1000006",
+    "employee_email": "lisa.anderson@msg.com",
+    "permission_level": "viewer"
+  },
+  {
+    "id": "FAL-1000007",
+    "folder_id": "FLD-1000009",
+    "employee_email": "emily.parker@msg.com",
+    "permission_level": "co_owner"
+  },
+  {
+    "id": "FAL-1000008",
+    "folder_id": "FLD-1000004",
+    "employee_email": "marcus.bennett@msg.com",
+    "permission_level": "viewer"
+  }
+]

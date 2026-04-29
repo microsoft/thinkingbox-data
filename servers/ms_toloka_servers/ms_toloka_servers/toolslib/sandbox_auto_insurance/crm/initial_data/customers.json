@@ -1,0 +1,67 @@
+[
+  {
+    "id": "CUS-00012345",
+    "email": "robert.chen@outlook.com",
+    "first_name": "Robert",
+    "last_name": "Chen",
+    "date_of_birth": "1985-03-15",
+    "phone": "310-555-0101",
+    "tier": "Standard",
+    "fraud_flag": false,
+    "ssn_last_4": "1234",
+    "security_question": "What is your pet's name?",
+    "security_answer": "Fluffy"
+  },
+  {
+    "id": "CUS-00023456",
+    "email": "sarah.miller@outlook.com",
+    "first_name": "Sarah",
+    "last_name": "Miller",
+    "date_of_birth": "1990-07-22",
+    "phone": "800-555-0199",
+    "tier": "Preferred",
+    "fraud_flag": false,
+    "ssn_last_4": "5678",
+    "security_question": "What city were you born in?",
+    "security_answer": "Boston"
+  },
+  {
+    "id": "CUS-00034567",
+    "email": "david.wilson@outlook.com",
+    "first_name": "David",
+    "last_name": "Wilson",
+    "date_of_birth": "1978-11-30",
+    "phone": "713-555-0123",
+    "tier": "Premium",
+    "fraud_flag": false,
+    "ssn_last_4": "9012",
+    "security_question": "What is your mother's maiden name?",
+    "security_answer": "Williams"
+  },
+  {
+    "id": "CUS-00045678",
+    "email": "emily.davis@techsolutions.com",
+    "first_name": "Emily",
+    "last_name": "Davis",
+    "date_of_birth": "1995-01-10",
+    "phone": "212-555-0125",
+    "tier": "Standard",
+    "fraud_flag": true,
+    "ssn_last_4": "3456",
+    "security_question": "What is your favorite color?",
+    "security_answer": "Blue"
+  },
+  {
+    "id": "CUS-00056789",
+    "email": "james.thompson@email.com",
+    "first_name": "James",
+    "last_name": "Thompson",
+    "date_of_birth": "1982-05-18",
+    "phone": null,
+    "tier": "Preferred",
+    "fraud_flag": false,
+    "ssn_last_4": "7890",
+    "security_question": null,
+    "security_answer": null
+  }
+]

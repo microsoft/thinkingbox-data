@@ -1,0 +1,58 @@
+[
+  {
+    "id": "LIC-29471863",
+    "software_name": "Tableau",
+    "license_type": "standard",
+    "total_licenses": 25,
+    "annual_cost_per_license": 840
+  },
+  {
+    "id": "LIC-57382946",
+    "software_name": "Salesforce",
+    "license_type": "unlimited",
+    "total_licenses": null,
+    "annual_cost_per_license": null
+  },
+  {
+    "id": "LIC-68149527",
+    "software_name": "Adobe Creative Cloud",
+    "license_type": "individual",
+    "total_licenses": 10,
+    "annual_cost_per_license": 600
+  },
+  {
+    "id": "LIC-84726391",
+    "software_name": "Slack",
+    "license_type": "unlimited",
+    "total_licenses": null,
+    "annual_cost_per_license": null
+  },
+  {
+    "id": "LIC-19263875",
+    "software_name": "Jira",
+    "license_type": "standard",
+    "total_licenses": 50,
+    "annual_cost_per_license": 600
+  },
+  {
+    "id": "LIC-46578239",
+    "software_name": "GitHub Enterprise",
+    "license_type": "unlimited",
+    "total_licenses": null,
+    "annual_cost_per_license": null
+  },
+  {
+    "id": "LIC-73918564",
+    "software_name": "Snowflake",
+    "license_type": "enterprise",
+    "total_licenses": 30,
+    "annual_cost_per_license": 2400
+  },
+  {
+    "id": "LIC-31854792",
+    "software_name": "Looker",
+    "license_type": "standard",
+    "total_licenses": 15,
+    "annual_cost_per_license": 1200
+  }
+]

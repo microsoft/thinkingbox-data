@@ -1,0 +1,44 @@
+[
+  {
+    "id": "CLT-0012345",
+    "name": "TechCorp Industries",
+    "requires_nda": true,
+    "clearance_level": "standard",
+    "required_training_courses": ["CRS-0012345", "CRS-0023456"]
+  },
+  {
+    "id": "CLT-0023456",
+    "name": "HealthCare Solutions Inc",
+    "requires_nda": true,
+    "clearance_level": "high_security",
+    "required_training_courses": ["CRS-0034567", "CRS-0045678", "CRS-0056789"]
+  },
+  {
+    "id": "CLT-0034567",
+    "name": "Finance Global Partners",
+    "requires_nda": true,
+    "clearance_level": "high_security",
+    "required_training_courses": ["CRS-0012345", "CRS-0067890"]
+  },
+  {
+    "id": "CLT-0045678",
+    "name": "Retail Dynamics LLC",
+    "requires_nda": false,
+    "clearance_level": "standard",
+    "required_training_courses": []
+  },
+  {
+    "id": "CLT-0056789",
+    "name": "Manufacturing Systems Co",
+    "requires_nda": true,
+    "clearance_level": "standard",
+    "required_training_courses": ["CRS-0012345"]
+  },
+  {
+    "id": "CLT-0067890",
+    "name": "Energy Solutions Group",
+    "requires_nda": true,
+    "clearance_level": "standard",
+    "required_training_courses": ["CRS-0078901"]
+  }
+]

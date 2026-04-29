@@ -1,0 +1,54 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # - id: trailing-whitespace
+      # - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+        args: ["--maxkb=46080"]
+      - id: check-merge-conflict
+      # - id: mixed-line-ending
+      #   args: ["--fix=lf"]
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.6
+    hooks:
+      - id: insert-license
+        name: Insert Microsoft copyright header (Python)
+        files: \.py$
+        args:
+          - --license-filepath=.license-header.txt
+          - --comment-style=#
+  - repo: local
+    hooks:
+      - id: py-compile-warnings
+        name: check python files compile without warnings
+        entry: python -W error::SyntaxWarning -m py_compile
+        language: system
+        types: [python]
+      - id: validate-collection-md
+        name: Validate COLLECTION.md legal front-matter
+        entry: python scripts/validate_collection_md.py
+        language: system
+        files: COLLECTION\.md$
+        pass_filenames: true
+      - id: check-collection-md-exists
+        name: Require COLLECTION.md when adding DVC files to a collection
+        entry: python scripts/validate_collection_md.py --check-dvc
+        language: system
+        files: \.dvc$
+        pass_filenames: true
+        # Uncomment if and when we can configure AI.TB.Data pre-commit hooks to access AI.TB code (including in GitHub Continuous Integration)
+      # - id: validate-scenario-tags
+      #   name: "Check enumerated eval: and domain: tags if specified on scenario YAMLs"
+      #   entry: python scripts/validate_scenario_tags.py
+      #   language: system
+      #   files: ^dataset/scenario/.*\.yaml$
+      #   pass_filenames: true
+      - id: update-collections-json
+        name: Regenerate docs/knowledge-documents/data/collections.json
+        entry: bash
+        args: ["-c", "python scripts/report_legal.py --format json --output docs/knowledge-documents/data/collections.json && git add docs/knowledge-documents/data/collections.json"]
+        language: system
+        files: 'support/search_sources/.*COLLECTION\.md$'
+        pass_filenames: false

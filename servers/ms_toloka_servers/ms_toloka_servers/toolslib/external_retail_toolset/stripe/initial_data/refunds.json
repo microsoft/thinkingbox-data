@@ -1,0 +1,11 @@
+[
+  {
+    "id": "RFD-10000001",
+    "transaction_id": "TXN-10000002",
+    "order_id": "ORD-10000002",
+    "amount": 50.00,
+    "refund_reason": "partial_refund_minor_defect",
+    "status": "pending",
+    "refund_date": "2024-10-22T11:00:00Z"
+  }
+]

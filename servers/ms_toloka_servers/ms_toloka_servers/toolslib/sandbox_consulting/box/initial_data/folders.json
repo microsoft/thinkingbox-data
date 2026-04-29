@@ -1,0 +1,82 @@
+[
+  {
+    "id": "FLD-1000001",
+    "folder_name": "GDPR Article 30 Processing Records",
+    "confidentiality_level": "internal",
+    "owner_email": "hr@msg.com",
+    "client_id": null,
+    "engagement_code": null
+  },
+  {
+    "id": "FLD-1000002",
+    "folder_name": "Zephyrus Biotech - Clinical Trial Protocols",
+    "confidentiality_level": "client_confidential",
+    "owner_email": "sarah.johnson@msg.com",
+    "client_id": "CLT-1000001",
+    "engagement_code": "ENG-1000001"
+  },
+  {
+    "id": "FLD-1000003",
+    "folder_name": "Meridian Robotics - ASIC Design Specifications",
+    "confidentiality_level": "client_confidential",
+    "owner_email": "michael.chen@msg.com",
+    "client_id": "CLT-1000002",
+    "engagement_code": "ENG-1000002"
+  },
+  {
+    "id": "FLD-1000004",
+    "folder_name": "SOC 2 Type II Attestation Archives",
+    "confidentiality_level": "public",
+    "owner_email": "marketing@msg.com",
+    "client_id": null,
+    "engagement_code": null
+  },
+  {
+    "id": "FLD-1000005",
+    "folder_name": "Basel III Capital Adequacy Calculations",
+    "confidentiality_level": "confidential",
+    "owner_email": "finance@msg.com",
+    "client_id": null,
+    "engagement_code": null
+  },
+  {
+    "id": "FLD-1000006",
+    "folder_name": "Quantum Ledger Systems - ISO 27701 Gap Analysis",
+    "confidentiality_level": "client_confidential",
+    "owner_email": "david.martinez@msg.com",
+    "client_id": "CLT-1000003",
+    "engagement_code": "ENG-1000003"
+  },
+  {
+    "id": "FLD-1000007",
+    "folder_name": "Zero Trust Network Architecture Blueprints",
+    "confidentiality_level": "confidential",
+    "owner_email": "it-security@msg.com",
+    "client_id": null,
+    "engagement_code": null
+  },
+  {
+    "id": "FLD-1000008",
+    "folder_name": "NIST Cybersecurity Framework 2.0 Workbooks",
+    "confidentiality_level": "internal",
+    "owner_email": "training@msg.com",
+    "client_id": null,
+    "engagement_code": null
+  },
+  {
+    "id": "FLD-1000009",
+    "folder_name": "Celestial Energy - Smart Grid API Documentation",
+    "confidentiality_level": "client_confidential",
+    "owner_email": "emily.parker@msg.com",
+    "client_id": "CLT-1000004",
+    "engagement_code": "ENG-1000004"
+  },
+  {
+    "id": "FLD-1000010",
+    "folder_name": "ISO 42001 AI Management System Templates",
+    "confidentiality_level": "internal",
+    "owner_email": "partners@msg.com",
+    "client_id": null,
+    "engagement_code": null
+  }
+]

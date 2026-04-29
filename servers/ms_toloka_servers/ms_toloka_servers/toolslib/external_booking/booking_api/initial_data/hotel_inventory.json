@@ -1,0 +1,57 @@
+[
+  {
+    "id": "INV-00000001",
+    "hotel_id": "HTL-00012345",
+    "room_type": "deluxe_room",
+    "board_type": "with_breakfast",
+    "date": "2025-12-15T00:00:00Z",
+    "available_count": 5,
+    "price_per_night": 152.50,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "id": "INV-00000002",
+    "hotel_id": "HTL-00012345",
+    "room_type": "deluxe_room",
+    "board_type": "with_breakfast",
+    "date": "2025-12-16T00:00:00Z",
+    "available_count": 5,
+    "price_per_night": 152.50,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "id": "INV-00000003",
+    "hotel_id": "HTL-00012345",
+    "room_type": "deluxe_room",
+    "board_type": "with_breakfast",
+    "date": "2025-12-17T00:00:00Z",
+    "available_count": 5,
+    "price_per_night": 152.50,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "id": "INV-00000004",
+    "hotel_id": "HTL-00012346",
+    "room_type": "deluxe_room",
+    "board_type": "with_breakfast",
+    "date": "2025-12-15T00:00:00Z",
+    "available_count": 3,
+    "price_per_night": 119.75,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  },
+  {
+    "id": "INV-00000005",
+    "hotel_id": "HTL-00012346",
+    "room_type": "deluxe_room",
+    "board_type": "with_breakfast",
+    "date": "2025-12-16T00:00:00Z",
+    "available_count": 3,
+    "price_per_night": 119.75,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+]

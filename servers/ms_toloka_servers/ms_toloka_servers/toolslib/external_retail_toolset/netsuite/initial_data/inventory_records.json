@@ -1,0 +1,42 @@
+[
+  {
+    "sku": "SKU-10000001",
+    "available_quantity": 15,
+    "reserved_quantity": 3,
+    "warehouse_location": "Memphis-A12",
+    "restock_date": null,
+    "expected_restock_quantity": null
+  },
+  {
+    "sku": "SKU-10000002",
+    "available_quantity": 0,
+    "reserved_quantity": 0,
+    "warehouse_location": "Memphis-B05",
+    "restock_date": "2024-11-05T00:00:00Z",
+    "expected_restock_quantity": 50
+  },
+  {
+    "sku": "SKU-10000003",
+    "available_quantity": 8,
+    "reserved_quantity": 2,
+    "warehouse_location": "Chicago-C18",
+    "restock_date": null,
+    "expected_restock_quantity": null
+  },
+  {
+    "sku": "SKU-10000004",
+    "available_quantity": 2,
+    "reserved_quantity": 1,
+    "warehouse_location": "Memphis-A12",
+    "restock_date": null,
+    "expected_restock_quantity": null
+  },
+  {
+    "sku": "SKU-10000005",
+    "available_quantity": 0,
+    "reserved_quantity": 0,
+    "warehouse_location": "Dallas-D22",
+    "restock_date": "2024-11-15T00:00:00Z",
+    "expected_restock_quantity": 25
+  }
+]

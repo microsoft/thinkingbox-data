@@ -1,0 +1,86 @@
+[
+  {
+    "sku": "SKU-10000001",
+    "name": "Samsung 28 cu ft French Door Refrigerator",
+    "category": "appliances",
+    "brand": "Samsung",
+    "base_price": 1899.99,
+    "weight_lbs": 285.0,
+    "is_refurbished": false,
+    "warranty_period_days": 1095,
+    "points_redemption_eligible": true,
+    "requires_installation": true
+  },
+  {
+    "sku": "SKU-10000002",
+    "name": "LG 65 inch OLED 4K Smart TV",
+    "category": "audio_video",
+    "brand": "LG",
+    "base_price": 1299.99,
+    "weight_lbs": 55.0,
+    "is_refurbished": false,
+    "warranty_period_days": 365,
+    "points_redemption_eligible": true,
+    "requires_installation": false
+  },
+  {
+    "sku": "SKU-10000003",
+    "name": "Dyson V15 Detect Cordless Vacuum",
+    "category": "appliances",
+    "brand": "Dyson",
+    "base_price": 549.99,
+    "weight_lbs": 6.8,
+    "is_refurbished": false,
+    "warranty_period_days": 730,
+    "points_redemption_eligible": true,
+    "requires_installation": false
+  },
+  {
+    "sku": "SKU-10000004",
+    "name": "Apple MacBook Pro 16-inch M3 Max",
+    "category": "computing",
+    "brand": "Apple",
+    "base_price": 2899.99,
+    "weight_lbs": 4.8,
+    "is_refurbished": false,
+    "warranty_period_days": 365,
+    "points_redemption_eligible": false,
+    "requires_installation": false
+  },
+  {
+    "sku": "SKU-10000005",
+    "name": "Dell XPS 15 Laptop (Certified Refurbished)",
+    "category": "computing",
+    "brand": "Dell",
+    "base_price": 1199.99,
+    "weight_lbs": 4.5,
+    "is_refurbished": true,
+    "warranty_period_days": 365,
+    "points_redemption_eligible": true,
+    "requires_installation": false
+  },
+  {
+    "sku": "SKU-10000006",
+    "name": "Bosch 800 Series Dishwasher",
+    "category": "appliances",
+    "brand": "Bosch",
+    "base_price": 1099.99,
+    "weight_lbs": 85.0,
+    "is_refurbished": false,
+    "warranty_period_days": 1095,
+    "points_redemption_eligible": true,
+    "requires_installation": true
+  },
+  {
+    "sku": "SKU-10000007",
+    "name": "Sony WH-1000XM5 Wireless Headphones",
+    "category": "audio_video",
+    "brand": "Sony",
+    "base_price": 399.99,
+    "weight_lbs": 0.55,
+    "is_refurbished": false,
+    "warranty_period_days": 365,
+    "points_redemption_eligible": true,
+    "requires_installation": false
+  }
+]

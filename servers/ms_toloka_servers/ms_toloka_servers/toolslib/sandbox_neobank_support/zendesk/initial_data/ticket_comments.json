@@ -1,0 +1,57 @@
+[
+  {
+    "id": 23118465221916,
+    "ticket_id": 1,
+    "author_id": 1,
+    "body": "Office printer stopped responding to print requests",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Office printer stopped responding to print requests</p></div>",
+    "public": true,
+    "created_at": "2025-01-15T10:00:00Z",
+    "ItemInternalId": "123d7175-2bb9-41d9-9131-d5f2e57af9f7",
+    "key": "23118465221916"
+  },
+  {
+    "id": 23118465221917,
+    "ticket_id": 2,
+    "author_id": 3,
+    "body": "Cannot connect to the company VPN",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Cannot connect to the company VPN</p></div>",
+    "public": true,
+    "created_at": "2025-01-14T14:30:00Z",
+    "ItemInternalId": "223d7175-2bb9-41d9-9131-d5f2e57af9f8",
+    "key": "23118465221917"
+  },
+  {
+    "id": 23118465221918,
+    "ticket_id": 3,
+    "author_id": 1,
+    "body": "User needs help resetting their account password",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">User needs help resetting their account password</p></div>",
+    "public": true,
+    "created_at": "2025-01-10T08:00:00Z",
+    "ItemInternalId": "323d7175-2bb9-41d9-9131-d5f2e57af9f9",
+    "key": "23118465221918"
+  },
+  {
+    "id": 23118465221919,
+    "ticket_id": 4,
+    "author_id": 4,
+    "body": "Need to install Adobe Creative Suite on workstation",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Need to install Adobe Creative Suite on workstation</p></div>",
+    "public": true,
+    "created_at": "2025-01-13T09:00:00Z",
+    "ItemInternalId": "423d7175-2bb9-41d9-9131-d5f2e57af9fa",
+    "key": "23118465221919"
+  },
+  {
+    "id": 23118465221920,
+    "ticket_id": 5,
+    "author_id": 3,
+    "body": "Emails are bouncing back with error message",
+    "html_body": "<div class=\"zd-comment\" dir=\"auto\"><p dir=\"auto\">Emails are bouncing back with error message</p></div>",
+    "public": true,
+    "created_at": "2025-01-12T11:30:00Z",
+    "ItemInternalId": "523d7175-2bb9-41d9-9131-d5f2e57af9fb",
+    "key": "23118465221920"
+  }
+]

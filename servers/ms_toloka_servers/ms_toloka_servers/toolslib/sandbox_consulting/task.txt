@@ -1,0 +1,473 @@
+# Task: Implement Remaining Consulting Domain Tools
+
+## Objective
+Implement the remaining mock tools for the consulting domain following the established patterns and architecture.
+
+## Already Implemented (5 tools - DO NOT REIMPLEMENT)
+✅ Internal Software Catalog (2 tools): software_catalog_search, software_catalog_get_details
+✅ Salesforce CRM (2 tools): salesforce_get_engagement, salesforce_check_employee_assignment
+✅ Workday HCM (1 master tool): workday_api with action=get_employee
+✅ Mavenlink (support models): employee_assignments data
+
+## Tools To Implement (13 remaining)
+
+### 1. Okta Identity Management (1 tool)
+- okta_provision_access
+
+### 2. Mavenlink Resource Management (1 master tool with 3 actions)
+- mavenlink_api with actions: get_engagement, get_employee_assignments, validate_engagement_code
+
+### 3. SAP Concur Travel & Expense (1 master tool with 2 actions)
+- concur_api with actions: get_expense_report, override_expense_rejection
+
+### 4. IT Asset Management (1 master tool with 6 actions)
+- asset_management_api with actions: get_employee_devices, get_device_details, check_inventory, reserve_device, assign_device, retire_device
+
+### 5. License Management Platform (1 master tool with 3 actions)
+- license_management_api with actions: check_availability, allocate, get_cost
+
+### 6. Degreed Learning Management (1 master tool with 8 actions)
+- degreed_api with actions: search_courses, get_course_details, check_enrollment, enroll_employee, get_training_history, check_certification_status, get_required_trainings, assign_training
+
+### 7. Client Access Management (1 master tool with 6 actions)
+- client_access_api with actions: provision_vpn, check_vpn_access, revoke_vpn, provision_client_system, check_client_requirements, get_employee_prerequisites
+
+### 8. Approval Workflow System (1 tool)
+- approval_create_request
+
+### 9. Sterling BackCheck (1 master tool with 3 actions)
+- background_check_api with actions: get_status, initiate, get_timeline
+
+### 10. NDA Management System (1 master tool with 2 actions)
+- nda_api with actions: check_status, send_for_signature
+
+### 11. Box Document Management (1 master tool with 2 actions)
+- box_api with actions: get_folder_details, grant_folder_access
+
+### 12. Approver Lookup Service (1 tool)
+- approver_lookup_get_contact
+
+### 13. Hardware Procurement (1 tool)
+- hardware_procurement_create_order
+
+---
+
+## Context to Gather
+
+### 1. Read Specifications
+```
+mcp-tools-library/src/mcp_tools_library/consulting/_specs/03_TOOL_SPEC.json
+mcp-tools-library/src/mcp_tools_library/consulting/_specs/02_DATABASE_SCHEMA.json
+mcp-tools-library/src/mcp_tools_library/consulting/_specs/IMPLEMENTATION_DETAILS
+```
+
+### 2. Study Architecture Patterns
+Read these files to understand the established patterns:
+```
+# Existing implementations (reference examples):
+mcp-tools-library/src/mcp_tools_library/consulting/software_catalog/
+mcp-tools-library/src/mcp_tools_library/consulting/salesforce_crm/
+mcp-tools-library/src/mcp_tools_library/consulting/workday/
+
+# Similar patterns in external_retail_toolset:
+mcp-tools-library/src/mcp_tools_library/external_retail_toolset/oms/
+mcp-tools-library/src/mcp_tools_library/external_retail_toolset/stripe/
+
+# Tests examples:
+mcp-tools-library/tests/consulting/software_catalog/
+mcp-tools-library/tests/consulting/salesforce_crm/
+mcp-tools-library/tests/consulting/workday/
+```
+
+### 3. Read Architecture Rules
+```
+.cursor/rules/python.mdc - Python coding standards
+```
+
+---
+
+## Structure Requirements
+
+### Directory Structure for Each Service
+```
+consulting/
+└── {service_name}/
+    ├── __init__.py          # Export models
+    ├── models.py            # Pydantic models with get_id()
+    ├── initial_data/        # JSON seed files
+    │   ├── {table1}.json
+    │   └── {table2}.json
+    └── tools/              # Tool implementations
+        ├── __init__.py
+        ├── {tool1}.py
+        └── {tool2}.py
+```
+
+### Model Requirements
+```python
+from pydantic import BaseModel, ConfigDict, Field
+from enum import Enum
+
+# 1. All enums must inherit from str, Enum
+class YourEnum(str, Enum):
+    VALUE1 = "value1"
+    VALUE2 = "value2"
+
+# 2. All models must have model_config
+class YourModel(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        validate_assignment=True,
+    )
+
+    id: str = Field(..., description="Unique identifier")
+    # ... other fields
+
+    # 3. REQUIRED: All models must implement get_id()
+    def get_id(self) -> str:
+        return self.id
+```
+
+### Tool Implementation Pattern
+
+#### For Simple Tools (Non-Master)
+```python
+from typing import Any, Dict, Type
+from mcp_core import Tool
+from mcp_core.db.database import InMemoryDatabase
+from mcp_core.utils.schema_utils import get_schema_without_refs
+from pydantic import BaseModel, ConfigDict, Field
+
+class YourToolInput(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        validate_assignment=True,
+    )
+    param1: str = Field(..., description="...", examples=["..."])
+
+class YourToolOutput(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        validate_assignment=True,
+        use_enum_values=True,  # Convert enums to strings
+    )
+    result: str = Field(..., description="...")
+
+class YourTool(Tool):
+    @property
+    def name(self) -> str:
+        return "tool_name"  # NO namespace prefix
+
+    @property
+    def description(self) -> str:
+        return "Clear description from spec"
+
+    @property
+    def input_schema(self) -> Dict[str, Any]:
+        return get_schema_without_refs(YourToolInput)
+
+    @property
+    def output_schema(self) -> Dict[str, Any]:
+        return get_schema_without_refs(YourToolOutput)
+
+    @property
+    def request_model(self) -> Type[BaseModel]:
+        return YourToolInput
+
+    @property
+    def output_model(self) -> Type[BaseModel]:
+        return YourToolOutput
+
+    async def run(self, db: InMemoryDatabase, request: YourToolInput) -> YourToolOutput:
+        try:
+            # Implementation
+            data = db.get_by_id(Model, request.id)
+            if not data:
+                raise Tool.ExecutionError(f"Not found: {request.id}")
+
+            return YourToolOutput(result="...")
+
+        except Tool.ExecutionError:
+            raise
+        except Exception as e:
+            raise Tool.ExecutionError(f"Failed: {str(e)}")
+```
+
+#### For Master Tools (Multiple Actions)
+```python
+from enum import Enum
+
+# 1. Define action enum
+class YourApiAction(str, Enum):
+    ACTION1 = "action1"
+    ACTION2 = "action2"
+
+class YourApiInput(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        validate_assignment=True,
+        use_enum_values=True,
+    )
+
+    action: YourApiAction = Field(..., description="Action to perform")
+    param1: Optional[str] = Field(None, description="Required for action1")
+    # All params are optional, validation happens in methods
+
+class YourApiOutput(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        populate_by_name=True,
+        validate_assignment=True,
+    )
+
+    result1: Optional[Dict] = Field(None, description="For action1")
+    result2: Optional[bool] = Field(None, description="For action2")
+
+class YourApiTool(Tool):
+    @property
+    def name(self) -> str:
+        return "api"
+
+    @property
+    def description(self) -> str:
+        return """Multi-action tool description.
+
+        - action='action1': Description. REQUIRES: param1. Returns result1.
+        - action='action2': Description. REQUIRES: param2. Returns result2.
+        """
+
+    async def run(self, db: InMemoryDatabase, request: YourApiInput) -> YourApiOutput:
+        try:
+            if request.action == YourApiAction.ACTION1:
+                return await self._action1(db, request)
+            elif request.action == YourApiAction.ACTION2:
+                return await self._action2(db, request)
+            else:
+                raise Tool.ExecutionError(f"Invalid action: {request.action}")
+        except Tool.ExecutionError:
+            raise
+        except Exception as e:
+            raise Tool.ExecutionError(f"Failed: {str(e)}")
+
+    async def _action1(self, db: InMemoryDatabase, request: YourApiInput) -> YourApiOutput:
+        if not request.param1:
+            raise Tool.ExecutionError("Missing required parameter: param1")
+        # Implementation
+        return YourApiOutput(result1={...})
+```
+
+### Test Pattern
+```python
+import pytest
+from mcp_core import Tool
+from mcp_core.db.database import InMemoryDatabase
+
+class TestYourTool:
+    @pytest.fixture
+    def test_db(self):
+        db = InMemoryDatabase.__new__(InMemoryDatabase)
+        db._stem_to_model_cls = {"model_name": ModelClass}
+        db._model_cls_to_stem = {ModelClass: "model_name"}
+
+        # Create test data
+        item1 = ModelClass(id="001", ...)
+        db._store = {ModelClass: [item1]}
+        return db
+
+    @pytest.fixture
+    def your_tool(self):
+        return YourTool()
+
+    @pytest.mark.anyio
+    async def test_success(self, your_tool, test_db):
+        """Test successful operation."""
+        request_data = {"param": "value"}
+        result = await your_tool.run_with_validation(test_db, request_data)
+        assert result["expected_field"] == "expected_value"
+
+    @pytest.mark.anyio
+    async def test_error(self, your_tool, test_db):
+        """Test error handling."""
+        request_data = {"param": "invalid"}
+        with pytest.raises(Tool.ExecutionError, match="Expected error"):
+            await your_tool.run_with_validation(test_db, request_data)
+```
+
+---
+
+## Critical Requirements
+
+### 1. Enums (MANDATORY)
+- **All enumerable fields MUST be Enum types**
+- Never use Union[Literal["a"], Literal["b"]]
+- Enum format: `class YourEnum(str, Enum):`
+- Values use UPPERCASE with underscores: `STANDARD = "standard"`
+
+### 2. Type Safety
+- **NEVER use Any type anywhere**
+- Use Optional[T] for nullable fields
+- All fields must have explicit types
+
+### 3. Output Models
+- Add `use_enum_values=True` to model_config for output models
+- This converts enums to strings in JSON output
+- Use Optional[] for fields that may not be present
+
+### 4. Tool Naming
+- Tool name property should NOT include namespace
+- Example: `name = "search"` not `name = "software_catalog_search"`
+- Namespace is added automatically by the server
+
+### 5. ID Generation
+- Use deterministic patterns for new IDs
+- Format: `PREFIX-2-NNNNNN` for generated IDs
+- Format: `PREFIX-1-NNNNNN` for pre-seeded data
+- Example:
+```python
+PREFIX_FOR_NEW_IDS = "APR-2"
+count = 0
+while True:
+    new_id = f"{PREFIX_FOR_NEW_IDS}-{count:06d}"
+    if new_id not in existing:
+        return new_id
+    count += 1
+```
+
+### 6. Descriptions Style
+- Use natural language, not CAPS for emphasis
+- ❌ BAD: "Provide EITHER this OR that"
+- ✅ GOOD: "Provide either this or that"
+
+### 7. Handling Null in Optional Fields
+- Use `.get()` in tests for Optional fields
+- Example: `assert result.get("optional_field") is None`
+- Not: `assert result["optional_field"] is None` (KeyError!)
+
+---
+
+## Initial Data Requirements
+
+### Format
+- JSON files in `initial_data/` directory
+- Each file corresponds to a table from DATABASE_SCHEMA.json
+- Use realistic data matching the consulting domain
+
+### Example
+```json
+[
+  {
+    "id": "PREFIX-1000001",
+    "field1": "value1",
+    "field2": "value2",
+    "date_field": "2024-01-15T00:00:00Z",
+    "enum_field": "enum_value"
+  }
+]
+```
+
+### Data Quality
+- 8-15 records per table is sufficient
+- Use consistent email domains: @msg.com
+- Dates in ISO format with timezone
+- Cross-reference IDs must be valid
+
+---
+
+## Testing & Verification
+
+### Step 1: Run Tests for Your Implementation
+```bash
+cd /path/to/mcp-tools-library
+uv run pytest tests/consulting/{your_service}/ -v
+```
+
+### Step 2: Run All Consulting Tests
+```bash
+uv run pytest tests/consulting/ -v
+```
+
+### Step 3: Run Full Test Suite (Skip Typesense)
+```bash
+./scripts/run-all-tests.sh tools --skip-typesense
+```
+
+### Test Coverage Requirements
+- Minimum 2 tests per tool (success + error)
+- For master tools: test each action separately
+- Test cases to include:
+  - ✅ Success scenarios
+  - ✅ Not found errors
+  - ✅ Missing required parameters
+  - ✅ Empty database
+  - ✅ All fields present in output
+
+---
+
+## Implementation Order (Recommended)
+
+### Phase 1: Simple Tools (Easier)
+1. Okta Identity Management (1 simple tool)
+2. Approval Workflow (1 simple tool)
+3. Approver Lookup (1 simple tool)
+4. Hardware Procurement (1 simple tool)
+
+### Phase 2: Small Master Tools (2-3 actions)
+5. Sterling BackCheck (3 actions)
+6. NDA Management (2 actions)
+7. Box Document Management (2 actions)
+8. SAP Concur (2 actions)
+
+### Phase 3: Medium Master Tools (3-6 actions)
+9. Mavenlink API (3 actions) - some models already exist
+10. License Management (3 actions)
+11. Client Access Management (6 actions)
+12. IT Asset Management (6 actions)
+
+### Phase 4: Complex Master Tools (8+ actions)
+13. Degreed LMS (8 actions)
+
+---
+
+## Common Pitfalls to Avoid
+
+1. ❌ Using `Any` type - use specific types
+2. ❌ Missing `get_id()` method in models
+3. ❌ Using strings instead of Enums for enumerable fields
+4. ❌ Including namespace in tool name property
+5. ❌ Forgetting `use_enum_values=True` in output models
+6. ❌ Not handling Optional fields properly in tests
+7. ❌ Using non-deterministic ID generation (random, timestamps)
+8. ❌ Missing `model_config` in Pydantic models
+9. ❌ Not re-raising Tool.ExecutionError in try/except
+10. ❌ Validating too much - keep guards minimal
+
+---
+
+## Success Criteria
+
+For each service implementation:
+
+✅ Models defined with all required enums
+✅ All models have get_id() method
+✅ Initial data JSON files created (8-15 records)
+✅ Tools implement required actions
+✅ Action enums for master tools
+✅ Comprehensive tests (min 2 per tool)
+✅ All tests pass
+✅ No linter errors
+✅ Follows established patterns
+
+---
+
+## Reference Implementation
+
+See completed examples:
+- Simple tool: `consulting/software_catalog/tools/search.py`
+- Master tool: `consulting/workday/tools/api.py`
+- Tests: `tests/consulting/workday/test_api.py`
+
+Good luck! Follow the patterns exactly and all tests will pass. 🚀

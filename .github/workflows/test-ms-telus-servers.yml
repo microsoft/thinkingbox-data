@@ -1,0 +1,33 @@
+name: Test MS Telus Servers
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    paths:
+      - 'servers/ms_telus_servers/**'
+      - '.github/workflows/test-ms-telus-servers.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        working-directory: ./servers/ms_telus_servers
+        run: uv sync --group dev
+
+      - name: Run tests
+        working-directory: ./servers/ms_telus_servers
+        run: uv run pytest tests/ -m "not typesense" --verbose

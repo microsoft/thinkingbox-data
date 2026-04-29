@@ -1,0 +1,47 @@
+[
+  {
+    "id": "TRV-1000001",
+    "employee_email": "marcus.bennett@msg.com",
+    "destination": "New York, NY",
+    "departure_date": "2024-11-25T08:00:00Z",
+    "return_date": "2024-11-27T18:00:00Z",
+    "flight_class": "economy",
+    "hotel_rate_per_night": 250
+  },
+  {
+    "id": "TRV-1000002",
+    "employee_email": "jennifer.patel@msg.com",
+    "destination": "San Francisco, CA",
+    "departure_date": "2024-12-01T09:30:00Z",
+    "return_date": "2024-12-05T20:00:00Z",
+    "flight_class": "business",
+    "hotel_rate_per_night": 320
+  },
+  {
+    "id": "TRV-1000003",
+    "employee_email": "alice.wilson@msg.com",
+    "destination": "Chicago, IL",
+    "departure_date": "2024-11-28T07:15:00Z",
+    "return_date": "2024-11-29T22:30:00Z",
+    "flight_class": "economy",
+    "hotel_rate_per_night": 180
+  },
+  {
+    "id": "TRV-1000004",
+    "employee_email": "bob.taylor@msg.com",
+    "destination": "Boston, MA",
+    "departure_date": "2024-12-10T10:00:00Z",
+    "return_date": "2024-12-14T17:45:00Z",
+    "flight_class": "economy",
+    "hotel_rate_per_night": null
+  },
+  {
+    "id": "TRV-1000005",
+    "employee_email": "emma.garcia@msg.com",
+    "destination": "Seattle, WA",
+    "departure_date": "2024-12-03T06:45:00Z",
+    "return_date": "2024-12-08T19:15:00Z",
+    "flight_class": "first",
+    "hotel_rate_per_night": 450
+  }
+]

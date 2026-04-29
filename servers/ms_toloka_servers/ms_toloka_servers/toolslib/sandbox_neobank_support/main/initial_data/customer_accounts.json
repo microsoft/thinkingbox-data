@@ -1,0 +1,47 @@
+[
+  {
+    "id": "CUST-294718",
+    "account_number": "4000294718563847",
+    "account_type": "checking",
+    "status": "active",
+    "balance": 15421.00,
+    "currency": "USD",
+    "opened_date": "2023-01-15"
+  },
+  {
+    "id": "CUST-573926",
+    "account_number": "4000573926481352",
+    "account_type": "savings",
+    "status": "active",
+    "balance": 52317.00,
+    "currency": "USD",
+    "opened_date": "2023-02-20"
+  },
+  {
+    "id": "CUST-681453",
+    "account_number": "4000681453972618",
+    "account_type": "credit_card",
+    "status": "active",
+    "balance": -2851.00,
+    "currency": "USD",
+    "opened_date": "2023-03-10"
+  },
+  {
+    "id": "CUST-847291",
+    "account_number": "4000847291635479",
+    "account_type": "checking",
+    "status": "suspended",
+    "balance": 1248.00,
+    "currency": "USD",
+    "opened_date": "2023-04-05"
+  },
+  {
+    "id": "CUST-192638",
+    "account_number": "4000192638574921",
+    "account_type": "savings",
+    "status": "closed",
+    "balance": 0.00,
+    "currency": "USD",
+    "opened_date": "2022-12-01"
+  }
+]

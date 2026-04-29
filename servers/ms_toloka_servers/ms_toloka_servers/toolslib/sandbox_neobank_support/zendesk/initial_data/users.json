@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "name": "Marcus Sullivan",
+    "email": "marcus.sullivan@techcorp.com",
+    "role": "end-user",
+    "organization_id": "1",
+    "phone": "+1-415-892-3417",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "2",
+    "name": "Rebecca Anderson",
+    "email": "rebecca.anderson@techcorp.com",
+    "role": "agent",
+    "organization_id": "1",
+    "phone": "+1-415-783-2954",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "3",
+    "name": "Lawrence Mitchell",
+    "email": "lawrence.mitchell@techcorp.com",
+    "role": "end-user",
+    "organization_id": "1",
+    "phone": "+1-415-624-8731",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-06-15T00:00:00Z",
+    "updated_at": "2024-06-15T00:00:00Z"
+  },
+  {
+    "id": "4",
+    "name": "Catherine Hayes",
+    "email": "alice.williams@company2.com",
+    "role": "end-user",
+    "organization_id": "2",
+    "phone": "+1-512-947-2186",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-03-20T00:00:00Z",
+    "updated_at": "2024-03-20T00:00:00Z"
+  },
+  {
+    "id": "5",
+    "name": "Samuel Bradford",
+    "email": "samuel.bradford@techcorp.com",
+    "role": "admin",
+    "organization_id": "1",
+    "phone": "+1-415-358-7429",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+]

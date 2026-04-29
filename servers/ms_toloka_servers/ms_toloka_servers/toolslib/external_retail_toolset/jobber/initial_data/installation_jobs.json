@@ -1,0 +1,38 @@
+[
+  {
+    "id": "JOB-10000001",
+    "order_id": "ORD-10000001",
+    "customer_id": "CUS-10000001",
+    "service_type": "appliance_basic",
+    "scheduled_date": "2024-10-25T10:00:00Z",
+    "technician_id": "TECH-0045",
+    "status": "scheduled",
+    "completion_date": null,
+    "workmanship_warranty_end": null,
+    "service_cost": 129.00
+  },
+  {
+    "id": "JOB-10000002",
+    "order_id": "ORD-10000002",
+    "customer_id": "CUS-10000002",
+    "service_type": "tv_mounting",
+    "scheduled_date": "2024-10-20T14:00:00Z",
+    "technician_id": "TECH-0023",
+    "status": "completed",
+    "completion_date": "2024-10-20T16:30:00Z",
+    "workmanship_warranty_end": "2025-01-18T23:59:59Z",
+    "service_cost": 99.00
+  },
+  {
+    "id": "JOB-10000003",
+    "order_id": "ORD-10000003",
+    "customer_id": "CUS-10000003",
+    "service_type": "appliance_advanced",
+    "scheduled_date": "2024-11-05T09:00:00Z",
+    "technician_id": null,
+    "status": "scheduled",
+    "completion_date": null,
+    "workmanship_warranty_end": null,
+    "service_cost": 249.00
+  }
+]

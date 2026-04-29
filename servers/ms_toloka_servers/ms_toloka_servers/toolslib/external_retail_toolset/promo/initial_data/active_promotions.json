@@ -1,0 +1,46 @@
+[
+  {
+    "id": "PRM-10000001",
+    "promo_code": "SAVE20",
+    "discount_type": "percentage",
+    "discount_value": 20.00,
+    "stackable_with_points": false,
+    "stackable_with_loyalty": true,
+    "excluded_skus": ["SKU-10099999", "SKU-10099998"],
+    "valid_from": "2024-10-01T00:00:00Z",
+    "valid_until": "2024-10-31T23:59:59Z"
+  },
+  {
+    "id": "PRM-10000002",
+    "promo_code": "TECH15",
+    "discount_type": "percentage",
+    "discount_value": 15.00,
+    "stackable_with_points": true,
+    "stackable_with_loyalty": true,
+    "excluded_skus": [],
+    "valid_from": "2024-09-01T00:00:00Z",
+    "valid_until": "2024-12-31T23:59:59Z"
+  },
+  {
+    "id": "PRM-10000003",
+    "promo_code": "FLAT50",
+    "discount_type": "fixed_amount",
+    "discount_value": 50.00,
+    "stackable_with_points": false,
+    "stackable_with_loyalty": false,
+    "excluded_skus": ["SKU-10012345"],
+    "valid_from": "2024-10-15T00:00:00Z",
+    "valid_until": "2024-11-15T23:59:59Z"
+  },
+  {
+    "id": "PRM-10000004",
+    "promo_code": "WELCOME10",
+    "discount_type": "percentage",
+    "discount_value": 10.00,
+    "stackable_with_points": true,
+    "stackable_with_loyalty": true,
+    "excluded_skus": [],
+    "valid_from": "2024-01-01T00:00:00Z",
+    "valid_until": "2025-12-31T23:59:59Z"
+  }
+]
