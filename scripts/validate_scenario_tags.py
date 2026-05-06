@@ -15,7 +15,7 @@ appear on the Leaderboard), but any tag that IS present must use a value
 from the enumerated list.
 
 Valid values are derived directly from the Domain and Eval enums in
-AI.ThinkingBox/thinkingbox/common/tag_types.py (installed as a package
+thinkingbox/thinkingbox/common/tag_types.py (installed as a package
 dependency), so this script stays in sync with the source of truth automatically.
 
 See also: validate_tags.py — the complementary tool for full-stack validation

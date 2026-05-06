@@ -2,11 +2,11 @@
 
 ## Repository
 
-Use the following tag of `AI.ThinkingBox.Data` to use a stable version of this dataset and tools.
+Use the following tag of `thinkingbox-data` to use a stable version of this dataset and tools.
 
 |  |  |
 | - | - |
-| Tag | [ds-airline-tau-bench-2026-04-v1.0](https://github.com/microsoft/AI.ThinkingBox.Data/releases/tag/ds-airline-tau-bench-2026-04-v1.0) |
+| Tag | [ds-airline-tau-bench-2026-04-v1.0](https://github.com/microsoft/thinkingbox-data/releases/tag/ds-airline-tau-bench-2026-04-v1.0) |
 
 
 ## Overview
@@ -77,17 +77,17 @@ Some interaction with the user is expected in most test cases, to retrieve missi
 
 ## Running
 
-Check `AI.ThinkingBox/README.md` for installing ThinkingBox.
+Check `thinkingbox/README.md` for installing ThinkingBox.
 
 ```bash
 # Install the airline tau-bench server in the ThinkingBox virtual environment
 uv pip install --config-settings editable-mode=compat -e servers/thinkingbox_tools
 
 # Start session proxy
-THINKINGBOX_DATA=AI.ThinkingBox.Data tb mcp-start --servers AI.ThinkingBox.Data/servers/servers.yaml
+THINKINGBOX_DATA=thinkingbox-data tb mcp-start --servers thinkingbox-data/servers/servers.yaml
 
 # Decode (full dataset, 5 repetitions)
-tb infer -c config.yaml -d AI.ThinkingBox.Data/dataset -a think \
-    --test-list AI.ThinkingBox.Data/releases/dataset_2604_airline_tau_bench/testlist_2604_airline_tau_bench.yaml \
+tb infer -c config.yaml -d thinkingbox-data/dataset -a think \
+    --test-list thinkingbox-data/releases/dataset_2604_airline_tau_bench/testlist_2604_airline_tau_bench.yaml \
     --repeat 5 --batch-size 40 -o output_2604_airline_tau_bench.jsonl
 ```

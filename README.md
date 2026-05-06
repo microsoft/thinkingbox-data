@@ -1,20 +1,20 @@
-# AI.ThinkingBox.Data
+# thinkingbox-data
 
-This repo contains datasets to use with AI.Thinkingbox.
+This repo contains datasets to use with thinkingbox.
 
 ## Clone this branch
 
 ```bash
-git clone https://github.com/microsoft/AI.ThinkingBox.Data.git
+git clone https://github.com/microsoft/thinkingbox-data.git
 # OR using GitHub CLI
-gh repo clone microsoft/AI.ThinkingBox.Data
+gh repo clone microsoft/thinkingbox-data
 ```
 
 ## Install servers
 
-Create a virtualenv for ThinkingBox (follow instructions in the AI.ThinkingBox README) and activate it
+Create a virtualenv for ThinkingBox (follow instructions in the thinkingbox README) and activate it
 
-Also install typesense (instructions in `AI.ThinkingBox/docs/tools_with_additional_setup.md`)
+Also install typesense (instructions in `thinkingbox/docs/tools_with_additional_setup.md`)
 
 Install server packages in this repo
 
@@ -32,7 +32,7 @@ uv pip install --config-settings editable-mode=compat -e servers/ms_telus_server
 Start the MCP Session Proxy with environment variable THINKINGBOX_DATA pointing to the root of this repo.
 
 ```bash
-THINKINGBOX_DATA="AI.ThinkingBox.Data" tb mcp-start --servers AI.ThinkingBox.Data/servers/servers.yaml
+THINKINGBOX_DATA="thinkingbox-data" tb mcp-start --servers thinkingbox-data/servers/servers.yaml
 ```
 
 Start typesense
@@ -45,7 +45,7 @@ Run a test
 
 ```bash
 # Run one
-tb infer -c config.yaml --dataset AI.ThinkingBox.Data/dataset --agent think --name sandbox_external_retail_group1.py:test_case_ST002_001 --repeat 1 --batch-size 1 --dump testcontext --output output.yaml
+tb infer -c config.yaml --dataset thinkingbox-data/dataset --agent think --name sandbox_external_retail_group1.py:test_case_ST002_001 --repeat 1 --batch-size 1 --dump testcontext --output output.yaml
 
 # Check output
 tb pp output.yaml
@@ -54,7 +54,7 @@ tb pp output.yaml
 Run all sandbox_external_retail, 10 repetitions
 
 ```bash
-tb infer -c config.yaml --dataset AI.ThinkingBox.Data/dataset --agent think --inputs AI.ThinkingBox.Data/dataset/test_case/sandbox_external_retail --repeat 10 --batch-size 40 --output output_sandbox_external_retail_10reps.jsonl
+tb infer -c config.yaml --dataset thinkingbox-data/dataset --agent think --inputs thinkingbox-data/dataset/test_case/sandbox_external_retail --repeat 10 --batch-size 40 --output output_sandbox_external_retail_10reps.jsonl
 ```
 
 ## Third-party code

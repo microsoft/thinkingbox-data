@@ -1,13 +1,13 @@
-# AI.ThinkingBox.Data/servers
+# thinkingbox-data/servers
 
-MCP servers to use with AI.Thinkingbox.
+MCP servers to use with thinkingbox.
 
 Each directory is a python package containing one or more MCP servers.
 
 This `servers/` folder is expected to have the following structure (example with one server package, `thinkingbox_tools`):
 
 ```
-AI.ThinkingBox.Data/
+thinkingbox-data/
   servers/
     thinkingbox_tools/  # a group of related servers, in this case the main body of ThinkingBox tests
         tests/  # unit tests for the servers in thinkingbox_tools

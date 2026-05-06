@@ -2,11 +2,11 @@
 
 ## Repository
 
-Use the following tag of `AI.ThinkingBox.Data` to use a stable version of this dataset and tools.
+Use the following tag of `thinkingbox-data` to use a stable version of this dataset and tools.
 
 |  |  |
 | - | - |
-| Tag | [ds-external-retail-2026-02-v1.0](https://github.com/microsoft/AI.ThinkingBox.Data/releases/tag/ds-external-retail-2026-02-v1.0) |
+| Tag | [ds-external-retail-2026-02-v1.0](https://github.com/microsoft/thinkingbox-data/releases/tag/ds-external-retail-2026-02-v1.0) |
 
 
 ## Overview
@@ -147,7 +147,7 @@ MCS tests were run with the following parameters:
 
 ## Running
 
-Check `AI.ThinkingBox/README.md` for installing ThinkingBox
+Check `thinkingbox/README.md` for installing ThinkingBox
 
 ```bash
 # Install the servers in the ThinkingBox virtual environment
@@ -157,15 +157,15 @@ uv pip install --config-settings editable-mode=compat -e servers/ms_toloka_serve
 mkdir -p /tmp/typesense/data && typesense-server --data-dir="/tmp/typesense/data" --api-key="Fake" --enable-cors
 
 # Start session proxy
-THINKINGBOX_DATA=AI.ThinkingBox.Data tb mcp-start --servers servers.yaml
+THINKINGBOX_DATA=thinkingbox-data tb mcp-start --servers servers.yaml
 
 # Decode (full100, 20 repetitions)
-tb infer -c config.yaml -d AI.ThinkingBox.Data/dataset -a think \
-    --inputs AI.ThinkingBox.Data/dataset/test_case/sandbox_external_retail/ \
+tb infer -c config.yaml -d thinkingbox-data/dataset -a think \
+    --inputs thinkingbox-data/dataset/test_case/sandbox_external_retail/ \
     --repeat 20 --batch-size 40 -o output_zendesk_external_retail_full100.jsonl
 
 # Decode (quick20, 5 repetitions)
-tb infer -c config.yaml -d AI.ThinkingBox.Data/dataset -a think \
-    --test-list AI.ThinkingBox.Data/releases/dataset_2602_external_retail/testlist_2602_external_retail_quick20.yaml \
+tb infer -c config.yaml -d thinkingbox-data/dataset -a think \
+    --test-list thinkingbox-data/releases/dataset_2602_external_retail/testlist_2602_external_retail_quick20.yaml \
     --repeat 5 --batch-size 40 -o output_zendesk_external_retail_quick20.jsonl
 ```
