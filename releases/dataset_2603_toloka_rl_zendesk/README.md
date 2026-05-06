@@ -2,11 +2,11 @@
 
 ## Repository
 
-Use the following tag of `AI.ThinkingBox.Data` to use a stable version of this dataset and tools.
+Use the following tag of `thinkingbox-data` to use a stable version of this dataset and tools.
 
 |  |  |
 | - | - |
-| Tag | [ds-toloka-rl-zendesk-2026-03-v1.0](https://github.com/microsoft/AI.ThinkingBox.Data/releases/tag/ds-toloka-rl-zendesk-2026-03-v1.0) |
+| Tag | [ds-toloka-rl-zendesk-2026-03-v1.0](https://github.com/microsoft/thinkingbox-data/releases/tag/ds-toloka-rl-zendesk-2026-03-v1.0) |
 
 
 ## Overview
@@ -107,7 +107,7 @@ Results on `t11_24_25_varset_3_rm` refer to a run on the PPE CAPI deployment of 
 
 ## Running
 
-Check `AI.ThinkingBox/README.md` for installing ThinkingBox
+Check `thinkingbox/README.md` for installing ThinkingBox
 
 ```bash
 # Install the Toloka RL servers in the ThinkingBox virtual environment
@@ -117,10 +117,10 @@ uv pip install --config-settings editable-mode=compat -e servers/ms_toloka_serve
 mkdir -p /tmp/typesense/data && typesense-server --data-dir="/tmp/typesense/data" --api-key="Fake" --enable-cors
 
 # Start session proxy
-THINKINGBOX_DATA=AI.ThinkingBox.Data tb mcp-start --servers AI.ThinkingBox.Data/servers/servers.yaml
+THINKINGBOX_DATA=thinkingbox-data tb mcp-start --servers thinkingbox-data/servers/servers.yaml
 
 # Decode (full dataset, 5 repetitions)
-tb infer -c config.yaml -d AI.ThinkingBox.Data/dataset -a think \
-    --test-list AI.ThinkingBox.Data/releases/dataset_2603_toloka_rl_zendesk/testlist_2603_toloka_rl_zendesk.yaml \
+tb infer -c config.yaml -d thinkingbox-data/dataset -a think \
+    --test-list thinkingbox-data/releases/dataset_2603_toloka_rl_zendesk/testlist_2603_toloka_rl_zendesk.yaml \
     --repeat 5 --batch-size 40 -o output_2603_toloka_rl_zendesk.jsonl
 ```
