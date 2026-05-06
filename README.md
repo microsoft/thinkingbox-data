@@ -1,60 +1,74 @@
 # thinkingbox-data
 
-This repo contains datasets to use with thinkingbox.
+Curated datasets, MCP tool server packages, and supporting data files for use
+with [ThinkingBox](https://github.com/microsoft/thinkingbox). See the
+framework's [README](https://github.com/microsoft/thinkingbox#readme) for
+installation, configuration, and the `tb` CLI overview.
 
-## Clone this branch
+## Contents
 
-```bash
-git clone https://github.com/microsoft/thinkingbox-data.git
-# OR using GitHub CLI
-gh repo clone microsoft/thinkingbox-data
+- **`dataset/`** — scenarios, agents, and test cases.
+- **`servers/`** — MCP tool server packages (`thinkingbox_tools`,
+  `ms_toloka_servers`, `ms_telus_servers`) and the master `servers.yaml`
+  consumed by `tb mcp-start`.
+- **`support/`** — large data files used by some tools (embeddings, knowledge
+  bases). Set `THINKINGBOX_DATA=<path-to-this-repo>` so tools can locate them.
+- **`releases/`** — per-release dataset snapshots pinned to git tags.
+
+## Layout
+
+The commands below assume both repos are cloned side-by-side and you are in
+their **parent directory**:
+
+```
+parent/
+├── thinkingbox/        # framework (CLI, Session Proxy, agent loop)
+└── thinkingbox-data/   # this repo (datasets, server packages, support files)
 ```
 
-## Install servers
+## Setup
 
-Create a virtualenv for ThinkingBox (follow instructions in the thinkingbox README) and activate it
-
-Also install typesense (instructions in `thinkingbox/docs/tools_with_additional_setup.md`)
-
-Install server packages in this repo
+Install the framework first (see the [thinkingbox
+README](https://github.com/microsoft/thinkingbox#readme)). Then, in the same
+virtualenv, install the server packages from this repo:
 
 ```bash
-# For thinkingbox_tools Servers
-uv pip install --config-settings editable-mode=compat -e servers/thinkingbox_tools
-# For Toloka Sandbox Servers
-uv pip install --config-settings editable-mode=compat -e servers/ms_toloka_servers
-# For Telus Scenario Servers
-uv pip install --config-settings editable-mode=compat -e servers/ms_telus_servers
+uv pip install --config-settings editable-mode=compat -e thinkingbox-data/servers/thinkingbox_tools
+uv pip install --config-settings editable-mode=compat -e thinkingbox-data/servers/ms_toloka_servers
+uv pip install --config-settings editable-mode=compat -e thinkingbox-data/servers/ms_telus_servers
 ```
 
-## Start Session Proxy
+Some tools also need extra services (e.g. Typesense, embeddings server) — see
+[`tools_with_additional_setup.md`](https://github.com/microsoft/thinkingbox/blob/main/docs/tools_with_additional_setup.md)
+in the framework repo.
 
-Start the MCP Session Proxy with environment variable THINKINGBOX_DATA pointing to the root of this repo.
+## Run
+
+Start the Session Proxy with `THINKINGBOX_DATA` pointing at this repo:
 
 ```bash
-THINKINGBOX_DATA="thinkingbox-data" tb mcp-start --servers thinkingbox-data/servers/servers.yaml
+THINKINGBOX_DATA="thinkingbox-data" \
+    tb mcp-start --servers thinkingbox-data/servers/servers.yaml
 ```
 
-Start typesense
+Run a single test:
 
 ```bash
-mkdir -p /tmp/typesense/data && typesense-server --data-dir="/tmp/typesense/data" --api-key="Fake" --enable-cors
-```
-
-Run a test
-
-```bash
-# Run one
-tb infer -c config.yaml --dataset thinkingbox-data/dataset --agent think --name sandbox_external_retail_group1.py:test_case_ST002_001 --repeat 1 --batch-size 1 --dump testcontext --output output.yaml
-
-# Check output
+tb infer -c thinkingbox/config/config_o4mini.yaml \
+    --dataset thinkingbox-data/dataset --agent think \
+    --name sandbox_external_retail_group1.py:test_case_ST002_001 \
+    --repeat 1 --batch-size 1 --dump testcontext --output output.yaml
 tb pp output.yaml
 ```
 
-Run all sandbox_external_retail, 10 repetitions
+Run a full directory, 10 repetitions each:
 
 ```bash
-tb infer -c config.yaml --dataset thinkingbox-data/dataset --agent think --inputs thinkingbox-data/dataset/test_case/sandbox_external_retail --repeat 10 --batch-size 40 --output output_sandbox_external_retail_10reps.jsonl
+tb infer -c thinkingbox/config/config_o4mini.yaml \
+    --dataset thinkingbox-data/dataset --agent think \
+    --inputs thinkingbox-data/dataset/test_case/sandbox_external_retail \
+    --repeat 10 --batch-size 40 \
+    --output output_sandbox_external_retail_10reps.jsonl
 ```
 
 ## Third-party code
