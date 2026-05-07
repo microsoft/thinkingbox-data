@@ -1,9 +1,18 @@
 use_internal_servers: true
 servers:
-  # THINKGBOX INTERNAL SERVERS
+  # THINKINGBOX INTERNAL SERVERS
   airline_tau_bench:
     type: mcp-process
     command: ["{python}", "-m", "thinkingbox_tools.mcp_airline_tau_bench"]
+  email_system:
+    type: mcp-process
+    command: ["{python}", "-m", "thinkingbox_tools.mcp_email_system"]
+  ms_store:
+    type: mcp-process
+    command: ["{python}", "-m", "thinkingbox_tools.mcp_ms_store"]
+  online_banking:
+    type: mcp-process
+    command: ["{python}", "-m", "thinkingbox_tools.mcp_online_banking"]
 
   # TOLOKA SANDBOX SERVERS
   sandbox_external_retail:
