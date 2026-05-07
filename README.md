@@ -161,6 +161,19 @@ For interactive-mode hotkeys (ESC+ENTER to submit) and slash commands, see
 [Interactive TUI](https://github.com/microsoft/thinkingbox#interactive-tui)
 in the framework README.
 
+## Synthetic data disclosure
+
+This dataset includes synthetic and/or generated data.
+
+- Synthetic data may be generated using automated processes, including
+  machine learning models.
+- Synthetic data is not intended to represent real individuals or real-world
+  events.
+- Any resemblance to real persons, entities, or events is coincidental.
+
+Users should evaluate the suitability of this data for their use case,
+including any potential biases or inaccuracies.
+
 ## Third-party code
 
 This repository does not vendor third-party source code. The MCP server packages under `servers/` declare their dependencies in their respective `pyproject.toml` files and install them from public package indexes (PyPI). Each dependency retains its own license.

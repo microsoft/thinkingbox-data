@@ -1,0 +1,66 @@
+NOTICES AND INFORMATION
+Do Not Translate or Localize
+
+This repository incorporates third-party data and derived code. The
+attributions in this file cover those third-party components.
+
+============================================================================
+τ-bench (tau-bench) — airline domain
+============================================================================
+Project:        https://github.com/sierra-research/tau-bench
+License:        MIT
+Source commit:  9ed9fd9cb776ee4cab8e0cf20d8a92f6a8bd67a9
+Citation:       Yao, S., Shinn, N., Razavi, P., & Narasimhan, K. (2024).
+                τ-bench: A Benchmark for Tool-Agent-User Interaction in
+                Real-World Domains.
+
+Files copied verbatim from tau-bench:
+
+    support/tau_bench/airline_data/flights.json
+    support/tau_bench/airline_data/reservations.json
+    support/tau_bench/airline_data/users.json
+
+(See support/tau_bench/readme.txt for the original upstream URLs.)
+
+Files containing code derived from tau-bench's airline environment,
+refactored for use within ThinkingBox while preserving the original public
+method signatures so external callers remain unaffected:
+
+    servers/thinkingbox_tools/thinkingbox_tools/toolslib/airline_tau_bench_system.py
+
+Modifications by Microsoft Corporation:
+
+  - Refactored the original tau-bench airline env into a Pydantic-modeled
+    business-logic engine (airline_tau_bench_system.py).
+  - Wrapped airline tools as an MCP server for use with the ThinkingBox
+    session proxy (servers/thinkingbox_tools/thinkingbox_tools/mcp_airline_tau_bench.py).
+  - Added a scenario configuration
+    (dataset/scenario/airline_tau_bench_full.yaml) and test cases
+    (dataset/test_case/airline_tau_bench.py) for use with the ThinkingBox
+    evaluation harness.
+
+Original copyright notice and MIT permission notice from tau-bench,
+reproduced in full as required by the MIT license:
+
+    MIT License
+
+    Copyright (c) 2024 Sierra
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+    CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+    TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+    SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
