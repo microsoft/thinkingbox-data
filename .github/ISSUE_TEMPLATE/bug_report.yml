@@ -1,0 +1,129 @@
+name: Bug Report
+description: Report a defect, regression, or unexpected behavior in ThinkingBox.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report. Please fill out all
+        sections — the strict template helps us reproduce and fix issues
+        quickly.
+
+        For feature proposals, use the **Feature Request** template instead.
+
+  - type: dropdown
+    id: affected-package
+    attributes:
+      label: Affected package or dataset
+      description: |
+        Which component is the bug in? If multiple, list the others under
+        Additional context.
+      options:
+        - thinkingbox_tools (servers/thinkingbox_tools)
+        - ms_toloka_servers (servers/ms_toloka_servers)
+        - A dataset under releases/
+        - Repo-wide tooling (CI, lint, scripts)
+        - Other (describe in Additional context)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear, concise description of what the bug is.
+      placeholder: |
+        When I do X, the affected package does Y, but I expected Z.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro-steps
+    attributes:
+      label: Reproduction steps
+      description: |
+        Exact, minimal steps to reproduce. Include commands, config files,
+        and any input data needed. Anyone reading this should be able to
+        reproduce the issue without asking follow-up questions.
+      placeholder: |
+        1. `git clone …` and check out commit `abc123`
+        2. `cd servers/thinkingbox_tools && uv sync`
+        3. Run …
+        4. Observe …
+      render: markdown
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: |
+        What actually happened? Include the full error message and stack
+        trace if applicable. Use code blocks for terminal output.
+      render: shell
+    validations:
+      required: true
+
+  - type: input
+    id: data-commit
+    attributes:
+      label: thinkingbox-data commit SHA
+      description: |
+        Output of `git rev-parse --short HEAD` in your clone.
+      placeholder: "e.g. abc1234"
+    validations:
+      required: true
+
+  - type: input
+    id: tb-version
+    attributes:
+      label: ThinkingBox version (if applicable)
+      description: |
+        If the bug surfaces only when used with the `tb` framework, the
+        version or commit of `microsoft/thinkingbox` you're running. Leave
+        blank if the bug is purely in this repo.
+      placeholder: "e.g. 0.1.0 or commit abc1234"
+    validations:
+      required: false
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python version
+      description: Output of `python --version`.
+      placeholder: "e.g. Python 3.12.3"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - WSL
+        - Other (describe in Additional context)
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: |
+        Anything else that might help — links, related issues, screenshots,
+        or what you've already tried.
+    validations:
+      required: false
