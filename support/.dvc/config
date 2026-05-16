@@ -1,0 +1,8 @@
+[core]
+    remote = azure_remote
+['remote "azure_remote"']
+    url = azure://tbdatasupport
+    account_name = thinkingboxresults
+['remote "orange_remote"']
+    url = azure://data/bic_rl/tbdatasupport
+    account_name = orngscuscresco

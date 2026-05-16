@@ -1,0 +1,42 @@
+[
+  {
+    "employee_email": "jennifer.patel@msg.com",
+    "clearance_level": "standard",
+    "status": "cleared"
+  },
+  {
+    "employee_email": "marcus.bennett@msg.com",
+    "clearance_level": "high_security",
+    "status": "cleared"
+  },
+  {
+    "employee_email": "alice.jones@msg.com",
+    "clearance_level": "standard",
+    "status": "cleared"
+  },
+  {
+    "employee_email": "robert.nguyen@msg.com",
+    "clearance_level": "standard",
+    "status": "in_progress"
+  },
+  {
+    "employee_email": "stephanie.rivera@msg.com",
+    "clearance_level": "standard",
+    "status": "cleared"
+  },
+  {
+    "employee_email": "michael.harrison@msg.com",
+    "clearance_level": "high_security",
+    "status": "in_progress"
+  },
+  {
+    "employee_email": "emily.davis@msg.com",
+    "clearance_level": "standard",
+    "status": "cleared"
+  },
+  {
+    "employee_email": "david.garcia@msg.com",
+    "clearance_level": "standard",
+    "status": "failed"
+  }
+]

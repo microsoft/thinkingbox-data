@@ -1,0 +1,29 @@
+[
+  {
+    "id": "WCL-10000001",
+    "contract_id": "WCT-10000002",
+    "customer_id": "CUS-10000002",
+    "claim_date": "2024-10-01T10:30:00Z",
+    "issue_description": "Product not functioning properly",
+    "status": "approved",
+    "resolution": "Replacement unit approved and shipped"
+  },
+  {
+    "id": "WCL-10000002",
+    "contract_id": "WCT-10000003",
+    "customer_id": "CUS-10000003",
+    "claim_date": "2024-10-15T14:20:00Z",
+    "issue_description": "Accidental damage - device dropped",
+    "status": "in_progress",
+    "resolution": null
+  },
+  {
+    "id": "WCL-10000003",
+    "contract_id": "WCT-10000005",
+    "customer_id": "CUS-10000004",
+    "claim_date": "2024-09-20T09:15:00Z",
+    "issue_description": "Component failed - screen flickering",
+    "status": "completed",
+    "resolution": "Repaired and returned to customer"
+  }
+]

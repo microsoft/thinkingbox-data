@@ -1,0 +1,44 @@
+[
+  {
+    "id": "VPN-1000001",
+    "employee_email": "jennifer.patel@msg.com",
+    "client_id": null,
+    "revoked_at": null
+  },
+  {
+    "id": "VPN-1000002",
+    "employee_email": "marcus.bennett@msg.com",
+    "client_id": "CLT-0012345",
+    "revoked_at": null
+  },
+  {
+    "id": "VPN-1000003",
+    "employee_email": "alice.jones@msg.com",
+    "client_id": "CLT-0012345",
+    "revoked_at": null
+  },
+  {
+    "id": "VPN-1000004",
+    "employee_email": "robert.nguyen@msg.com",
+    "client_id": null,
+    "revoked_at": null
+  },
+  {
+    "id": "VPN-1000005",
+    "employee_email": "stephanie.rivera@msg.com",
+    "client_id": "CLT-0067890",
+    "revoked_at": null
+  },
+  {
+    "id": "VPN-1000006",
+    "employee_email": "michael.harrison@msg.com",
+    "client_id": null,
+    "revoked_at": "2024-11-01T00:00:00Z"
+  },
+  {
+    "id": "VPN-1000007",
+    "employee_email": "emily.davis@msg.com",
+    "client_id": "CLT-0012345",
+    "revoked_at": null
+  }
+]

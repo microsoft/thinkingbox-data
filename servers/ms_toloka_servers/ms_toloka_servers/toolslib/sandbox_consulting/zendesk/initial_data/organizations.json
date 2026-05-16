@@ -1,0 +1,47 @@
+[
+  {
+    "id": "1",
+    "name": "Example Corporation",
+    "domain_names": ["example.com"],
+    "details": "Main support organization",
+    "notes": "Premium customer",
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "2",
+    "name": "Company 2 Inc",
+    "domain_names": ["company2.com"],
+    "details": "Secondary organization",
+    "notes": "Standard customer",
+    "created_at": "2024-03-15T00:00:00Z",
+    "updated_at": "2024-03-15T00:00:00Z"
+  },
+  {
+    "id": "3",
+    "name": "Tech Solutions Ltd",
+    "domain_names": ["techsolutions.com", "techsol.io"],
+    "details": "Technology consulting organization",
+    "notes": "Enterprise customer",
+    "created_at": "2024-05-10T00:00:00Z",
+    "updated_at": "2024-05-10T00:00:00Z"
+  },
+  {
+    "id": "4",
+    "name": "Global Services Group",
+    "domain_names": ["globalservices.com"],
+    "details": "International service provider",
+    "notes": "Global account",
+    "created_at": "2024-06-20T00:00:00Z",
+    "updated_at": "2024-06-20T00:00:00Z"
+  },
+  {
+    "id": "5",
+    "name": "StartupXYZ",
+    "domain_names": ["startupxyz.io"],
+    "details": "Fast-growing startup",
+    "notes": "Basic plan customer",
+    "created_at": "2024-08-01T00:00:00Z",
+    "updated_at": "2024-08-01T00:00:00Z"
+  }
+]

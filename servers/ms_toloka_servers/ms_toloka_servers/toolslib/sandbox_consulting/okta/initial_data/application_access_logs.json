@@ -1,0 +1,62 @@
+[
+  {
+    "id": "AAL-1000001",
+    "employee_email": "jennifer.patel@msg.com",
+    "app_name": "Tableau Desktop",
+    "access_type": "full_access"
+  },
+  {
+    "id": "AAL-1000002",
+    "employee_email": "marcus.bennett@msg.com",
+    "app_name": "Microsoft Power BI Pro",
+    "access_type": "full_access"
+  },
+  {
+    "id": "AAL-1000003",
+    "employee_email": "sarah.johnson@msg.com",
+    "app_name": "Adobe Creative Cloud",
+    "access_type": "contributor"
+  },
+  {
+    "id": "AAL-1000004",
+    "employee_email": "jennifer.patel@msg.com",
+    "app_name": "Salesforce",
+    "access_type": "admin"
+  },
+  {
+    "id": "AAL-1000005",
+    "employee_email": "mike.wilson@msg.com",
+    "app_name": "Jira",
+    "access_type": "full_access"
+  },
+  {
+    "id": "AAL-1000006",
+    "employee_email": "emily.brown@msg.com",
+    "app_name": "Confluence",
+    "access_type": "read_only"
+  },
+  {
+    "id": "AAL-1000007",
+    "employee_email": "david.garcia@msg.com",
+    "app_name": "Tableau Creator",
+    "access_type": "full_access"
+  },
+  {
+    "id": "AAL-1000008",
+    "employee_email": "lisa.martinez@msg.com",
+    "app_name": "Microsoft Power BI Pro",
+    "access_type": "contributor"
+  },
+  {
+    "id": "AAL-1000009",
+    "employee_email": "robert.taylor@msg.com",
+    "app_name": "Box",
+    "access_type": "full_access"
+  },
+  {
+    "id": "AAL-1000010",
+    "employee_email": "jennifer.patel@msg.com",
+    "app_name": "Slack Enterprise",
+    "access_type": "admin"
+  }
+]

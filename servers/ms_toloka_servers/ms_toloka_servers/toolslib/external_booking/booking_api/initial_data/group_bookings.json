@@ -1,0 +1,72 @@
+[
+  {
+    "id": "GRP-00000001",
+    "group_booking_id": "GRP-00012345",
+    "coordinator_name": "Alice Johnson",
+    "coordinator_email": "alice.johnson@company.com",
+    "coordinator_phone": "+1-212-847-3921",
+    "total_rooms": 5,
+    "check_in_date": "2025-12-15T15:00:00Z",
+    "check_out_date": "2025-12-18T11:00:00Z",
+    "hotel_id": "HTL-00012345",
+    "booking_references": ["BKG-00012345", "BKG-00012346", "BKG-00012347", "BKG-00012348", "BKG-00012349"],
+    "created_at": "2025-11-01T10:00:00Z",
+    "updated_at": "2025-11-01T10:00:00Z"
+  },
+  {
+    "id": "GRP-00000002",
+    "group_booking_id": "GRP-00067890",
+    "coordinator_name": "Bob Smith",
+    "coordinator_email": "bob.smith@event.com",
+    "coordinator_phone": "+1-312-528-4067",
+    "total_rooms": 10,
+    "check_in_date": "2025-12-20T15:00:00Z",
+    "check_out_date": "2025-12-22T11:00:00Z",
+    "hotel_id": "HTL-00012346",
+    "booking_references": ["BKG-00012345", "BKG-00012346", "BKG-00012347"],
+    "created_at": "2025-11-10T10:00:00Z",
+    "updated_at": "2025-11-10T10:00:00Z"
+  },
+  {
+    "id": "GRP-00000003",
+    "group_booking_id": "GRP-00033333",
+    "coordinator_name": "Carol White",
+    "coordinator_email": "carol.white@conference.com",
+    "coordinator_phone": "+1-415-693-2845",
+    "total_rooms": 15,
+    "check_in_date": "2026-01-05T15:00:00Z",
+    "check_out_date": "2026-01-08T11:00:00Z",
+    "hotel_id": "HTL-00012345",
+    "booking_references": ["BKG-00012348", "BKG-00012349"],
+    "created_at": "2025-11-15T10:00:00Z",
+    "updated_at": "2025-11-15T10:00:00Z"
+  },
+  {
+    "id": "GRP-00000004",
+    "group_booking_id": "GRP-00044444",
+    "coordinator_name": "David Green",
+    "coordinator_email": "david.green@wedding.com",
+    "coordinator_phone": "+1-305-781-6293",
+    "total_rooms": 8,
+    "check_in_date": "2025-12-30T15:00:00Z",
+    "check_out_date": "2026-01-02T11:00:00Z",
+    "hotel_id": "HTL-00012348",
+    "booking_references": ["BKG-00012345", "BKG-00012346", "BKG-00012348", "BKG-00012349"],
+    "created_at": "2025-11-20T10:00:00Z",
+    "updated_at": "2025-11-20T10:00:00Z"
+  },
+  {
+    "id": "GRP-00000005",
+    "group_booking_id": "GRP-00055555",
+    "coordinator_name": "Emma Brown",
+    "coordinator_email": "emma.brown@corporate.com",
+    "coordinator_phone": "+1-720-394-8172",
+    "total_rooms": 12,
+    "check_in_date": "2026-02-10T15:00:00Z",
+    "check_out_date": "2026-02-12T11:00:00Z",
+    "hotel_id": "HTL-00012349",
+    "booking_references": ["BKG-00012345", "BKG-00012347", "BKG-00012349"],
+    "created_at": "2025-11-25T10:00:00Z",
+    "updated_at": "2025-11-25T10:00:00Z"
+  }
+]

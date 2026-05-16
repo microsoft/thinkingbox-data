@@ -1,0 +1,74 @@
+[
+  {
+    "id": "ASN-0012345",
+    "employee_email": "marcus.bennett@msg.com",
+    "engagement_code": "ENG-0012345",
+    "assignment_status": "active",
+    "start_date": "2024-01-15T00:00:00Z",
+    "end_date": "2024-12-31T00:00:00Z",
+    "senior_manager_email": "sarah.johnson@msg.com"
+  },
+  {
+    "id": "ASN-0023456",
+    "employee_email": "jennifer.patel@msg.com",
+    "engagement_code": "ENG-0012345",
+    "assignment_status": "active",
+    "start_date": "2024-02-01T00:00:00Z",
+    "end_date": "2024-12-31T00:00:00Z",
+    "senior_manager_email": "sarah.johnson@msg.com"
+  },
+  {
+    "id": "ASN-0034567",
+    "employee_email": "alice.wilson@msg.com",
+    "engagement_code": "ENG-0023456",
+    "assignment_status": "active",
+    "start_date": "2024-03-01T00:00:00Z",
+    "end_date": "2024-08-31T00:00:00Z",
+    "senior_manager_email": "michael.chen@msg.com"
+  },
+  {
+    "id": "ASN-0045678",
+    "employee_email": "bob.taylor@msg.com",
+    "engagement_code": "ENG-0034567",
+    "assignment_status": "booked",
+    "start_date": "2025-01-01T00:00:00Z",
+    "end_date": null,
+    "senior_manager_email": "emily.rodriguez@msg.com"
+  },
+  {
+    "id": "ASN-0056789",
+    "employee_email": "carol.davis@msg.com",
+    "engagement_code": "ENG-0056789",
+    "assignment_status": "active",
+    "start_date": "2024-02-15T00:00:00Z",
+    "end_date": "2024-11-30T00:00:00Z",
+    "senior_manager_email": "jennifer.williams@msg.com"
+  },
+  {
+    "id": "ASN-0067890",
+    "employee_email": "daniel.moore@msg.com",
+    "engagement_code": "ENG-0078901",
+    "assignment_status": "active",
+    "start_date": "2024-04-01T00:00:00Z",
+    "end_date": "2025-03-31T00:00:00Z",
+    "senior_manager_email": "amanda.martinez@msg.com"
+  },
+  {
+    "id": "ASN-0078901",
+    "employee_email": "emma.garcia@msg.com",
+    "engagement_code": "ENG-0078901",
+    "assignment_status": "booked",
+    "start_date": "2024-06-01T00:00:00Z",
+    "end_date": "2025-03-31T00:00:00Z",
+    "senior_manager_email": "amanda.martinez@msg.com"
+  },
+  {
+    "id": "ASN-0089012",
+    "employee_email": "frank.martinez@msg.com",
+    "engagement_code": "ENG-0089012",
+    "assignment_status": "booked",
+    "start_date": "2025-02-01T00:00:00Z",
+    "end_date": null,
+    "senior_manager_email": "james.anderson@msg.com"
+  }
+]

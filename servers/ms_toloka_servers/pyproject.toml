@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ms_toloka_servers"
+version = "0.1.0"
+description = "MS Toloka servers"
+requires-python = ">=3.10"
+dependencies = [
+    "fastmcp",
+    "pydantic",
+    "odata-query>=0.9.0",
+    "typesense",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "trio>=0.22.0",
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["ms_toloka_servers*"]
+
+[tool.pytest.ini_options]
+markers = [
+    "tb_mcp_start: tests that require a running the MCP session handler server",
+]

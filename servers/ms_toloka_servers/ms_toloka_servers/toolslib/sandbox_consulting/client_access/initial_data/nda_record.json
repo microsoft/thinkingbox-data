@@ -1,0 +1,42 @@
+[
+  {
+    "employee_email": "jennifer.patel@msg.com",
+    "client_id": "CLT-0012345",
+    "status": "signed"
+  },
+  {
+    "employee_email": "marcus.bennett@msg.com",
+    "client_id": "CLT-0012345",
+    "status": "signed"
+  },
+  {
+    "employee_email": "alice.jones@msg.com",
+    "client_id": "CLT-0012345",
+    "status": "signed"
+  },
+  {
+    "employee_email": "robert.nguyen@msg.com",
+    "client_id": "CLT-0067890",
+    "status": "sent_for_signature"
+  },
+  {
+    "employee_email": "stephanie.rivera@msg.com",
+    "client_id": "CLT-0067890",
+    "status": "signed"
+  },
+  {
+    "employee_email": "michael.harrison@msg.com",
+    "client_id": "CLT-0012345",
+    "status": "not_signed"
+  },
+  {
+    "employee_email": "emily.davis@msg.com",
+    "client_id": "CLT-0012345",
+    "status": "signed"
+  },
+  {
+    "employee_email": "david.garcia@msg.com",
+    "client_id": "CLT-0012345",
+    "status": "expired"
+  }
+]

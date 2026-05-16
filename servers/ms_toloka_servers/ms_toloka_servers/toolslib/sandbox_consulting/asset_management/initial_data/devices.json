@@ -1,0 +1,98 @@
+[
+  {
+    "id": "MSG00001001",
+    "device_type": "laptop",
+    "model": "HP ZBook Fury 17 G9",
+    "age_months": 12,
+    "inventory_status": "available",
+    "location": "New York"
+  },
+  {
+    "id": "MSG00001002",
+    "device_type": "laptop",
+    "model": "Lenovo ThinkPad P16s Gen 2",
+    "age_months": 18,
+    "inventory_status": "available",
+    "location": "New York"
+  },
+  {
+    "id": "MSG00001003",
+    "device_type": "laptop",
+    "model": "ASUS ProArt Studiobook 16",
+    "age_months": 6,
+    "inventory_status": "assigned",
+    "location": "San Francisco"
+  },
+  {
+    "id": "MSG00002001",
+    "device_type": "phone",
+    "model": "Google Pixel 7a",
+    "age_months": 24,
+    "inventory_status": "assigned",
+    "location": "Chicago"
+  },
+  {
+    "id": "MSG00002002",
+    "device_type": "phone",
+    "model": "Sony Xperia 1 V",
+    "age_months": 8,
+    "inventory_status": "available",
+    "location": "Austin"
+  },
+  {
+    "id": "MSG00002003",
+    "device_type": "phone",
+    "model": "Fairphone 5",
+    "age_months": 10,
+    "inventory_status": "available",
+    "location": "Austin"
+  },
+  {
+    "id": "MSG00003001",
+    "device_type": "laptop",
+    "model": "Tuxedo InfinityBook Pro 14",
+    "age_months": 36,
+    "inventory_status": "retired",
+    "location": "New York"
+  },
+  {
+    "id": "MSG00003002",
+    "device_type": "laptop",
+    "model": "MSI Prestige 14 Evo",
+    "age_months": 3,
+    "inventory_status": "reserved",
+    "location": "Chicago"
+  },
+  {
+    "id": "MSG00004001",
+    "device_type": "monitor",
+    "model": "BenQ SW321C PhotoVue",
+    "age_months": 24,
+    "inventory_status": "available",
+    "location": "New York"
+  },
+  {
+    "id": "MSG00004002",
+    "device_type": "docking_station",
+    "model": "CalDigit TS4 Thunderbolt 4",
+    "age_months": 18,
+    "inventory_status": "available",
+    "location": "San Francisco"
+  },
+  {
+    "id": "MSG00005001",
+    "device_type": "laptop",
+    "model": "Framework Laptop 13 AMD",
+    "age_months": 15,
+    "inventory_status": "in_repair",
+    "location": "San Francisco"
+  },
+  {
+    "id": "MSG00005002",
+    "device_type": "laptop",
+    "model": "Razer Blade 14 (2024)",
+    "age_months": 5,
+    "inventory_status": "available",
+    "location": "Chicago"
+  }
+]

@@ -1,0 +1,34 @@
+name: Test MS Toloka Servers
+
+permissions:
+  contents: read
+
+on:
+  pull_request:
+    paths:
+      - 'servers/ms_toloka_servers/**'
+      - '.github/workflows/test-ms-toloka-servers.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v6
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        python-version: 3.12
+        enable-cache: true
+
+    - name: Install dependencies
+      working-directory: ./servers/ms_toloka_servers
+      run: |
+        uv sync --group dev
+
+    - name: Run tests with pytest
+      working-directory: ./servers/ms_toloka_servers
+      run: |
+        uv run pytest -m "not tb_mcp_start" tests/ --verbose

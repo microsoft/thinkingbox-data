@@ -1,0 +1,74 @@
+[
+  {
+    "id": "USR-10000001",
+    "name": "Sarah Johnson",
+    "email": "sarah.johnson@travelers.com",
+    "role": "end-user",
+    "organization_id": "ORG-10000001",
+    "phone": "+1-212-847-0101",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "USR-10000002",
+    "name": "Mike Chen",
+    "email": "mike.chen@bookingplatform.com",
+    "role": "agent",
+    "organization_id": "ORG-10000001",
+    "phone": "+1-646-528-0102",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "USR-10000003",
+    "name": "Emily Rodriguez",
+    "email": "emily.rodriguez@travelers.com",
+    "role": "end-user",
+    "organization_id": "ORG-10000002",
+    "phone": "+1-305-693-0103",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-06-15T00:00:00Z",
+    "updated_at": "2024-06-15T00:00:00Z"
+  },
+  {
+    "id": "USR-10000004",
+    "name": "David Park",
+    "email": "david.park@corporatetravel.com",
+    "role": "end-user",
+    "organization_id": "ORG-10000003",
+    "phone": "+1-415-781-0104",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-03-20T00:00:00Z",
+    "updated_at": "2024-03-20T00:00:00Z"
+  },
+  {
+    "id": "USR-10000005",
+    "name": "Lisa Thompson",
+    "email": "lisa.thompson@bookingplatform.com",
+    "role": "admin",
+    "organization_id": "ORG-10000001",
+    "phone": "+1-917-394-0100",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "USR-10000006",
+    "name": "James Anderson",
+    "email": "james.anderson@grouptravel.com",
+    "role": "end-user",
+    "organization_id": "ORG-10000003",
+    "phone": "+1-720-528-0105",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-07-10T00:00:00Z",
+    "updated_at": "2024-07-10T00:00:00Z"
+  }
+]

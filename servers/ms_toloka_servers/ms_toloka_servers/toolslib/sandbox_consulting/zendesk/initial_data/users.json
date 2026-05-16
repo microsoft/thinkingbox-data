@@ -1,0 +1,62 @@
+[
+  {
+    "id": "1",
+    "name": "Marcus Thompson",
+    "email": "marcus.thompson@msg.com",
+    "role": "end-user",
+    "organization_id": "1",
+    "phone": "+1-312-847-3921",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "2",
+    "name": "Lisa Martinez",
+    "email": "lisa.martinez@msg.com",
+    "role": "agent",
+    "organization_id": "1",
+    "phone": "+1-212-634-8756",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  },
+  {
+    "id": "3",
+    "name": "Robert Chen",
+    "email": "robert.chen@msg.com",
+    "role": "end-user",
+    "organization_id": "1",
+    "phone": "+1-415-928-4512",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-06-15T00:00:00Z",
+    "updated_at": "2024-06-15T00:00:00Z"
+  },
+  {
+    "id": "4",
+    "name": "Patricia Anderson",
+    "email": "patricia.anderson@msg.com",
+    "role": "end-user",
+    "organization_id": "2",
+    "phone": "+1-617-492-7638",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-03-20T00:00:00Z",
+    "updated_at": "2024-03-20T00:00:00Z"
+  },
+  {
+    "id": "5",
+    "name": "Christopher Lee",
+    "email": "christopher.lee@msg.com",
+    "role": "admin",
+    "organization_id": "1",
+    "phone": "+1-206-789-3245",
+    "verified": true,
+    "active": true,
+    "created_at": "2024-01-01T00:00:00Z",
+    "updated_at": "2024-01-01T00:00:00Z"
+  }
+]

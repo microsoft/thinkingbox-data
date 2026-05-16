@@ -1,0 +1,42 @@
+[
+  {
+    "id": "LIC-1000001",
+    "catalog_id": "CAT-1000001",
+    "employee_email": "marcus.bennett@msg.com",
+    "engagement_code": "ENG-0012345",
+    "pool_type": "standard",
+    "deallocated_at": null
+  },
+  {
+    "id": "LIC-1000002",
+    "catalog_id": "CAT-1000001",
+    "employee_email": "jennifer.patel@msg.com",
+    "engagement_code": "ENG-0012345",
+    "pool_type": "standard",
+    "deallocated_at": null
+  },
+  {
+    "id": "LIC-1000003",
+    "catalog_id": "CAT-1000002",
+    "employee_email": "alice.wilson@msg.com",
+    "engagement_code": "ENG-0023456",
+    "pool_type": "enterprise",
+    "deallocated_at": null
+  },
+  {
+    "id": "LIC-1000004",
+    "catalog_id": "CAT-1000003",
+    "employee_email": "bob.taylor@msg.com",
+    "engagement_code": null,
+    "pool_type": "standard",
+    "deallocated_at": null
+  },
+  {
+    "id": "LIC-1000005",
+    "catalog_id": "CAT-1000003",
+    "employee_email": "carol.davis@msg.com",
+    "engagement_code": "ENG-0034567",
+    "pool_type": "standard",
+    "deallocated_at": "2024-10-15T00:00:00Z"
+  }
+]

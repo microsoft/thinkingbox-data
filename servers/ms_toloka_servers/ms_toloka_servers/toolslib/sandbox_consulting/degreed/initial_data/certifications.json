@@ -1,0 +1,72 @@
+[
+  {
+    "id": "CERT-1000001",
+    "employee_email": "jennifer.patel@msg.com",
+    "certification_name": "HIPAA",
+    "issued_date": "2024-11-01T00:00:00Z",
+    "expiry_date": "2025-11-01T00:00:00Z"
+  },
+  {
+    "id": "CERT-1000002",
+    "employee_email": "jennifer.patel@msg.com",
+    "certification_name": "Python Professional",
+    "issued_date": "2024-11-20T00:00:00Z",
+    "expiry_date": null
+  },
+  {
+    "id": "CERT-1000003",
+    "employee_email": "marcus.bennett@msg.com",
+    "certification_name": "AWS Certified Solutions Architect",
+    "issued_date": "2024-06-15T00:00:00Z",
+    "expiry_date": "2027-06-15T00:00:00Z"
+  },
+  {
+    "id": "CERT-1000004",
+    "employee_email": "alice.jones@msg.com",
+    "certification_name": "GDPR Compliance",
+    "issued_date": "2024-09-20T00:00:00Z",
+    "expiry_date": "2025-09-20T00:00:00Z"
+  },
+  {
+    "id": "CERT-1000005",
+    "employee_email": "alice.jones@msg.com",
+    "certification_name": "Financial Data Security",
+    "issued_date": "2024-08-10T00:00:00Z",
+    "expiry_date": "2025-08-10T00:00:00Z"
+  },
+  {
+    "id": "CERT-1000006",
+    "employee_email": "robert.nguyen@msg.com",
+    "certification_name": "Cybersecurity Fundamentals",
+    "issued_date": "2024-07-30T00:00:00Z",
+    "expiry_date": null
+  },
+  {
+    "id": "CERT-1000007",
+    "employee_email": "stephanie.rivera@msg.com",
+    "certification_name": "HIPAA",
+    "issued_date": "2024-10-25T00:00:00Z",
+    "expiry_date": "2025-10-25T00:00:00Z"
+  },
+  {
+    "id": "CERT-1000008",
+    "employee_email": "michael.harrison@msg.com",
+    "certification_name": "PMP",
+    "issued_date": "2024-05-10T00:00:00Z",
+    "expiry_date": "2027-05-10T00:00:00Z"
+  },
+  {
+    "id": "CERT-1000009",
+    "employee_email": "emily.davis@msg.com",
+    "certification_name": "HIPAA",
+    "issued_date": "2024-09-05T00:00:00Z",
+    "expiry_date": "2025-09-05T00:00:00Z"
+  },
+  {
+    "id": "CERT-1000010",
+    "employee_email": "david.garcia@msg.com",
+    "certification_name": "Certified Kubernetes Administrator",
+    "issued_date": "2024-08-20T00:00:00Z",
+    "expiry_date": "2027-08-20T00:00:00Z"
+  }
+]

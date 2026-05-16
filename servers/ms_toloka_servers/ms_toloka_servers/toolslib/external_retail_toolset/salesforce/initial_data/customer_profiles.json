@@ -1,0 +1,44 @@
+[
+  {
+    "id": "CUS-10000001",
+    "email": "john.smith@example.com",
+    "name": "John Smith",
+    "phone": "+1-555-0123",
+    "registration_date": "2023-01-15T10:30:00Z",
+    "customer_tier": "plus_member",
+    "lifetime_value": 1250.50,
+    "total_orders": 8,
+    "customer_score": 75,
+    "behavioral_segment": "regular",
+    "acquisition_source": "organic_search",
+    "discount_usage_rate": 0.65
+  },
+  {
+    "id": "CUS-10000002",
+    "email": "jane.doe@example.com",
+    "name": "Jane Doe",
+    "phone": "+1-555-0124",
+    "registration_date": "2023-03-20T14:15:00Z",
+    "customer_tier": "standard",
+    "lifetime_value": 450.00,
+    "total_orders": 3,
+    "customer_score": 50,
+    "behavioral_segment": "opportunist",
+    "acquisition_source": "social_media",
+    "discount_usage_rate": 0.85
+  },
+  {
+    "id": "CUS-10000003",
+    "email": "bob.wilson@example.com",
+    "name": "Bob Wilson",
+    "phone": "+1-555-0125",
+    "registration_date": "2022-06-10T09:00:00Z",
+    "customer_tier": "vip",
+    "lifetime_value": 5200.75,
+    "total_orders": 22,
+    "customer_score": 92,
+    "behavioral_segment": "regular",
+    "acquisition_source": "referral",
+    "discount_usage_rate": 0.20
+  }
+]

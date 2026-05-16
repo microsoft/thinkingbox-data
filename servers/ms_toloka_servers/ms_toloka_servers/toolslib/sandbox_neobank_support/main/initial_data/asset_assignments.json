@@ -1,0 +1,59 @@
+[
+  {
+    "id": "ASN-39471826",
+    "asset_id": "VDB-HW-29417",
+    "employee_id": "WD-847291",
+    "assigned_at": "2023-01-20T10:00:00Z",
+    "assigned_by": "system",
+    "is_active": true
+  },
+  {
+    "id": "ASN-57829341",
+    "asset_id": "VDB-HW-73918",
+    "employee_id": "WD-681453",
+    "assigned_at": "2024-02-20T10:00:00Z",
+    "assigned_by": "system",
+    "is_active": true
+  },
+  {
+    "id": "ASN-68143579",
+    "asset_id": "VDB-HW-68149",
+    "employee_id": "WD-847291",
+    "assigned_at": "2023-06-15T10:00:00Z",
+    "assigned_by": "system",
+    "is_active": true
+  },
+  {
+    "id": "ASN-84726193",
+    "asset_id": "VDB-HW-84726",
+    "employee_id": "WD-192638",
+    "assigned_at": "2022-11-05T10:00:00Z",
+    "assigned_by": "system",
+    "is_active": true
+  },
+  {
+    "id": "ASN-19263758",
+    "asset_id": "VDB-HW-46571",
+    "employee_id": "WD-681453",
+    "assigned_at": "2023-11-10T10:00:00Z",
+    "assigned_by": "system",
+    "is_active": true
+  },
+  {
+    "id": "ASN-46578132",
+    "asset_id": "VDB-HW-92647",
+    "employee_id": "WD-218647",
+    "assigned_at": "2021-06-01T10:00:00Z",
+    "assigned_by": "system",
+    "is_active": false,
+    "returned_at": "2024-01-15T10:00:00Z"
+  },
+  {
+    "id": "ASN-73918254",
+    "asset_id": "VDB-HW-58413",
+    "employee_id": "WD-753918",
+    "assigned_at": "2025-09-19T11:30:00Z",
+    "assigned_by": "system",
+    "is_active": true
+  }
+]

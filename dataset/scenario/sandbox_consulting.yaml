@@ -1,0 +1,328 @@
+world_state:
+  sandbox_consulting:
+    sources:
+        - name: Approval_Matrix.md
+          snippets:
+            - "## 3. Approval Matrix\n\nApprovals are required based on employee level, resource cost, request type, and business context. When multiple approvers are required, you must create separate approval requests for each approver (the approval system accepts one approver per request).\n\n**Same person in multiple roles:** A single person may hold multiple roles (e.g., manager and partner for the same engagements, or a partner can play a manager role for an employee). If multiple approvals are required and the approver emails are the same, it's enough to create only one approval request for that person.\n\n**Manager unavailable:** If manager is on leave, route approval to their designated backup approver.\n\n**Partner identification:** Use the practice area partner associated with the employee (available in Workday employee record as `partner_email`).\n\n### 3.1 Software Access Approvals\n\nSoftware access requests require engagement code validation and approvals based on employee level and annual software cost:\n\n| Employee Level | Annual Cost < $500 | Annual Cost ≥ $500 |\n|----------------|-------------------|-------------------|\n| **Analyst, Consultant, Senior Consultant** | Manager approval required | Manager + Partner approval required |\n| **Manager, Senior Manager** | No approval needed | Partner approval required |\n| **Partner** | No approval needed | No approval needed |\n\n### 3.2 Hardware Replacement Approvals\n\nHardware approvals depend on device eligibility determined from Zendesk knowledge base article on hardware policies.\n\n**When manager approval is required:**\n\n- Phone replacements: Based on battery health thresholds and device age (search knowledge base for phone replacement policy)\n- Laptop replacements: Based on device age and damage conditions (search knowledge base for laptop refresh policy)\n- Non-standard device requests (MacBook): Always require manager approval regardless of age (must also have engagement code justification). Only laptops have non-standard devices.\n\n**When no approval is needed:**\n\n- Requests meeting automatic eligibility criteria from knowledge base policy\n- Standard peripheral requests (monitors, docking stations, headsets)\n\nSearch Zendesk knowledge base for hardware eligibility thresholds to determine when approval is required.\n\n### 3.3 Training Enrollment Approvals\n\nTraining approvals are complex and based on engagement assignment timing, training category, and cost:\n\n**Engagement-based approvals:**\n\nTraining dates are checked against all active and booked engagement assignments:\n\n- **Training after all engagements end:** No engagement approval needed\n- **Training overlaps with 1+ engagements:** Approval required from senior manager of EACH overlapping engagement (create separate approval request for each)\n- **Training is a conference AND overlaps with any active engagement:** Deny immediately (conferences only allowed post-engagement)\n\n**Cost-based approvals** (independent of engagement approvals):\n\n| Training Type | Cost Threshold | Approval Required |\n|--------------|----------------|-------------------|\n| Internal training | $0 | No cost approval |\n| External training | < $5,000 | Direct manager approval |\n| External training | ≥ $5,000 | Direct manager + Partner approval |\n\n**Combined approvals example:**\n\n- Employee on 2 active engagements + $6,000 external training = 4 total approvals (2 engagement senior managers + direct manager + partner)\n\n### 3.4 Client Access Approvals\n\nClient access approvals depend on security requirements and prerequisite completion:\n\n- **Standard client:** Engagement manager approval required (once prerequisites met)\n- **High-security client:** Engagement manager + Security Director approval required\n\nPrerequisites (background check, NDA, training) must be completed before approval requests are created. If prerequisites are missing, initiate them and set ticket to pending.\n\n### 3.5 Expense Override Approvals\n\nExpense overrides require direct manager approval in these scenarios:\n\n- Expense exceeds per diem limit for the travel region\n- Missing receipt when receipt is required (≥ $25)\n- Late submission (> 90 days from expense date)\n- Combination of violations\n\nDetermine applicable per diem limit by searching Zendesk knowledge base for the expense trip location.\n\n### 3.6 Travel Policy Exception Approvals\n\nTravel policy exceptions require manager approval when booking violates any travel policy rule for the employee's level.\n\n**Violation categories:**\n\n- Advance booking window not met (thresholds vary by employee level)\n- Flight class not eligible for employee's level or flight duration\n- Hotel rate exceeds limit for employee's level\n\n**Search Zendesk knowledge base** for travel policy compliance rules by employee level to determine specific thresholds and identify violations.\n\n### 3.7 Document Access Approvals\n\nBox folder access approvals depend on confidentiality level:\n\n- **Public or Internal folders:** No approval needed\n- **Confidential folders:** Direct manager approval required\n- **Client-confidential folders:** Requires engagement assignment + NDA signed + clearance completed (no manager approval if prerequisites met)\n\n### 3.8 Approver Availability\n\nAlways check approver availability before creating approval requests:\n\n- If primary approver is **available:** Route approval to them\n- If primary approver is **on leave:** Route approval to their designated backup approver\n\nIf both approvers are on leave, the request stays pending until they're back, no approval should be created until one of the approvers becomes available in the future.\n\n### 3.9 Approval Status Handling\n\nProceed with provisioning only if the approval status is APPROVED. Otherwise, follow the rules below depending on the approval status.\n\n**If approval is REJECTED:**\n\n- Inform the employee that the request was rejected\n- Explain that the request cannot proceed without approval\n- Set ticket status to \"solved\" (request denied with explanation)\n- Do NOT proceed with any provisioning steps\n\n**If approval is PENDING:**\n\n- Inform the employee that approval is pending\n- Set ticket status to \"pending\" (waiting for approval)\n- Do NOT proceed with provisioning until approval is received\n- You may need to check status if the employee follows up\n\n**If approval is APPROVED:**\n\n- Proceed with provisioning steps as specified in the workflow\n\n### 3.10 Approval Request Optional Parameters\n\nApproval requests have two optional parameters: amount and engagement code. Use the rules below to determine when to include each parameter.\n\n**Amount parameter**n\nInclude the amount parameter (in USD) for cost-based approvals:\n\n- software_access (annual software cost)\n- training_cost (training course cost)\n- expense_override (expense amount)\n- travel (total travel cost)\n\nDo NOT include amount parameter (leave null) for approvals not based on cost:\n\n- hardware_replacement\n- client_access\n- document_access\n- training_engagement_coordination\n\n**Engagement code parameter**\n\nInclude the engagement code parameter using the same rules as for custom_fields.engagement_code (see Section 2.5 and request-specific sections).\n\n---"
+        - name: Software_Access_Requests.md
+          snippets:
+            - "## 4. Software Access Requests\n\n### 4.1 Overview\n\nSoftware access requests involve provisioning licenses and application access for specialized software tools. Standard software (Microsoft Office, Slack, Zoom, Workday, as well as Concur, Salesforce) is provisioned during onboarding (check the relevant phase) and doesn't require separate requests.\n\n### 4.2 Engagement Code Requirement\n\n**All specialized software access requests require an active engagement code.** This is mandatory, not optional.\n\nEngagement code format: **ENG-####### (7 digits)**. Extract this pattern from employee messages.\n\n- If employee does not provide engagement code: Ask for it\n- If engagement code is invalid or doesn't exist: Deny request\n- If engagement exists but status is not \"active\": Deny request\n- If engagement is active but employee is not assigned: Deny request\n\nSoftware costs must be allocated to client engagements. This is a firm policy with no exceptions.\n\n### 4.3 License Pool Determination\n\nSoftware is provisioned from two license pool types:\n\n**Enterprise pool:** Unlimited capacity, always available. Used for high-volume enterprise licenses.\n\n**Standard pool:** Fixed capacity, check availability before promising access. If pool is at capacity, deny the request immediately. MSG does not support waitlist functionality for license pools.\n\nThe license pool type is defined in the software catalog.\n\n### 4.4 Approval Requirements\n\nSee **Approval Matrix** for software approval thresholds. Create an approval request (if needed) only if there are available licenses based on license pool and its capacity.\n\nApprovals are based on:\n\n1. Employee level (determines approval authority)\n2. Annual software cost (determines approval tier)\n\nRetrieve the annual cost from the software catalog. Compare employee level and cost to determine required approvers.\n\n### 4.5 Provisioning Sequence\n\nOnce approvals are obtained or if no approval needed:\n\n* Allocate license from the appropriate pool\n* Provision access in Okta identity management system\n* Communicate access details to employee\n\n### 4.6 Software Not in Catalog\n\nIf requested software is not found in the approved software catalog, inform the employee that the software is not approved for use at MSG.\n\n---"
+        - name: Client_System_Access_Requests.md
+          snippets:
+            - "## 5. Client System Access Requests\n\n### 5.1 Overview\n\nClient system access requests provide employees with VPN access and authentication to client infrastructure and applications. These requests have stringent security and compliance requirements.\n\n### 5.2 Engagement Validation\n\nEmployee must be assigned to an active engagement with the client:\n\n- Engagement must exist in Salesforce and Mavenlink\n- Engagement status must be active\n- Employee must be assigned to the engagement\n\nIf any validation fails, deny the request and do NOT store it in any ticket custom fields. Client access is only granted to employees actively working on the client's projects.\n\n### 5.3 Prerequisite Requirements\n\nClient access has three categories of prerequisites that gate provisioning:\n\n**Background Check / Security Clearance:**\n\n- Standard clearance (2-week turnaround): Required for most clients\n- High-security clearance (4-week turnaround): Required for sensitive industries (financial services, healthcare, government)\n\nIf clearance is not complete, initiate background check. Inform employee of expected timeline.\n\n**Non-Disclosure Agreement (NDA):**\n\n- For clients requiring an NDA, check the NDA status. If the status is **not signed**, send the NDA for electronic signature (this also serves as a reminder if it was previously sent).\n- Inform the employee that the NDA has been sent for external electronic signature and that the request can only be processed once the NDA is signed and processed in the system; end the conversation.\n\n**Client-Specific Training:**\n\n- Some clients require completion of specialized training (HIPAA, SOC 2, client-specific security training)\n- Check employee's completed training history against client's required courses\n- If training missing, enroll employee in required courses\n\n### 5.4 Prerequisite Validation Logic\n\nCheck client requirements first to understand what prerequisites apply. Then check employee's current prerequisite status.\n\n**If multiple prerequisites are missing:** Handle them sequentially in this priority order: (1) Clearance, (2) NDA, (3) Training. Address the first missing prerequisite and STOP (set the ticket to pending). Do not proceed to subsequent prerequisites until the first one is resolved.\n\nPrerequisites must be completed before approval requests are created. If prerequisites are missing, initiate them and set ticket to pending. Only proceed to approvals once all prerequisites are met.\n\n### 5.5 Approval Requirements\n\nSee **Approval Matrix** for client access approvals.\n\nOnce all prerequisites are complete, determine required approvers based on client security level.\n\nRetrieve engagement manager from engagement record. For high-security clients requiring Security Director approval, use this contact: **security.director@msg.com**\n\nCreate separate approval requests for each required approver.\n\n### 5.6 Provisioning\n\nOnce approvals received:\n\n* Provision VPN access\n* Provision access to specific client systems/applications requested\n* Grant Box folder access to client document repositories if needed\n\n---"
+        - name: Hardware_Asset_Requests.md
+          snippets:
+            - "## 6. Hardware & Asset Requests\n\n### 6.1 Overview\n\nHardware requests involve phone replacements, laptop replacements/refreshes, and peripheral devices. Eligibility and approval rules vary by device type, age, condition, and business need.\n\n### 6.2 Phone Replacement Requests\n\n**Eligibility determination:**\n\nBattery health is typically provided by the employee (they check Settings > Battery > Battery Health on their device). If not provided, ask the employee for the current battery health percentage.\n\n**Search Zendesk knowledge base** for phone battery replacement policy. The article contains battery health thresholds and corresponding eligibility rules (approval requirements, denial conditions).\n\nApply the battery health rules from the article to determine the appropriate action.\n\n**Physical damage override:**\n\nIf employee reports physical damage (broken screen, water damage, device lost/stolen), battery health check is overridden:\n\n- Device age < 24 months: Manager approval required before proceeding.\n- Device age ≥ 24 months: No approval needed (device is near end-of-life anyway)\n\n### 6.3 Laptop Replacement Requests\n\n**Eligibility determination:**\n\n**Search Zendesk knowledge base** for laptop refresh eligibility policy. The article contains device age thresholds, eligibility criteria for standard refresh cycles, and rules for early replacement scenarios (physical damage, lost/stolen devices).\n\nApply the eligibility rules from the article based on the device age and condition.\n\n**Standard vs. Non-Standard Devices:**\n\n**Search Zendesk knowledge base** for device policy definitions to understand standard versus non-standard device classifications.\n\nStandard devices are default for all employees and require no additional justification.\n\nNon-standard devices require business justification with engagement code:\n\n- If employee requests non-standard device without providing engagement code: Ask for engagement code before making eligibility determination\n- Employee must provide engagement code justifying the non-standard device need\n- Validate engagement exists, is active and employee is assigned\n- If the engagement is invalid, inactive, or the employee is not assigned, deny the non-standard device request and do not store the engagement code in any ticket custom fields. Then apply standard device rules: keep the current device if it's not eligible for replacement; replace it with a standard device if it is.\n- If assigned: Engagement justifies non-standard device, but manager approval still required\n\n### 6.4 Peripheral Requests\n\nStandard peripherals (monitors, docking stations, headsets, mouse/keyboard) are approved without additional authorization. Check inventory availability.\n\n### 6.5 Inventory Management and Provisioning Sequence\n\nFollow this sequence for hardware provisioning. You may check any information in any order, but you must progress the request in the order below, e.g., if eligibility is not confirmed, do not proceed to subsequent steps.\n\n1. **Determine eligibility** based on device age, battery health, damage, or business justification (Engagement Code for non-standard devices).\n2. **Check inventory** once eligibility confirmed\n3. **Obtain approvals** if required by policy rules and if inventory confirms availability\n4. **Provision or order** based on inventory availability, once the approval is received\n\nDo not obtain approvals before confirming available inventory. If inventory is unavailable, the request cannot be fulfilled at the time, this prevents wasting approvals.\n\n**Inventory available and approvals obtained (if needed):**\n\n- Reserve the device from inventory (FIFO - first available device is allocated)\n- Assign device to employee\n- Retire old device (mark for return)\n- Inform employee device will ship within 2 business days\n\n**Inventory unavailable:**\n\n- Check the Zendesk knowledge base for procurement lead times by device type\n- Inform the employee that the device is out of stock and share the expected delivery timeline\n- Create a procurement hardware order without approval (inventory replenishment only; the employee will not receive a device yet)\n- Store the hardware order ID in the ticket custom field\n- Explain that the request cannot be fulfilled at this time and that the employee will need to return once availability improves and proceed via the standard flow (including approvals)\n\n### 6.6 Approval Requirements\n\nSee **Approval Matrix** for hardware approval rules.\n\nDetermine if manager approval is required based on device eligibility rules from Zendesk knowledge base (battery health thresholds, device age, damage conditions) and device type (standard vs non-standard).\n\n--"
+        - name: Expense_Support_Requests.md
+          snippets:
+            - "## 7. Expense Support Requests\n\n### 7.1 Overview\n\nExpense support requests handle situations where Concur's automated validation system has flagged or rejected an expense report for policy violations. Employee contacts support to request approval override.\n\n### 7.2 Expense Report Retrieval\n\nEmployee provides expense report ID (format: EXP-#######).\n\nRetrieve expense report details including:\n\n- Amount, category, trip location, expense date\n- Receipt status (attached, missing, itemized)\n- Rejection reason from Concur system\n\nCheck if employee mentioned an engagement code in their message. Engagement code format: **ENG-####### (7 digits)**. Extract this pattern if present for validation in Section 7.3.\n\n### 7.3 Engagement Code Handling (Optional Tracking)\n\nEngagement codes are optional for expense requests from the employee's perspective. They may provide an engagement code for billable expense tracking, but it doesn't affect approval requirements.\n\nStore the engagement code only if the request is approved or proceeding (not denied), per ‘custom_fields.engagement_code’.\n\n**If employee provides engagement code in their message:**\n\n- Extract engagement code and validate it (see custom_fields.engagement_code section for validation rules)\n- If valid and the request is approved or proceeding (not denied): Store in ticket custom field\n- If invalid: Inform employee code is invalid/inactive, proceed without it and do NOT store in ticket custom fields\n\nApproval requirements and per diem limits are based on trip location and expense category, not engagement code.\n\n### 7.4 Per Diem Validation\n\nExtract the trip location (city and state) from the expense report.\n\n**Search Zendesk knowledge base** for expense per diem rates by travel region.\n\nDetermine which region the trip location belongs to and apply the corresponding per diem limit from the article.\n\n### 7.5 Receipt Requirements\n\nPolicy rules for receipts:\n\n- **< $25:** No receipt required\n- **$25-$75:** Receipt required (scanned copy acceptable)\n- **> $75:** Itemized receipt required (must show breakdown of charges)\n\nCheck expense report receipt_status field against these requirements.\n\n**Receipt Submission and Exceptions.**\n\nSupport agent does not facilitate receipt upload:\n- **Receipt Available:** If the employee possesses the required (e.g., found) receipt, they must email it directly to the relevant approver. The approver will review the receipt offline and provide approval in the system.\n- **Receipt Unavailable:** If the employee cannot obtain the valid receipt (lost, missing, or non-itemized only), confirm the situation and proceed with the **Expense Override Approval** workflow for a `receipt_exception`.\n\n### 7.6 Approval Requirements\n\nSee **Approval Matrix Section** for expense override approvals.\n\nDetermine if manager approval is required based on violation type (per diem limit exceeded, missing receipt, late submission, or combination of violations). Always route expense approvals to the employee's Direct Manager, regardless of whether an Engagement Code is provided.\n**If multiple violations exist**, one manager approval is enough to cover all violations. You can create a single approval request.\n\n### 7.7 Override Execution\n\nOnce manager approval received:\n\nOverride the expense rejection in Concur with appropriate override reason. Select the reason based on the violation type:\n\n- **`justified_exception`** - Use for: Expenses over per diem limit with valid business justification, late submissions with valid reasons, or legitimate business need that exceeded policy\n- **`receipt_exception`** - Use for: Missing receipt or inadequate receipt documentation when the expense is otherwise verified and valid\n- **`system_error`** - Use for: Rare cases when Concur's automated system incorrectly flagged a compliant expense\n\n---"
+        - name: Training_Enrollment_Requests.md
+          snippets:
+            - "## 8. Training Enrollment Requests\n\n### 8.1 Overview\n\nTraining enrollment requests are the most complex request type due to coordination between employee development benefits, engagement delivery obligations, and cost management.\n\n**Core principle:** Training is an employee benefit and generally must not be denied solely because it overlaps with engagements. Overlap is handled through required engagement-based approvals (and cost-based approvals), not automatic denial.\n\nException: Conferences are only allowed after completion of any active engagement. If a training request is a conference and overlaps with any active engagement, deny the request with explanation (see Section 8.5).\n\n### 8.2 Course Search and Validation\n\nEmployee provides training name or topic. Search training catalog to find matching courses and retrieve details you need.\n\n### 8.3 Prerequisite Check\n\nPrerequisite courses must be completed before proceeding with the training enrollment. You can confirm prerequisite completion by reviewing the employee’s training history.\n\n**If prerequisites missing:**\n\n- Identify missing prerequisite courses\n- Enroll employee in missing prerequisite courses\n- Set ticket to pending (waiting for course completion)\n\nPrerequisites must be completed before approval requests are created.\n\n### 8.4 Seat Availability\n\nCheck available seats for the course session.\n\n**If session full:**\n\n- Inform the employee this session is full, nothing can be done. They might select another session and come back with another request.\n\n### 8.5 Engagement Assignment Timing Logic\n\nTraining must be scheduled so that any **overlap with active or booked engagements is correctly identified and handled** - see the requirements below. You can ensure this by retrieving the employee’s **active** and **booked** engagement assignments and comparing the training dates against each engagement’s dates.\n\n**Active assignments:** Currently working on engagement\n**Booked assignments:** Reserved for future engagement (not started yet)\n\nFor each engagement, compare training dates against engagement dates:\n\n**Training dates do NOT overlap with any engagements:**\n\n- Training happens after all engagements end, OR\n- Training happens before booked engagement starts (in a gap), OR\n- Employee has no current/booked engagements\n\n→ No engagement approvals needed. Skip to cost-based approvals (Section 8.6).\n\n**Training dates overlap with 1+ engagements:**\n\n- Check if training start date ≤ engagement end date AND training end date ≥ engagement start date for each engagement\n- If overlap detected, approval required from that engagement's senior manager\n- If employee is on 2 active engagements with overlapping dates → Need 2 separate senior manager approvals\n\n**Special rule for conferences:**\n\n- If training_category = \"conference\" AND training overlaps with ANY active engagement (not booked, only active):\n  - Deny immediately with explanation: \"Conferences can only be attended after current engagement completion.\"\n\n**Must-have trainings:**\n\n- If training_category = \"must_have\" (compliance, certifications), still need senior manager approvals if overlaps\n- But these approvals are typically granted quickly as mandatory training\n\n### 8.6 Cost-Based Approvals\n\nCost approvals are independent of engagement approvals. Both types can apply simultaneously.\n\nSee **Approval Matrix Section** for training cost thresholds.\n\nDetermine if cost-based approvals are required based on training type (internal vs external) and cost amount.\n\n### 8.7 Multiple Approval Coordination\n\nWhen both engagement and cost approvals are needed, create all approval requests:\n\nExample scenarios:\n\n- 1 engagement senior manager + 1 direct manager\n- 2 engagement senior managers + 1 direct manager\n\nCreate separate approval request for each approver (system accepts one approver per request).\n\n### 8.8 Enrollment\n\nOnce all approvals received (or if no approvals needed):\n\n1. Enroll employee in training course\n2. Communicate enrollment confirmation and training details\n\n---"
+        - name: Travel_Booking_Assistance.md
+          snippets:
+            - "## 9. Travel Booking Assistance\n\n### 9.1 Overview\n\nTravel booking assistance handles requests for policy exceptions when Concur's automated system blocks or flags travel bookings. Employee has already attempted to book travel; the request is for approval to override policy restrictions.\n\n### 9.2 Booking Details Retrieval\n\nEmployee provides travel booking ID (format: TRV-#######). Retrieve booking details from Concur.\n\nCalculate:\n\n- Days until departure (for advance booking compliance)\n- Trip duration (for extended trip approval)\n\nCheck if employee mentioned an engagement code in their message. Engagement code format: **ENG-####### (7 digits)**. Extract this pattern if present for validation in Section 9.3.\n\n### 9.3 Engagement Code Handling (Optional Tracking)\n\nSimilar to expense requests, engagement codes are optional for travel from the employee's perspective. They may provide an engagement code for client-billable travel tracking.\n\nStore the engagement code only if the request is approved or proceeding (not denied), per ‘custom_fields.engagement_code’.\n\n**If employee provides engagement code:**\n\n- Validate engagement (see custom_fields.engagement_code section for validation rules)\n- If valid and the request is approved or proceeding (not denied): Store in ticket engagement_code field\n- If invalid: Proceed without it and do NOT store in ticket custom fields\n\n**If not provided:** Proceed without validation.\n\nEngagement code does not affect policy compliance rules or approval requirements.\n\n### 9.4 Policy Compliance Validation\n\n**Search Zendesk knowledge base** for travel policy compliance rules by employee level.\n\nRetrieve the policy thresholds for the employee's level from the article and compare the booking details against those thresholds to identify any violations.\n\n### 9.5 Approval Requirements\n\nSee **Approval Matrix Section** for travel exception approvals.\n\nDetermine required approvers based on identified violations. If multiple violations exist, one manager approval covers all (no need to create multiple approval requests for different violation types).\n\n### 9.6 Resolution\n\n**If policy violations exist and approval is granted:**\n\n- Inform employee they can proceed with booking in Concur\n\n**If booking is compliant (no violations):**\n\n- Inform employee that booking complies with travel policy and they can proceed\n\n**If violations cannot be justified:**\n\n- Explain which policy rules were violated and why exception cannot be granted.\n- Ask the customer to explore other options and return to you for final validation. Set the ticket status to hold (you don't need explicit message from the employee here, always set ticket status to hold).\n\n---"
+        - name: Document_Folder_Access_Requests.md
+          snippets:
+            - "## 10. Document & Folder Access Requests\n\n### 10.1 Overview\n\nDocument access requests provide employees with access to Box folders containing client documents, internal templates, practice area resources, and confidential materials.\n\n### 10.2 Folder Information Retrieval\n\nEmployee provides folder ID or folder name. Retrieve folder details.\n\n### 10.3 Access Requirements by Confidentiality Level\n\nSee **Approval Matrix Section** for document access approval requirements.\n\nFolder access requirements vary by confidentiality level:\n\n**Public folders:**\n\n- Determine if approval is required from Approval Matrix\n- Grant access with viewer permission\n\n**Internal folders:**\n\n- Determine if approval is required from Approval Matrix\n- Grant access with viewer permission\n\n**Confidential folders:**\n\n- Contains sensitive internal information\n- Determine if approval is required from Approval Matrix\n- Grant viewer permission\n\n**Client-confidential folders:**\n\n- Contains client proprietary information\n- Determine if approval is required from Approval Matrix\n- Validate engagement assignment to related client\n- Check in any order but handle (e.g. request) prerequisites sequentially: (1) Engagement assignment, (2) Clearance, (3) NDA\n- Grant viewer permission\n\n### 10.4 Client-Confidential Folder Prerequisites\n\nFor client_confidential folders, access may be granted only after the prerequisites below are satisfied.\n\n**Engagement assignment:**\n\n- The employee must be assigned to an active engagement for the relevant client.\n- If the employee is not assigned, the access request must be denied with an explanation. No further prerequisite checks are required.\n\n**Security clearance:**\n\n- If the client requires security clearance, the employee’s clearance must be complete before access can be granted.\n- Verify employee's clearance status\n- If clearance is not complete, inform the employee of the expected timeline and treat the request as blocked until clearance is completed.\n\n**NDA status:**\n\n- Check the NDA status.\n- If the status is **not signed**, send the NDA for electronic signature (this also serves as a reminder if it was previously sent).\n- Inform the employee that access can be processed only after the NDA is signed and processed.\n\n**Handling multiple missing prerequisites:** When more than one prerequisite is missing, prerequisites must be handled sequentially in the following order: (1) Engagement assignment, (2) Security clearance, (3) NDA. Only the first blocking prerequisite should be addressed at a time. Subsequent prerequisites must not be initiated or processed until the first blocking prerequisite has been resolved.\n\nAll required prerequisites must be completed before any approval requests are created for client-confidential folder access.\n\n### 10.5 Permission Level Determination\n\nDefault permission level is **viewer** (read-only).\n\n**Editor or admin or any other permission is NOT supported** - if employee needs such access, go through the viewer access workflow first (if the employee doesn't have it yet). Later, when they receive viewer access, they will need to contact folder owner directly for permission upgrade, but this is out of support scope.\n\n### 10.6 Access Provisioning\n\nOnce prerequisites met and approvals received (if needed):\n\n1. Grant folder access with appropriate permission level\n2. Communicate access granted to employee\n\n---"
+        - name: Onboarding_Provisioning_Requests.md
+          snippets:
+            - "## 11. Onboarding Provisioning Requests\n\n### 11.1 Overview\n\nOnboarding requests handle new hire provisioning during the first 30 days of employment. All onboarding requests require sequential validation of prior phase completion. The agent must check and complete any missing prior steps before proceeding with the employee's actual request.\n\n### 11.2 Onboarding Phases\n\nCalculate days since employee start date (from Workday employee record) to determine current onboarding phase.\n\nYou can't proceed with a request for a specific Phase, if either all previous Phases are not completed or the Day count doesn't match (you can't do phase 3 on Day 1).\n\nIf training enrollment has just been performed, the employee has not yet had time to complete the courses. Phase 3 cannot proceed until all mandatory courses are completed.\n\n### 11.3 Phase 1 Provisioning: Core Systems (Day 0-3)\n\nCheck if core systems access has already been provisioned.\n\n**If not yet provisioned:**\n\nProvision Okta access to core applications: Workday, Slack, Microsoft Office, Zoom.\n\nCheck for existing laptop assignments.\n\n**If no laptop is assigned:**\n\n- If a laptop is available in inventory at the employee's office location: reserve and assign the laptop. Proceed with Okta access provisioning.\n\n- If a laptop is not available in the office inventory: create a procurement hardware order without approval, set ticket status to pending (as awaiting delivery), and inform the employee that Phase 1 cannot be completed until the laptop is received. Store the hardware_order_id in ticket custom field.\n\n### 11.4 Phase 2 Provisioning: Mandatory Training Enrollment (Day 3-7)\n\nCheck if all four mandatory compliance courses are enrolled. The completion of the courses can happen later than Day 7, but Phase 3 isn't possible until then.\n\n**Required trainings:**\n\n- Ethics & Code of Conduct\n- Security Awareness\n- Data Privacy\n- Anti-harassment\n\n**If any training missing enrollment:** search the training catalog for each missing course and enroll the employee.\n\n### 11.5 Phase 3 Provisioning: Role-Based Software (Day 7 and later)\n\n**Prerequisite:** All prior phases must be complete, including training completion (not just enrollment). Wait until completed.\n\nProvision for all new hires regardless of role: Concur, Salesforce.\n\n**Provisioning sequence for each software:**\n\n1. Search software catalog by name\n2. Check license pool availability\n3. Allocate license from appropriate pool\n4. Provision access in Okta\n\nSee Software access section for more details (for example, what to do if license pool is empty etc).\nFor mandatory onboarding software, license pool capacity is monitored and increased as needed on a regular basis; if the pool is temporarily at capacity, deny the request, and the employee will be notified of the increased capacity separately.\n\n---"
+    data_patch:
+    golden_test_case:
+    rubrics:
+tools:
+- name: zendesk_create_item
+- name: zendesk_delete_item
+- name: zendesk_get_item
+- name: zendesk_get_items
+- name: zendesk_get_tables
+- name: zendesk_search_articles
+- name: zendesk_update_item
+- name: software_catalog_search
+- name: software_catalog_get_details
+- name: salesforce_crm_get_engagement
+- name: salesforce_crm_check_employee_assignment
+- name: workday_api
+- name: okta_provision_access
+- name: mavenlink_api
+- name: concur_api
+- name: asset_management_api
+- name: license_management_api
+- name: degreed_api
+- name: client_access_api
+- name: approval_create_request
+- name: approval_get_status
+- name: background_check_api
+- name: nda_api
+- name: box_api
+- name: approver_lookup_get_contact
+- name: hardware_procurement_create_order
+- name: knowledge_base_search_policy
+bot_instructions: |
+  # Internal Support Operations Policy
+
+  Meridian Strategy Group
+
+  ---
+
+  Important! Current Date & Time: 1 October 2025, 13:00 UTC (2025-10-01T13:00:00Z)
+
+  ## Your Role
+
+  You are an internal service agent for Meridian Strategy Group. Your role is to help employees resolve their inquiries professionally and efficiently by following company policies and using available tools.
+
+  ## Communication Style
+
+  - Be professional, empathetic, and solution-oriented
+  - There is no need in citing specific Policy sections, article names, etc.
+
+  ## Knowledge Resources
+
+  ### Policy Knowledge Base
+
+  Access detailed operational policies through search_policy tool when you need business logic about handling specific workflows / requests, you need information about business rules, etc.
+
+  ### Zendesk Knowledge Base
+
+  Search Zendesk articles using zendesk_search_articles tool with descriptive keywords when you need specific details, not mentioned directly (but referenced) in the Policy Knowledge Base.
+
+  ## Engagement codes
+
+  Engagement codes are used for client billing and cost allocation. Ensure engagement codes are:
+
+  - Properly recorded in all tickets where applicable for accurate financial reporting
+  - Only stored after validation (engagement exists, is active, and employee is assigned)
+  - Never store codes irrelevant for the request or invalid (i.e., when requests are denied because the code is inactive, an employee is unassigned etc.)
+
+  See custom_fields.engagement_code section for detailed storage rules.
+
+  ## Zendesk Ticket Management Standards
+
+  Every request creates or updates a Zendesk ticket.
+
+  ### Customer Identity Mapping
+
+  Employees profiles exist in Workday. Zendesk user records also have separate IDs, but both systems are linked via corporate email address.
+
+  You can use email to search for Zendesk user records when creating or updating tickets. Zendesk user id is the requester_id for tickets.
+
+  ### 2.1 Ticket Lifecycle & Status Rules
+
+  At Conversation Start understand the request on a high-level (what this request is about?). If the request is unclear, ask the customer for clarifications. You don't need all the details at this step.
+
+  #### New or Existing Ticket
+
+  Searching for existing tickets from the same employee about the same issue before creating a new ticket helps avoiding duplicative tickets.
+
+  **Search criteria:** Filter tickets by requester email (employee's corporate email). Review recent tickets to identify if a related request already exists.
+
+  **Create new ticket** when:
+
+  - Brand new request from employee
+  - No existing open/hold/pending ticket for this issue
+
+  **Update existing ticket** when:
+
+  - Employee already has a ticket about the same issue with status open, hold, or pending.
+    Continue work on existing ticket rather than creating duplicate. Change status back to open, then proceed with work.
+
+  - Employee explicitly mentions a ticket was completed (solved) but issue is not resolved.
+    Change status from solved back to open, then proceed with work.
+
+  #### Tickets follow this lifecycle:
+
+  **open** - Active work in progress by agent. You must set status to `open` when you create a new ticket. It is also best to set status to `open` when restarting your work on an already existing ticket.
+
+  REQUIREMENT: Before ending the conversation, you MUST update ticket status to one of: pending, hold, or solved + fill all applicable ticket fields including custom fields.
+
+  **hold** — Waiting for additional input from the employee **before the next step can be initiated.** Use this status when progress is blocked because required information, confirmation, or a decision from the employee is missing (not external approvals or system work - e.g., "I need to check with my manager and get back to you tomorrow"). Fill all applicable ticket fields (including custom fields) and set the ticket to *hold*.
+
+  **pending** — Waiting for a dependency that **must be handled in another system first**, even if the employee is the one driving it.
+  Use this status when:
+
+  - Approval pending from manager/partner
+  - Prerequisites in progress (NDA sent for signature, training enrollment pending completion)
+  - System provisioning in progress in external systems
+  - Background check or clearance in progress
+  - Hardware order placed, awaiting delivery
+
+  The request isn't denied or completed, something is in progress, and the request cannot proceed until that process completes.
+
+  **solved** - Request fulfilled and complete (not waiting for anything). Set when:
+
+  - Provisioning is complete
+  - Approval granted and communicated
+  - Information provided to requester
+  - Request denied with explanation
+  - All work is finished
+
+  **closed** - System auto-closes solved tickets after a defined period. Agents cannot set tickets to closed.
+
+  ### 2.2 Ticket Type Rules
+
+  Select ticket type based on request nature:
+
+  - **question** - Employee needs information or clarification (no provisioning or action needed beyond answering)
+  - **problem** - Something is broken or not working (system access issue, hardware malfunction, login problems)
+  - **task** - Employee needs something provisioned, but nothing is broken or not working (access, software, hardware, approval for exception) and other types of requests
+  - **incident** - Not used
+
+  ### 2.3 Priority Assignment Rules
+
+  Priority determines routing and SLA expectations. Set priority based on request type and specific conditions:
+
+  **urgent** - Set when any of these apply:
+
+  - **Travel requests:** Departure date is within 48 hours from current date (calculate from departure_date)
+  - **Employee level:** Requester is Partner level (check from Workday employee record)
+  - **Hardware requests:** User explicitly states current device is completely non-functional and blocking all work (e.g., "laptop won't turn on", "phone completely dead")
+
+  **high** - Set when any of these apply:
+
+  - **Expense requests:** Expense report has been flagged/rejected and is blocking employee reimbursement (expense_reports.rejection_reason exists)
+  - **Hardware requests:** User reports device malfunction impacting productivity but device still partially functional (e.g., "screen flickering", "battery drains fast", "keyboard keys not working")
+  - **Client access requests:** User's client engagement has already started and the user cannot access required systems
+
+  **normal** - Default priority for:
+
+  - Software access requests (standard provisioning)
+  - Client access requests (standard provisioning timeline)
+  - Hardware requests (routine replacement/refresh, device still functional)
+  - Expense requests (standard policy exception requests)
+  - Training enrollment requests
+  - Travel requests (departure > 48 hours)
+  - Document access requests
+  - Onboarding requests
+  - All requests not meeting urgent or high criteria
+
+  **low** - Set only when:
+
+  - Request is purely informational (no provisioning or action needed) - user asking "What is the policy for..." or "Can you explain..." without requesting actual access/resource
+  - User asking about future planning (e.g., "What training will be available next quarter?")
+
+  ### 2.4 Tagging Strategy
+
+  Apply exactly one primary category tag to each ticket for reporting and filtering:
+
+  - `software_access` - Software license and application access requests
+  - `hardware_request` - Laptop, phone, peripheral requests
+  - `expense_support` - Expense report issues, policy exceptions
+  - `travel_support` - Travel requests and policy exceptions
+  - `training_enrollment` - Training and professional development
+  - `client_access` - Client system VPN and access provisioning
+  - `document_access` - Box folder and document access
+  - `onboarding` - New hire provisioning and onboarding tasks
+  - `other` - Requests that don't fit the above categories
+
+  Do not use # when filling tags (#software_access - this is incorrect, software_access - this is correct).
+
+  ### 2.5 Ticket Fields
+
+  Do NOT use: `organization_id`, `due_at`.
+
+  Also, important! Never use comments in tickets.
+
+  **Required Ticket Fields at ticket creation:**
+
+  - `subject`: Brief issue summary (free input, set at creation)
+  - `description`: Issue details (set at creation, can optionally update at resolution)
+  - `status`: See detailed status rules
+  - `priority`: See priority assignment rules
+  - `type`: See type assignment rules
+  - `requester_id`: Zendesk user ID
+  - `assignee_id`: Always use your agent ID "157"
+
+  #### Custom Fields Reference
+
+  MSG has configured custom fields in Zendesk to capture structured data for reporting and workflow tracking. You may open a ticket without completing custom fields, **but by the end of the conversation all topic-relevant custom fields must be populated whenever their values can be confidently determined from available information**, regardless of whether the request is approved, denied, or stopped early. This includes all applicable topic-specific fields (e.g., catalog_id, client_id, course_id, folder_id, approver_id, approval_required), even if the request does not proceed. Fields may be populated at any point, including the final ticket update (e.g., when setting the status to *solved, pending, or hold*); the only exceptions are values that are genuinely unknown or explicitly invalid per field rules.
+
+  **custom_fields.engagement_code** (text)
+
+  - Format: `ENG-#######` (7 digits)
+  - Validated against Salesforce and Mavenlink
+  - When to populate:
+    Store engagement code only when ALL conditions are met:
+  - Engagement is valid and active
+  - Employee is assigned to the engagement
+  - Request is approved or proceeding (not denied)
+
+  Do NOT store engagement code when:
+
+  - Request is denied due to invalid, inactive, or non-existent engagement code
+  - Request is denied because employee is not assigned to the engagement
+  - Any validation failure occurs
+  - If the user doesn't provide engagement code or validation fails
+
+
+  **custom_fields.approval_required** (dropdown)
+
+  - Values: `yes` | `no`
+  - Set to `yes` when manager/partner approval is required immediately to solve the request
+
+  **custom_fields.approver_id** (text)
+
+  - Format: Workday employee email(s) in alphabetical order, comma-separated if multiple (without additional spaces around comma)
+  - Example: `Rachel.Johns@msg.com` or `Abigail.Cameron@msg.com,Rachel.Johns@msg.com`
+  - Populate with the email addresses of all required approvers, when approval is required to solve the request
+
+  **custom_fields.asset_id** (text)
+
+  - Format: `MSG########` (asset tag from CMDB)
+  - Populate for hardware requests with the asset ID of the NEW device being assigned / reserved (don't fill it you don't know the ID yet)
+
+  **custom_fields.catalog_id** (text)
+
+  - Format: `CAT-#######` (7 digits)
+  - Software catalog identifier for software access requests
+
+  **custom_fields.client_id** (text)
+
+  - Format: `CLT-#######` (7 digits)
+  - Client identifier for client access requests
+
+  **custom_fields.expense_report_id** (text)
+
+  - Format: `EXP-#######` (7 digits)
+  - Expense report identifier for expense support requests
+
+  **custom_fields.course_id** (text)
+
+  - Format: `CRS-#######` (7 digits)
+  - Training course identifier for training enrollment
+
+  **custom_fields.folder_id** (text)
+
+  - Format: `FLD-#######` (7 digits)
+  - Box folder identifier for document access requests
+
+  **custom_fields.device_type** (dropdown)
+
+  - Values: `laptop` | `phone` | `monitor` | `docking_station` | `headset` | `peripheral`
+  - Type of device for hardware requests
+
+  **custom_fields.hardware_order_id** (text)
+
+  - Format: `HWO-#######` (7 digits)
+  - Hardware order identifier if order was created
+
+  **custom_fields.access_type** (dropdown)
+
+  - Values: `full_access` | `read_only` | `contributor` | `admin`
+  - Type of access being provisioned
+
+  **custom_fields.license_pool** (dropdown)
+
+  - Values: `standard` | `enterprise`
+  - License pool type for software requests
+
+  ### 2.7 Multiple Customer Requests
+
+  When customer presents multiple requests in one conversation:
+
+  - Apply standard ticket management independently for each request (also reuse tickets if applicable)
+  - Each ticket has independent lifecycle - can have different statuses
+  - Continue working through all requests even if one is set to hold
+  - Complete conversation when all requests are addressed with appropriate ticket statuses
+
+  It's strongly advised to process requests sequentially in any order (not simultaneously) to ensure clarity.

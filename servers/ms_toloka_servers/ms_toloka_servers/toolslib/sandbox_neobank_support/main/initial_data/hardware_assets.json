@@ -1,0 +1,146 @@
+[
+  {
+    "id": "VDB-HW-29417",
+    "device_type": "laptop_premium",
+    "device_model": "MacBook Pro 16-inch M2",
+    "purchase_date": "2023-01-15T00:00:00Z",
+    "warehouse_location": "sf",
+    "condition": "good",
+    "is_assigned": true
+  },
+  {
+    "id": "VDB-HW-57382",
+    "device_type": "laptop_standard",
+    "device_model": "Dell Latitude 5520",
+    "purchase_date": "2023-03-20T00:00:00Z",
+    "warehouse_location": "sf",
+    "condition": "new",
+    "is_assigned": false
+  },
+  {
+    "id": "VDB-HW-68149",
+    "device_type": "monitor",
+    "device_model": "Dell UltraSharp 27 U2723DE",
+    "purchase_date": "2023-06-10T00:00:00Z",
+    "warehouse_location": "sf",
+    "condition": "good",
+    "is_assigned": true
+  },
+  {
+    "id": "VDB-HW-84726",
+    "device_type": "laptop_standard",
+    "device_model": "Dell Latitude 5520",
+    "purchase_date": "2022-09-15T00:00:00Z",
+    "warehouse_location": "nyc",
+    "condition": "fair",
+    "is_assigned": true
+  },
+  {
+    "id": "VDB-HW-19263",
+    "device_type": "headset",
+    "device_model": "Jabra Evolve2 65",
+    "purchase_date": "2024-01-10T00:00:00Z",
+    "warehouse_location": "nyc",
+    "condition": "new",
+    "is_assigned": false
+  },
+  {
+    "id": "VDB-HW-46571",
+    "device_type": "docking_station",
+    "device_model": "Dell WD19TB Thunderbolt Dock",
+    "purchase_date": "2023-11-01T00:00:00Z",
+    "warehouse_location": "austin",
+    "condition": "good",
+    "is_assigned": true
+  },
+  {
+    "id": "VDB-HW-73918",
+    "device_type": "laptop_premium",
+    "device_model": "MacBook Pro 14-inch M2",
+    "purchase_date": "2024-02-15T00:00:00Z",
+    "warehouse_location": "sf",
+    "condition": "new",
+    "is_assigned": true
+  },
+  {
+    "id": "VDB-HW-31854",
+    "device_type": "monitor",
+    "device_model": "LG UltraWide 34WN80C",
+    "purchase_date": "2023-08-20T00:00:00Z",
+    "warehouse_location": "sf",
+    "condition": "good",
+    "is_assigned": false
+  },
+  {
+    "id": "VDB-HW-92647",
+    "device_type": "laptop_standard",
+    "device_model": "HP EliteBook 840 G9",
+    "purchase_date": "2021-05-10T00:00:00Z",
+    "warehouse_location": "nyc",
+    "condition": "poor",
+    "is_assigned": false
+  },
+  {
+    "id": "VDB-HW-58413",
+    "device_type": "headset",
+    "device_model": "Logitech H650e",
+    "purchase_date": "2024-03-01T00:00:00Z",
+    "warehouse_location": "austin",
+    "condition": "new",
+    "is_assigned": true
+  },
+  {
+    "id": "VDB-HW-75392",
+    "device_type": "keyboard",
+    "device_model": "Logitech MX Keys",
+    "purchase_date": "2023-07-15T00:00:00Z",
+    "warehouse_location": "sf",
+    "condition": "good",
+    "is_assigned": false
+  },
+  {
+    "id": "VDB-HW-21867",
+    "device_type": "mouse",
+    "device_model": "Logitech MX Master 3S",
+    "purchase_date": "2023-07-15T00:00:00Z",
+    "warehouse_location": "sf",
+    "condition": "good",
+    "is_assigned": false
+  },
+  {
+    "id": "VDB-HW-49582",
+    "device_type": "laptop_standard",
+    "device_model": "Dell Latitude 5530",
+    "purchase_date": "2024-01-20T00:00:00Z",
+    "warehouse_location": "austin",
+    "condition": "new",
+    "is_assigned": false
+  },
+  {
+    "id": "VDB-HW-67139",
+    "device_type": "docking_station",
+    "device_model": "CalDigit TS4 Thunderbolt 4 Dock",
+    "purchase_date": "2023-10-05T00:00:00Z",
+    "warehouse_location": "sf",
+    "condition": "good",
+    "is_assigned": false
+  },
+  {
+    "id": "VDB-HW-83476",
+    "device_type": "monitor",
+    "device_model": "Dell UltraSharp 24 U2422HE",
+    "purchase_date": "2023-09-10T00:00:00Z",
+    "warehouse_location": "nyc",
+    "condition": "good",
+    "is_assigned": false
+  },
+  {
+    "id": "VDB-HW-14725",
+    "device_type": "laptop_premium",
+    "device_model": "MacBook Pro 16-inch M2 Pro",
+    "purchase_date": "2020-03-15T00:00:00Z",
+    "warehouse_location": "sf",
+    "condition": "retired",
+    "is_assigned": false
+  }
+]

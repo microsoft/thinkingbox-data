@@ -1,0 +1,38 @@
+[
+  {
+    "id": "DSC-10000001",
+    "order_id": "ORD-10012345",
+    "promo_code_used": "SAVE20",
+    "points_used": 0,
+    "loyalty_discount_applied": false,
+    "total_discount_amount": 180.00,
+    "stacking_rule_applied": "promo_code_only"
+  },
+  {
+    "id": "DSC-10000002",
+    "order_id": "ORD-10012346",
+    "promo_code_used": null,
+    "points_used": 500,
+    "loyalty_discount_applied": false,
+    "total_discount_amount": 25.00,
+    "stacking_rule_applied": "points_redemption_only"
+  },
+  {
+    "id": "DSC-10000003",
+    "order_id": "ORD-10012347",
+    "promo_code_used": "TECH15",
+    "points_used": 200,
+    "loyalty_discount_applied": true,
+    "total_discount_amount": 95.00,
+    "stacking_rule_applied": "promo_code_and_points_and_loyalty_stacked"
+  },
+  {
+    "id": "DSC-10000004",
+    "order_id": "ORD-10012348",
+    "promo_code_used": null,
+    "points_used": 0,
+    "loyalty_discount_applied": true,
+    "total_discount_amount": 45.00,
+    "stacking_rule_applied": "loyalty_pricing_only"
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "CRS-1000001",
+    "title": "Formal Methods for Safety-Critical Systems with TLA+",
+    "cost": 0,
+    "training_category": "must_have",
+    "max_seats": null,
+    "start_date": null,
+    "end_date": null,
+    "prerequisites": []
+  },
+  {
+    "id": "CRS-1000002",
+    "title": "eBPF Kernel Programming for Observability",
+    "cost": 500,
+    "training_category": "nice_to_have",
+    "max_seats": 20,
+    "start_date": "2025-02-15T09:00:00Z",
+    "end_date": "2025-02-17T17:00:00Z",
+    "prerequisites": ["CRS-1000001"]
+  },
+  {
+    "id": "CRS-1000003",
+    "title": "ISO 13485 Medical Device Quality Management",
+    "cost": 0,
+    "training_category": "must_have",
+    "max_seats": null,
+    "start_date": null,
+    "end_date": null,
+    "prerequisites": []
+  },
+  {
+    "id": "CRS-1000004",
+    "title": "Temporal Logic Verification with NuSMV",
+    "cost": 1200,
+    "training_category": "nice_to_have",
+    "max_seats": 15,
+    "start_date": "2025-03-01T09:00:00Z",
+    "end_date": "2025-03-05T17:00:00Z",
+    "prerequisites": []
+  },
+  {
+    "id": "CRS-1000005",
+    "title": "Strange Loop Conference 2025",
+    "cost": 2500,
+    "training_category": "conference",
+    "max_seats": 5,
+    "start_date": "2025-05-10T08:00:00Z",
+    "end_date": "2025-05-12T18:00:00Z",
+    "prerequisites": []
+  },
+  {
+    "id": "CRS-1000006",
+    "title": "NIST Post-Quantum Cryptography Standards",
+    "cost": 0,
+    "training_category": "must_have",
+    "max_seats": null,
+    "start_date": null,
+    "end_date": null,
+    "prerequisites": []
+  },
+  {
+    "id": "CRS-1000007",
+    "title": "Homomorphic Encryption Implementation Workshop",
+    "cost": 800,
+    "training_category": "nice_to_have",
+    "max_seats": 12,
+    "start_date": "2025-04-20T09:00:00Z",
+    "end_date": "2025-04-22T17:00:00Z",
+    "prerequisites": ["CRS-1000001", "CRS-1000002"]
+  },
+  {
+    "id": "CRS-1000008",
+    "title": "TOGAF Enterprise Architecture Practitioner",
+    "cost": 1500,
+    "training_category": "nice_to_have",
+    "max_seats": 10,
+    "start_date": "2025-06-01T09:00:00Z",
+    "end_date": "2025-06-10T17:00:00Z",
+    "prerequisites": []
+  },
+  {
+    "id": "CRS-1000009",
+    "title": "GDPR Article 25 - Privacy by Design Implementation",
+    "cost": 0,
+    "training_category": "must_have",
+    "max_seats": null,
+    "start_date": null,
+    "end_date": null,
+    "prerequisites": []
+  },
+  {
+    "id": "CRS-1000010",
+    "title": "ICFP - International Conference on Functional Programming 2025",
+    "cost": 3000,
+    "training_category": "conference",
+    "max_seats": 3,
+    "start_date": "2025-07-15T08:00:00Z",
+    "end_date": "2025-07-18T18:00:00Z",
+    "prerequisites": []
+  },
+  {
+    "id": "CRS-1000011",
+    "title": "Nonviolent Communication in Cross-Cultural Teams",
+    "cost": 600,
+    "training_category": "nice_to_have",
+    "max_seats": 25,
+    "start_date": "2025-03-10T09:00:00Z",
+    "end_date": "2025-03-11T17:00:00Z",
+    "prerequisites": []
+  },
+  {
+    "id": "CRS-1000012",
+    "title": "IEC 62443 Industrial Cybersecurity",
+    "cost": 0,
+    "training_category": "must_have",
+    "max_seats": null,
+    "start_date": null,
+    "end_date": null,
+    "prerequisites": []
+  }
+]

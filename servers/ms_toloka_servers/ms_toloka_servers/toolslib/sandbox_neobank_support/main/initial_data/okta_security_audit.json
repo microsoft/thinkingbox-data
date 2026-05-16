@@ -1,0 +1,112 @@
+[
+  {
+    "id": "OSA-14729583",
+    "employee_id": "WD-847291",
+    "operation": "unlock_account",
+    "performed_by": "WD-753918",
+    "performed_at": "2025-09-17T10:00:00Z",
+    "reason": "User locked out after multiple failed password attempts",
+    "ticket_id": "1",
+    "verification_method": "manager_approval",
+    "success": true
+  },
+  {
+    "id": "OSA-28561937",
+    "employee_id": "WD-192638",
+    "operation": "force_password_reset",
+    "performed_by": "system",
+    "performed_at": "2025-09-16T14:30:00Z",
+    "reason": "Password reset request via self-service portal",
+    "ticket_id": null,
+    "verification_method": "email_verification",
+    "success": true
+  },
+  {
+    "id": "OSA-39487216",
+    "employee_id": "WD-465782",
+    "operation": "remove_mfa_device",
+    "performed_by": "WD-753918",
+    "performed_at": "2025-09-15T11:15:00Z",
+    "reason": "Lost MFA device - employee traveling",
+    "ticket_id": "2",
+    "verification_method": "phone_verification",
+    "success": true
+  },
+  {
+    "id": "OSA-52819647",
+    "employee_id": "WD-218647",
+    "operation": "invalidate_all_sessions",
+    "performed_by": "WD-753918",
+    "performed_at": "2025-09-17T09:00:00Z",
+    "reason": "Security incident - suspicious activity detected",
+    "ticket_id": "3",
+    "verification_method": "security_incident",
+    "success": true
+  },
+  {
+    "id": "OSA-67194825",
+    "employee_id": "WD-147258",
+    "operation": "set_temporary_bypass",
+    "performed_by": "WD-573926",
+    "performed_at": "2025-09-10T16:00:00Z",
+    "reason": "Employee on extended leave - temporary security bypass",
+    "ticket_id": "4",
+    "verification_method": "hr_confirmation",
+    "success": true
+  },
+  {
+    "id": "OSA-73628491",
+    "employee_id": "WD-847291",
+    "operation": "send_verification_video_call",
+    "performed_by": "system",
+    "performed_at": "2025-09-17T14:00:00Z",
+    "reason": "Breaking glass access verification for SEV1 incident",
+    "ticket_id": "5",
+    "verification_method": "security_incident",
+    "success": true
+  },
+  {
+    "id": "OSA-81947562",
+    "employee_id": "WD-739154",
+    "operation": "add_mfa_device",
+    "performed_by": "WD-753918",
+    "performed_at": "2025-09-14T10:30:00Z",
+    "reason": "MFA enrollment for compliance requirement",
+    "ticket_id": null,
+    "verification_method": "manager_approval",
+    "success": true
+  },
+  {
+    "id": "OSA-94562813",
+    "employee_id": "WD-318569",
+    "operation": "remove_mfa_device",
+    "performed_by": "WD-753918",
+    "performed_at": "2025-09-13T15:45:00Z",
+    "reason": "Technical issues with MFA device - temporary disable for troubleshooting",
+    "ticket_id": "1",
+    "verification_method": "manager_approval",
+    "success": true
+  },
+  {
+    "id": "OSA-46839271",
+    "employee_id": "WD-681453",
+    "operation": "send_verification_manager",
+    "performed_by": "system",
+    "performed_at": "2025-09-12T09:00:00Z",
+    "reason": "High-privilege operation verification",
+    "ticket_id": null,
+    "verification_method": "biometric",
+    "success": true
+  },
+  {
+    "id": "OSA-58273946",
+    "employee_id": "WD-834765",
+    "operation": "unlock_account",
+    "performed_by": "WD-753918",
+    "performed_at": "2025-09-11T11:00:00Z",
+    "reason": "Account locked due to inactivity timeout",
+    "ticket_id": "2",
+    "verification_method": "email_verification",
+    "success": true
+  }
+]

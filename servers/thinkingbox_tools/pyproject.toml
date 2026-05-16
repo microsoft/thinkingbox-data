@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "thinkingbox_tools"
+version = "0.0.1"
+description = "Thinkingbox MCP servers"
+requires-python = ">=3.10"
+dependencies = [
+    "fastmcp",
+    "httpx",
+    "pydantic",
+    "python-dateutil",
+    "sqlparse",
+    "typesense",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "trio>=0.22.0",
+]
+
+[tool.setuptools]
+py-modules = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["thinkingbox_tools*"]
+
+[tool.pytest.ini_options]
+markers = [
+    "typesense: tests that require a running typesense server",
+]
