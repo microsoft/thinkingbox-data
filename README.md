@@ -108,14 +108,21 @@ up.
 
 ## Run larger scenarios
 
-The Session Proxy must be running with this repo's `servers.yaml` (see
-[Verify your setup](#verify-your-setup) above for the start command). All
-commands below assume you are in the `thinkingbox/` directory.
+To run dataset_2602_external_retail and dataset_2603_sandbox_rl_zendesk, 
+you need to also start typesense server. 
+
+All commands below assume you are in the `thinkingbox/` directory.
+
+```
+export THINKINGBOX_DATA="../thinkingbox-data/dataset"
+export TB_MCP_START_SERVERS_FILE=../thinkingbox-data/servers/servers.yaml
+./scripts/background_tasks.sh
+```
 
 ```bash
 uv run tb infer -c config/config_o4mini.yaml \
     --dataset ../thinkingbox-data/dataset --agent think \
-    --inputs ../thinkingbox-data/dataset/test_case/sandbox_external_retail \
+    --test-list ../thinkingbox-data/releases/dataset_2602_external_retail/testlist_2602_external_retail_full100.yaml \
     --repeat 10 --batch-size 40 \
     --output output_sandbox_external_retail_10reps.jsonl
 ```
