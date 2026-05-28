@@ -14,29 +14,29 @@ servers:
     type: mcp-process
     command: ["{python}", "-m", "thinkingbox_tools.mcp_online_banking"]
 
-  # TOLOKA SANDBOX SERVERS
+  # SANDBOX SERVERS
   sandbox_external_retail:
     type: mcp-process
-    command: ["{python}", "-m", "ms_toloka_servers.mcp_sandbox_external_retail"]
+    command: ["{python}", "-m", "sandbox_servers.mcp_sandbox_external_retail"]
     env:
       TYPESENSE_API_KEY: "Fake"
   sandbox_auto_insurance:
     type: mcp-process
-    command: ["{python}", "-m", "ms_toloka_servers.mcp_sandbox_auto_insurance"]
+    command: ["{python}", "-m", "sandbox_servers.mcp_sandbox_auto_insurance"]
     env:
       TYPESENSE_API_KEY: "Fake"
   sandbox_consulting:
     type: mcp-process
-    command: ["{python}", "-m", "ms_toloka_servers.mcp_sandbox_consulting"]
+    command: ["{python}", "-m", "sandbox_servers.mcp_sandbox_consulting"]
     env:
       TYPESENSE_API_KEY: "Fake"
   external_booking_v1:
     type: mcp-process
-    command: ["{python}", "-m", "ms_toloka_servers.mcp_external_booking_v1"]
+    command: ["{python}", "-m", "sandbox_servers.mcp_external_booking_v1"]
     env:
       TYPESENSE_API_KEY: "Fake"
   sandbox_neobank_support_v1:
     type: mcp-process
-    command: ["{python}", "-m", "ms_toloka_servers.mcp_sandbox_neobank_support_v1"]
+    command: ["{python}", "-m", "sandbox_servers.mcp_sandbox_neobank_support_v1"]
     env:
       TYPESENSE_API_KEY: "Fake"

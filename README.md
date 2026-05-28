@@ -9,8 +9,8 @@ installation, configuration, and the `tb` CLI overview.
 
 - **`dataset/`** — scenarios, agents, and test cases.
 - **`servers/`** — MCP tool server packages (`thinkingbox_tools`,
-  `ms_toloka_servers`, `ms_telus_servers`) and the master `servers.yaml`
-  consumed by `tb mcp-start`.
+  `sandbox_servers`) and the master `servers.yaml` consumed by
+  `tb mcp-start`.
 - **`support/`** — large data files used by some tools (embeddings, knowledge
   bases). Set `THINKINGBOX_DATA=<path-to-this-repo>` so tools can locate them.
 - **`releases/`** — per-release dataset snapshots pinned to git tags.
@@ -35,7 +35,7 @@ README](https://github.com/microsoft/thinkingbox#readme)). Then, still from
 
 ```bash
 uv pip install --config-settings editable-mode=compat -e ../thinkingbox-data/servers/thinkingbox_tools
-uv pip install --config-settings editable-mode=compat -e ../thinkingbox-data/servers/ms_toloka_servers
+uv pip install --config-settings editable-mode=compat -e ../thinkingbox-data/servers/sandbox_servers
 ```
 
 Some tools also need extra services (e.g. Typesense, embeddings server) — see
