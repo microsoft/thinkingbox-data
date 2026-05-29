@@ -1,7 +1,6 @@
 - sandbox_external_retail_group1.py:test_case_ST002_001
 - sandbox_external_retail_group1.py:test_case_ST002_003
 - sandbox_external_retail_group1.py:test_case_ST002_004
-- sandbox_external_retail_group1.py:test_case_ST002_006
 - sandbox_external_retail_group1.py:test_case_ST003_003
 - sandbox_external_retail_group1.py:test_case_ST003_004
 - sandbox_external_retail_group1.py:test_case_ST003_006
@@ -89,7 +88,6 @@
 - sandbox_external_retail_group1.py:test_case_ST025_006
 - sandbox_external_retail_group1.py:test_case_ST026_002
 - sandbox_external_retail_group1.py:test_case_ST026_003
-- sandbox_external_retail_group1.py:test_case_ST028_001
 - sandbox_external_retail_group1.py:test_case_ST028_003
 - sandbox_external_retail_group1.py:test_case_ST029_001
 - sandbox_external_retail_group1.py:test_case_ST029_002
@@ -233,7 +231,6 @@
 - sandbox_auto_insurance_group1.py:test_doc_005
 - sandbox_auto_insurance_group1.py:test_doc_006
 - sandbox_auto_insurance_group1.py:test_doc_007
-- sandbox_auto_insurance_group1.py:test_doc_008
 - sandbox_auto_insurance_group1.py:test_drv_001
 - sandbox_auto_insurance_group1.py:test_drv_002
 - sandbox_auto_insurance_group1.py:test_drv_003
@@ -416,7 +413,6 @@
 - sandbox_consulting_group1.py:test_csa_008
 - sandbox_consulting_group1.py:test_csa_009
 - sandbox_consulting_group1.py:test_csa_010
-- sandbox_consulting_group1.py:test_csa_011
 - sandbox_consulting_group1.py:test_csa_012
 - sandbox_consulting_group1.py:test_csa_013
 - sandbox_consulting_group1.py:test_csa_016
@@ -427,10 +423,8 @@
 - sandbox_consulting_group1.py:test_doc_004
 - sandbox_consulting_group1.py:test_doc_005
 - sandbox_consulting_group1.py:test_doc_007
-- sandbox_consulting_group1.py:test_doc_008
 - sandbox_consulting_group1.py:test_doc_009
 - sandbox_consulting_group1.py:test_doc_010
-- sandbox_consulting_group1.py:test_doc_011
 - sandbox_consulting_group1.py:test_doc_013
 - sandbox_consulting_group1.py:test_doc_014
 - sandbox_consulting_group1.py:test_doc_015
@@ -472,11 +466,9 @@
 - sandbox_consulting_group1.py:test_onb_003
 - sandbox_consulting_group1.py:test_onb_005
 - sandbox_consulting_group1.py:test_onb_007
-- sandbox_consulting_group1.py:test_onb_008
 - sandbox_consulting_group1.py:test_onb_009
 - sandbox_consulting_group1.py:test_onb_010
 - sandbox_consulting_group1.py:test_onb_011
-- sandbox_consulting_group1.py:test_onb_012
 - sandbox_consulting_group1.py:test_onb_013
 - sandbox_consulting_group1.py:test_onb_014
 - sandbox_consulting_group1.py:test_swa_001
@@ -487,7 +479,6 @@
 - sandbox_consulting_group1.py:test_swa_006
 - sandbox_consulting_group1.py:test_swa_007
 - sandbox_consulting_group1.py:test_swa_009
-- sandbox_consulting_group1.py:test_swa_011
 - sandbox_consulting_group1.py:test_swa_012
 - sandbox_consulting_group1.py:test_swa_013
 - sandbox_consulting_group1.py:test_swa_016
