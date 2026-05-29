@@ -151,7 +151,7 @@ Check `thinkingbox/README.md` for installing ThinkingBox
 
 ```bash
 # Install the servers in the ThinkingBox virtual environment
-uv pip install --config-settings editable-mode=compat -e servers/sandbox_servers
+uv pip install --config-settings editable-mode=compat -e servers/tb_business_ops_servers_202606
 
 # Start typesense (default port, key: Fake)
 mkdir -p /tmp/typesense/data && typesense-server --data-dir="/tmp/typesense/data" --api-key="Fake" --enable-cors

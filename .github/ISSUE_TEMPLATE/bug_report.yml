@@ -21,7 +21,7 @@ body:
         Additional context.
       options:
         - thinkingbox_tools (servers/thinkingbox_tools)
-        - sandbox_servers (servers/sandbox_servers)
+        - tb_business_ops_servers_202606 (servers/tb_business_ops_servers_202606)
         - A dataset under releases/
         - Repo-wide tooling (CI, lint, scripts)
         - Other (describe in Additional context)
