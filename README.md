@@ -32,7 +32,8 @@ set is defined by the test list linked from its release documentation.
   `tb mcp-start`.
 - **`support/`** — large data files used by some tools (embeddings, knowledge
   bases). Set `THINKINGBOX_DATA=<path-to-this-repo>` so tools can locate them.
-- **`releases/`** — benchmark releases and versioned dataset snapshots.
+- **[`releases/`](releases/README.md)** — supported benchmark releases and
+  their canonical test lists.
 
 ## Layout
 
@@ -149,7 +150,7 @@ In another terminal, run the benchmark:
 ```bash
 uv run tb infer -c config/config_o4mini.yaml \
     --dataset ../thinkingbox-data/dataset --agent think \
-    --test-list ../thinkingbox-data/releases/dataset_2603_sandbox_rl_zendesk/testlist_2603_sandbox_rl_zendesk.yaml \
+    --test-list ../thinkingbox-data/releases/thinkingbox_bench_v1/testlist_thinkingbox_bench_v1.yaml \
     --repeat 5 --batch-size 40 \
     --output output_thinkingbox_bench_v1.jsonl
 ```

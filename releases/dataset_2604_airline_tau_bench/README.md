@@ -78,16 +78,20 @@ Some interaction with the user is expected in most test cases, to retrieve missi
 ## Running
 
 Check `thinkingbox/README.md` for installing ThinkingBox.
+The commands below assume `thinkingbox/` and `thinkingbox-data/` are cloned
+side-by-side and are run from the `thinkingbox/` directory.
 
 ```bash
 # Install the airline tau-bench server in the ThinkingBox virtual environment
-uv pip install --config-settings editable-mode=compat -e servers/thinkingbox_tools
+uv pip install --config-settings editable-mode=compat \
+    -e ../thinkingbox-data/servers/thinkingbox_tools
 
 # Start session proxy
-THINKINGBOX_DATA=thinkingbox-data tb mcp-start --servers thinkingbox-data/servers/servers.yaml
+THINKINGBOX_DATA=../thinkingbox-data \
+    tb mcp-start --servers ../thinkingbox-data/servers/servers.yaml
 
 # Decode (full dataset, 5 repetitions)
-tb infer -c config.yaml -d thinkingbox-data/dataset -a think \
-    --test-list thinkingbox-data/releases/dataset_2604_airline_tau_bench/testlist_2604_airline_tau_bench.yaml \
+tb infer -c config.yaml -d ../thinkingbox-data/dataset -a think \
+    --test-list ../thinkingbox-data/releases/dataset_2604_airline_tau_bench/testlist_2604_airline_tau_bench.yaml \
     --repeat 5 --batch-size 40 -o output_2604_airline_tau_bench.jsonl
 ```

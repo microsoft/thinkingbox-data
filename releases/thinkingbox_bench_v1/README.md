@@ -21,16 +21,22 @@ designated dialogue properties pass.
 | **Total** | | **507** |
 
 The canonical task set is
-[`testlist_2603_sandbox_rl_zendesk.yaml`](../dataset_2603_sandbox_rl_zendesk/testlist_2603_sandbox_rl_zendesk.yaml).
+[`testlist_thinkingbox_bench_v1.yaml`](testlist_thinkingbox_bench_v1.yaml).
 The test list, rather than every test definition under `dataset/test_case/`,
 defines the release. It selects rubric-enhanced alternatives for 15 travel
 tasks and 15 neobank tasks in place of their corresponding base definitions,
 so these alternatives do not increase the task count.
 
-The source snapshot retains its original
-[`dataset_2603_sandbox_rl_zendesk`](../dataset_2603_sandbox_rl_zendesk/README.md)
-name for compatibility. Other datasets and tests in this repository are not
-part of ThinkingBox-Bench v1.0.
+Other datasets and tests in this repository are not part of ThinkingBox-Bench
+v1.0.
+
+## Evaluation method
+
+Each task compares the final backend state with its golden expected state using
+deterministic, hash-based checks. Thirty tasks additionally use simple yes/no
+rubrics evaluated by an LLM judge. A task passes only when its final state is
+correct and every applicable rubric returns the expected result; there is no
+partial credit.
 
 ## Intended use
 
@@ -68,7 +74,7 @@ In another terminal, run all 507 tasks:
 ```bash
 uv run tb infer -c config/config_o4mini.yaml \
     --dataset ../thinkingbox-data/dataset --agent think \
-    --test-list ../thinkingbox-data/releases/dataset_2603_sandbox_rl_zendesk/testlist_2603_sandbox_rl_zendesk.yaml \
+    --test-list ../thinkingbox-data/releases/thinkingbox_bench_v1/testlist_thinkingbox_bench_v1.yaml \
     --repeat 5 --batch-size 40 \
     --output output_thinkingbox_bench_v1.jsonl
 ```
