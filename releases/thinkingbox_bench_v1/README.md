@@ -140,11 +140,22 @@ uv run tb infer -c config/config_o4mini.yaml \
     --output output_thinkingbox_bench_v1.jsonl
 ```
 
-Aggregate pass rates:
+## Analyze the results
+
+The `tb infer` command writes one JSON object per trial to
+`output_thinkingbox_bench_v1.jsonl`. Use `tb agg` to compute the aggregate
+metrics:
 
 ```bash
 uv run tb agg output_thinkingbox_bench_v1.jsonl
 ```
+
+See [Analyzing inference results](https://github.com/microsoft/thinkingbox/blob/main/docs/analyzing_results.md)
+for the JSONL artifact schema, table and JSON output modes, pass@1, pass@20,
+and pass^20 definitions, per-domain filtering, inspecting individual
+trajectories with `tb pp`, rerunning assertions, and resuming interrupted runs.
+The guide also explains that the paper's trajectory failure categories require
+manual or external classification; `tb agg` does not assign those categories.
 
 Press Ctrl+C in the background-services terminal to stop Typesense and the MCP
 Session Proxy.
