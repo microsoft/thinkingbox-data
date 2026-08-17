@@ -136,7 +136,7 @@ source .venv/bin/activate
 uv run tb infer -c config/config_o4mini.yaml \
     --dataset ../thinkingbox-data/dataset --agent think \
     --test-list ../thinkingbox-data/releases/thinkingbox_bench_v1/testlist_thinkingbox_bench_v1.yaml \
-    --repeat 5 --batch-size 40 \
+    --repeat 20 --batch-size 20 \
     --output output_thinkingbox_bench_v1.jsonl
 ```
 
