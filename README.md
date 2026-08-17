@@ -49,18 +49,17 @@ parent/
 
 ## Setup
 
+For ThinkingBox-Bench, use the complete
+[v1.0 installation and run instructions](releases/thinkingbox_bench_v1/README.md#run-the-benchmark).
+The commands below are only for general repository development and smoke tests.
+
 Install the framework first (see the [thinkingbox
-README](https://github.com/microsoft/thinkingbox#readme)). Then, still from
-`thinkingbox/`, install the server packages from this repo into the same env:
+README](https://github.com/microsoft/thinkingbox#readme)). For the smoke tests
+below, install the `thinkingbox_tools` package into the same environment:
 
 ```bash
 uv pip install --config-settings editable-mode=compat -e ../thinkingbox-data/servers/thinkingbox_tools
-uv pip install --config-settings editable-mode=compat -e ../thinkingbox-data/servers/tb_business_ops_servers_202606
 ```
-
-Some tools also need extra services (e.g. Typesense, embeddings server) — see
-[`tools_with_additional_setup.md`](https://github.com/microsoft/thinkingbox/blob/main/docs/tools_with_additional_setup.md)
-in the framework repo.
 
 ## Verify your setup
 
@@ -128,34 +127,10 @@ up.
 
 ## Run ThinkingBox-Bench
 
-ThinkingBox-Bench requires the business-operations server package and its
-background services. Install the prerequisites described in
-[`tools_with_additional_setup.md`](https://github.com/microsoft/thinkingbox/blob/main/docs/tools_with_additional_setup.md),
-then see the
-[v1.0 release documentation](releases/thinkingbox_bench_v1/README.md) for the
-benchmark composition and evaluation details.
+Use the canonical
+[ThinkingBox-Bench v1.0 installation and run instructions](releases/thinkingbox_bench_v1/README.md#run-the-benchmark).
 
-All commands below assume you are in the `thinkingbox/` directory.
-
-In one terminal, start the background services:
-
-```
-export THINKINGBOX_DATA="../thinkingbox-data"
-export TB_MCP_START_SERVERS_FILE=../thinkingbox-data/servers/servers.yaml
-./scripts/background_tasks.sh
-```
-
-In another terminal, run the benchmark:
-
-```bash
-uv run tb infer -c config/config_o4mini.yaml \
-    --dataset ../thinkingbox-data/dataset --agent think \
-    --test-list ../thinkingbox-data/releases/thinkingbox_bench_v1/testlist_thinkingbox_bench_v1.yaml \
-    --repeat 5 --batch-size 40 \
-    --output output_thinkingbox_bench_v1.jsonl
-```
-
-### Re-run assertions on a saved test context
+## Re-run assertions on a saved test context
 
 After decoding once, re-run just the test assertions (no LLM calls):
 
@@ -173,7 +148,7 @@ uv run tb run-test -c config/config_o4mini.yaml \
     --resultfile output.yaml --update
 ```
 
-### Interactive TUI
+## Interactive TUI
 
 Chat with a scenario:
 

@@ -56,21 +56,66 @@ other model optimization.
 
 ## Run the benchmark
 
-The commands below assume `thinkingbox/` and `thinkingbox-data/` are cloned
-side-by-side and are run from the `thinkingbox/` directory.
+ThinkingBox-Bench requires:
 
-Install the benchmark's server package in the ThinkingBox environment:
+- Python 3.12 and [`uv`](https://docs.astral.sh/uv/)
+- a Linux or WSL environment
+- ThinkingBox and `thinkingbox-data` cloned side-by-side
+- Typesense 30.1, installed by the ThinkingBox installation script
+
+On Ubuntu or WSL Ubuntu, install the required system tools:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y git curl tar coreutils procps
+```
+
+Install `uv` if it is not already available:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+source "$HOME/.local/bin/env"
+```
+
+It does **not** require the embeddings server, downloaded Hugging Face models,
+or pre-indexed Typesense snapshots. Each benchmark scenario initializes its
+own Typesense collections from the sources in its scenario definition.
+
+Clone and install ThinkingBox:
+
+```bash
+git clone https://github.com/microsoft/thinkingbox.git
+git clone https://github.com/microsoft/thinkingbox-data.git
+
+cd thinkingbox-data
+git checkout thinkingbox-bench-v1.0
+cd ../thinkingbox
+
+uv venv --python 3.12
+uv sync --group dev
+source .venv/bin/activate
+```
+
+Install the benchmark's MCP server package into the same environment:
 
 ```bash
 uv pip install --config-settings editable-mode=compat \
     -e ../thinkingbox-data/servers/tb_business_ops_servers_202606
 ```
 
-Install the additional service prerequisites described in
-[`tools_with_additional_setup.md`](https://github.com/microsoft/thinkingbox/blob/main/docs/tools_with_additional_setup.md).
-ThinkingBox-Bench requires Typesense.
+Install Typesense into the active ThinkingBox virtual environment:
 
-In one terminal, start the required background services:
+```bash
+./scripts/install_typesense.sh
+typesense-server --version
+```
+
+Configure an LLM endpoint in `config/config_o4mini.yaml` or another ThinkingBox
+configuration file. See the
+[ThinkingBox LLM configuration guide](https://github.com/microsoft/thinkingbox/blob/main/docs/llm_endpoint_config.md)
+for the supported providers and fields.
+
+From `thinkingbox/`, start Typesense and the MCP Session Proxy in one terminal:
 
 ```bash
 export THINKINGBOX_DATA="../thinkingbox-data"
@@ -78,9 +123,16 @@ export TB_MCP_START_SERVERS_FILE="../thinkingbox-data/servers/servers.yaml"
 ./scripts/background_tasks.sh
 ```
 
-In another terminal, run all 507 tasks:
+Wait for the script to print `All processes are running`. It uses the
+`TYPESENSE_API_KEY=Fake` default expected by the benchmark server
+configuration. Keep this terminal running.
+
+In another terminal, enter `thinkingbox/`, activate the same environment, and
+run all 507 tasks:
 
 ```bash
+source .venv/bin/activate
+
 uv run tb infer -c config/config_o4mini.yaml \
     --dataset ../thinkingbox-data/dataset --agent think \
     --test-list ../thinkingbox-data/releases/thinkingbox_bench_v1/testlist_thinkingbox_bench_v1.yaml \
@@ -94,6 +146,9 @@ Aggregate pass rates:
 uv run tb agg output_thinkingbox_bench_v1.jsonl
 ```
 
-For a reproducible published result, record the exact `thinkingbox-data` commit
-and the ThinkingBox configuration, model deployment, inference parameters,
-user-simulator model, and judge model used for the run.
+Press Ctrl+C in the background-services terminal to stop Typesense and the MCP
+Session Proxy.
+
+For a reproducible published result, record the exact `thinkingbox` and
+`thinkingbox-data` commits, ThinkingBox configuration, model deployment,
+inference parameters, user-simulator model, and judge model used for the run.
