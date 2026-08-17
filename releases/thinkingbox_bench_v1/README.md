@@ -140,11 +140,20 @@ uv run tb infer -c config/config_o4mini.yaml \
     --output output_thinkingbox_bench_v1.jsonl
 ```
 
-Aggregate pass rates:
+## Analyze the results
+
+The `tb infer` command writes one JSON object per trial to
+`output_thinkingbox_bench_v1.jsonl`. Use `tb agg` to compute the aggregate
+metrics:
 
 ```bash
 uv run tb agg output_thinkingbox_bench_v1.jsonl
 ```
+
+For a JSONL containing 20 attempts for every task, the aggregate output includes
+pass@1, pass@20, and pass^20. pass@20 measures whether at least one of 20
+attempts succeeds; pass^20 estimates whether all 20 attempts succeed. These
+metrics are omitted if tasks have unequal attempt counts.
 
 Press Ctrl+C in the background-services terminal to stop Typesense and the MCP
 Session Proxy.
