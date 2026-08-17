@@ -6,7 +6,7 @@ Use the following tag of `thinkingbox-data` to use a stable version of this data
 
 |  |  |
 | - | - |
-| Tag | [`ds-airline-tau-bench-2026-04-v1.0`](https://github.com/microsoft/thinkingbox-data/tree/ds-airline-tau-bench-2026-04-v1.0) |
+| Tag | [`ds-airline-tau-bench-2026-04-v1.0`](https://github.com/microsoft/thinkingbox-data/releases/tag/ds-airline-tau-bench-2026-04-v1.0) |
 
 
 ## Overview
