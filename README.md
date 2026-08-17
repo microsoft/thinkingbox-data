@@ -21,10 +21,6 @@ If your goal is to run the published benchmark, follow the complete
 directly. The remaining setup and examples in this README are intended for
 customized ThinkingBox development, individual scenarios, and smoke testing.
 
-| Version | Tasks | Domains | Release |
-| - | -: | -: | - |
-| ThinkingBox-Bench v1.0 | 507 | 5 | [Documentation and usage](releases/thinkingbox_bench_v1/README.md) |
-
 The rest of this repository also contains individual datasets and development
 fixtures that are not part of ThinkingBox-Bench. The benchmark's canonical task
 set is defined by the test list linked from its release documentation.
