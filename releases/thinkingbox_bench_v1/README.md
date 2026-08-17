@@ -150,9 +150,10 @@ metrics:
 uv run tb agg output_thinkingbox_bench_v1.jsonl
 ```
 
-See [Analyzing inference results](https://github.com/microsoft/thinkingbox/blob/main/docs/analyzing_results.md)
-for the command used to obtain pass@1, pass@20, and pass^20 from the result
-JSONL.
+For a JSONL containing 20 attempts for every task, the aggregate output
+includes pass@1, pass@20, and pass^20. pass@20 measures whether at least one of
+20 attempts succeeds; pass^20 estimates whether all 20 attempts succeed. These
+metrics are omitted if tasks have unequal attempt counts.
 
 Press Ctrl+C in the background-services terminal to stop Typesense and the MCP
 Session Proxy.
