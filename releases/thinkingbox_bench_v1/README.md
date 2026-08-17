@@ -1,5 +1,14 @@
 # ThinkingBox-Bench v1.0
 
+## Repository
+
+Use the following `thinkingbox-data` tag for a stable version of the benchmark,
+tool servers, and supporting data:
+
+| | |
+| - | - |
+| Tag | [`thinkingbox-bench-v1.0`](https://github.com/microsoft/thinkingbox-data/tree/thinkingbox-bench-v1.0) |
+
 ThinkingBox-Bench is an executable benchmark for evaluating whether tool-using
 LLM agents can reliably complete stateful business workflows. Version 1.0
 contains 507 tool-agent-user tasks across five domains.
