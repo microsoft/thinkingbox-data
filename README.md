@@ -16,6 +16,11 @@ Each task runs in an isolated, stateful tool environment and is evaluated with
 executable checks over the final backend state and side effects. Some tasks
 also check required properties of the final response.
 
+If your goal is to run the published benchmark, follow the complete
+[ThinkingBox-Bench v1.0 installation and run instructions](releases/thinkingbox_bench_v1/README.md#run-the-benchmark)
+directly. The remaining setup and examples in this README are intended for
+customized ThinkingBox development, individual scenarios, and smoke testing.
+
 | Version | Tasks | Domains | Release |
 | - | -: | -: | - |
 | ThinkingBox-Bench v1.0 | 507 | 5 | [Documentation and usage](releases/thinkingbox_bench_v1/README.md) |
@@ -48,10 +53,6 @@ parent/
 ```
 
 ## Setup
-
-For ThinkingBox-Bench, use the complete
-[v1.0 installation and run instructions](releases/thinkingbox_bench_v1/README.md#run-the-benchmark).
-The commands below are only for general repository development and smoke tests.
 
 Install the framework first (see the [thinkingbox
 README](https://github.com/microsoft/thinkingbox#readme)). For the smoke tests
