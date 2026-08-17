@@ -5,6 +5,25 @@ with [ThinkingBox](https://github.com/microsoft/thinkingbox). See the
 framework's [README](https://github.com/microsoft/thinkingbox#readme) for
 installation, configuration, and the `tb` CLI overview.
 
+## ThinkingBox-Bench
+
+[ThinkingBox-Bench](releases/thinkingbox_bench_v1/README.md) is the primary
+evaluation release in this repository. Version 1.0 contains 507 executable
+tool-agent-user tasks across retail and e-commerce, travel and hospitality,
+auto insurance, neobank support, and consulting IT/HR support.
+
+Each task runs in an isolated, stateful tool environment and is evaluated with
+executable checks over the final backend state and side effects. Some tasks
+also check required properties of the final response.
+
+| Version | Tasks | Domains | Release |
+| - | -: | -: | - |
+| ThinkingBox-Bench v1.0 | 507 | 5 | [Documentation and usage](releases/thinkingbox_bench_v1/README.md) |
+
+The rest of this repository also contains individual datasets and development
+fixtures that are not part of ThinkingBox-Bench. The benchmark's canonical task
+set is defined by the test list linked from its release documentation.
+
 ## Contents
 
 - **`dataset/`** — scenarios, agents, and test cases.
@@ -13,7 +32,7 @@ installation, configuration, and the `tb` CLI overview.
   `tb mcp-start`.
 - **`support/`** — large data files used by some tools (embeddings, knowledge
   bases). Set `THINKINGBOX_DATA=<path-to-this-repo>` so tools can locate them.
-- **`releases/`** — per-release dataset snapshots pinned to git tags.
+- **`releases/`** — benchmark releases and versioned dataset snapshots.
 
 ## Layout
 
@@ -106,25 +125,33 @@ If `tb pp` shows a successful conversation or `tb agg` reports passing
 assertions, the framework, server packages, and LLM endpoint are all wired
 up.
 
-## Run larger scenarios
+## Run ThinkingBox-Bench
 
-To run dataset_2602_external_retail and dataset_2603_sandbox_rl_zendesk, 
-you need to also start typesense server. 
+ThinkingBox-Bench requires the business-operations server package and its
+background services. Install the prerequisites described in
+[`tools_with_additional_setup.md`](https://github.com/microsoft/thinkingbox/blob/main/docs/tools_with_additional_setup.md),
+then see the
+[v1.0 release documentation](releases/thinkingbox_bench_v1/README.md) for the
+benchmark composition and evaluation details.
 
 All commands below assume you are in the `thinkingbox/` directory.
 
+In one terminal, start the background services:
+
 ```
-export THINKINGBOX_DATA="../thinkingbox-data/dataset"
+export THINKINGBOX_DATA="../thinkingbox-data"
 export TB_MCP_START_SERVERS_FILE=../thinkingbox-data/servers/servers.yaml
 ./scripts/background_tasks.sh
 ```
 
+In another terminal, run the benchmark:
+
 ```bash
 uv run tb infer -c config/config_o4mini.yaml \
     --dataset ../thinkingbox-data/dataset --agent think \
-    --test-list ../thinkingbox-data/releases/dataset_2602_external_retail/testlist_2602_external_retail_full100.yaml \
-    --repeat 10 --batch-size 40 \
-    --output output_sandbox_external_retail_10reps.jsonl
+    --test-list ../thinkingbox-data/releases/dataset_2603_sandbox_rl_zendesk/testlist_2603_sandbox_rl_zendesk.yaml \
+    --repeat 5 --batch-size 40 \
+    --output output_thinkingbox_bench_v1.jsonl
 ```
 
 ### Re-run assertions on a saved test context

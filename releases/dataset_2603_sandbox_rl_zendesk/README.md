@@ -1,19 +1,16 @@
 # Sandbox RL Zendesk 26-03
 
-## Repository
-
-Use the following tag of `thinkingbox-data` to use a stable version of this dataset and tools.
-
-|  |  |
-| - | - |
-| Tag | [ds-sandbox-rl-zendesk-2026-03-v1.0](https://github.com/microsoft/thinkingbox-data/releases/tag/ds-sandbox-rl-zendesk-2026-03-v1.0) |
-
+> [!NOTE]
+> This is the source dataset snapshot for
+> [ThinkingBox-Bench v1.0](../thinkingbox_bench_v1/README.md). The snapshot
+> name is retained for compatibility; use the ThinkingBox-Bench release
+> documentation as the canonical benchmark entry point.
 
 ## Overview
 
 **Dataset name**: Sandbox RL Zendesk 26-03
 
-**Test cases**: 516
+**Test cases**: 507
 
 **Agents**: 5
 
@@ -30,7 +27,7 @@ Use the following tag of `thinkingbox-data` to use a stable version of this data
 **a01**
 
 - Name: B2C Ecommerce Electronics Support Agent (External)
-- Num Tests: 100
+- Num Tests: 98
 - Description: Handles consumer inquiries about orders, deliveries, returns, and warranty
 
 **a02r**
@@ -42,7 +39,7 @@ Use the following tag of `thinkingbox-data` to use a stable version of this data
 **a03**
 
 - Name: Car Insurance Policy & Claims Service Agent (External)
-- Num Tests: 101
+- Num Tests: 100
 - Description: Supports policy changes, FNOL intake, claim status inquiries, and documentation
 
 **a04r**
@@ -54,7 +51,7 @@ Use the following tag of `thinkingbox-data` to use a stable version of this data
 **a05**
 
 - Name: Internal Consulting Helpdesk Agent (IT, HR, Expense Support)
-- Num Tests: 107
+- Num Tests: 101
 - Description: Supports consultants with equipment issues, system access, travel/expense inquiries
 
 
@@ -74,11 +71,19 @@ Using this dataset for training or tuning would compromise its value as an indep
 
 Each test case is evaluated by comparing the final database state after the agent's execution against a golden expected state. This is a deterministic, hash-based comparison: the agent either produced exactly the correct set of side effects or it did not.
 
-In addition, 30 out of 516 test cases have simple rubrics evaluated by a LLM judge, in the form of yes/no questions.
+In addition, 30 out of 507 test cases have simple rubrics evaluated by an LLM
+judge in the form of yes/no questions. For these tasks, the canonical test list
+selects rubric-enhanced definitions in place of the corresponding base
+definitions; they are not additional tasks.
 
 Tests pass if the final state is correct and all rubrics evaluate to the expected result. There is no partial credit.
 
-## Evaluation results
+## Historical evaluation results
+
+The results below were produced on the original 516-task snapshot. Nine tasks
+with zero pass rate were subsequently removed, producing the current 507-task
+test list. These results are retained for provenance but must not be interpreted
+as results on ThinkingBox-Bench v1.0.
 
 All results are pass@k over 20 repetitions.
 
@@ -89,7 +94,7 @@ Agent:
 
 User simulator and Judge: GPT-5 Chat
 
-### ds-sandbox-rl-zendesk-2026-03-v1.0
+### Original 516-task snapshot
 
 | Model | Orchestrator | pass@1 | pass@5 |
 |---|---|---|---|
@@ -107,7 +112,8 @@ Results on `t11_24_25_varset_3_rm` refer to a run on the PPE CAPI deployment of 
 
 ## Running
 
-Check `thinkingbox/README.md` for installing ThinkingBox
+For the canonical benchmark instructions, see
+[ThinkingBox-Bench v1.0](../thinkingbox_bench_v1/README.md).
 
 ```bash
 # Install the Sandbox RL servers in the ThinkingBox virtual environment
