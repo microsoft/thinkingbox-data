@@ -5,6 +5,26 @@ with [ThinkingBox](https://github.com/microsoft/thinkingbox). See the
 framework's [README](https://github.com/microsoft/thinkingbox#readme) for
 installation, configuration, and the `tb` CLI overview.
 
+## ThinkingBox-Bench
+
+[ThinkingBox-Bench](releases/thinkingbox_bench_v1/README.md) is the primary
+evaluation release in this repository. Version 1.0 contains 507 executable
+tool-agent-user tasks across retail and e-commerce, travel and hospitality,
+auto insurance, neobank support, and consulting IT/HR support.
+
+Each task runs in an isolated, stateful tool environment and is evaluated with
+executable checks over the final backend state and side effects. Some tasks
+also check required properties of the final response.
+
+If your goal is to run the published benchmark, follow the complete
+[ThinkingBox-Bench v1.0 installation and run instructions](releases/thinkingbox_bench_v1/README.md#run-the-benchmark)
+directly. The remaining setup and examples in this README are intended for
+customized ThinkingBox development, individual scenarios, and smoke testing.
+
+The rest of this repository also contains individual datasets and development
+fixtures that are not part of ThinkingBox-Bench. The benchmark's canonical task
+set is defined by the test list linked from its release documentation.
+
 ## Contents
 
 - **`dataset/`** — scenarios, agents, and test cases.
@@ -13,7 +33,8 @@ installation, configuration, and the `tb` CLI overview.
   `tb mcp-start`.
 - **`support/`** — large data files used by some tools (embeddings, knowledge
   bases). Set `THINKINGBOX_DATA=<path-to-this-repo>` so tools can locate them.
-- **`releases/`** — per-release dataset snapshots pinned to git tags.
+- **[`releases/`](releases/README.md)** — supported benchmark releases and
+  their canonical test lists.
 
 ## Layout
 
@@ -30,17 +51,12 @@ parent/
 ## Setup
 
 Install the framework first (see the [thinkingbox
-README](https://github.com/microsoft/thinkingbox#readme)). Then, still from
-`thinkingbox/`, install the server packages from this repo into the same env:
+README](https://github.com/microsoft/thinkingbox#readme)). For the smoke tests
+below, install the `thinkingbox_tools` package into the same environment:
 
 ```bash
 uv pip install --config-settings editable-mode=compat -e ../thinkingbox-data/servers/thinkingbox_tools
-uv pip install --config-settings editable-mode=compat -e ../thinkingbox-data/servers/tb_business_ops_servers_202606
 ```
-
-Some tools also need extra services (e.g. Typesense, embeddings server) — see
-[`tools_with_additional_setup.md`](https://github.com/microsoft/thinkingbox/blob/main/docs/tools_with_additional_setup.md)
-in the framework repo.
 
 ## Verify your setup
 
@@ -106,28 +122,12 @@ If `tb pp` shows a successful conversation or `tb agg` reports passing
 assertions, the framework, server packages, and LLM endpoint are all wired
 up.
 
-## Run larger scenarios
+## Run ThinkingBox-Bench
 
-To run dataset_2602_external_retail and dataset_2603_sandbox_rl_zendesk, 
-you need to also start typesense server. 
+Use the canonical
+[ThinkingBox-Bench v1.0 installation and run instructions](releases/thinkingbox_bench_v1/README.md#run-the-benchmark).
 
-All commands below assume you are in the `thinkingbox/` directory.
-
-```
-export THINKINGBOX_DATA="../thinkingbox-data/dataset"
-export TB_MCP_START_SERVERS_FILE=../thinkingbox-data/servers/servers.yaml
-./scripts/background_tasks.sh
-```
-
-```bash
-uv run tb infer -c config/config_o4mini.yaml \
-    --dataset ../thinkingbox-data/dataset --agent think \
-    --test-list ../thinkingbox-data/releases/dataset_2602_external_retail/testlist_2602_external_retail_full100.yaml \
-    --repeat 10 --batch-size 40 \
-    --output output_sandbox_external_retail_10reps.jsonl
-```
-
-### Re-run assertions on a saved test context
+## Re-run assertions on a saved test context
 
 After decoding once, re-run just the test assertions (no LLM calls):
 
@@ -145,7 +145,7 @@ uv run tb run-test -c config/config_o4mini.yaml \
     --resultfile output.yaml --update
 ```
 
-### Interactive TUI
+## Interactive TUI
 
 Chat with a scenario:
 
