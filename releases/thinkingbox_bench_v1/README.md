@@ -151,11 +151,8 @@ uv run tb agg output_thinkingbox_bench_v1.jsonl
 ```
 
 See [Analyzing inference results](https://github.com/microsoft/thinkingbox/blob/main/docs/analyzing_results.md)
-for the JSONL artifact schema, table and JSON output modes, pass@1, pass@20,
-and pass^20 definitions, per-domain filtering, inspecting individual
-trajectories with `tb pp`, rerunning assertions, and resuming interrupted runs.
-The guide also explains that the paper's trajectory failure categories require
-manual or external classification; `tb agg` does not assign those categories.
+for the command used to obtain pass@1, pass@20, and pass^20 from the result
+JSONL.
 
 Press Ctrl+C in the background-services terminal to stop Typesense and the MCP
 Session Proxy.
