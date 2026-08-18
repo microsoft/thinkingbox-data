@@ -4,7 +4,6 @@
 """Tests for escalate_to_hotel tool."""
 
 import pytest
-from tb_business_ops_servers_202606.toolslib.external_booking.booking_api.models import Booking
 from tb_business_ops_servers_202606.toolslib.external_booking.hotel_partner_api.models import (
     EscalationReason,
 )
@@ -14,10 +13,7 @@ from tb_business_ops_servers_202606.toolslib.external_booking.hotel_partner_api.
 )
 from tb_business_ops_servers_202606.toolslib.external_booking.zendesk.models import Ticket
 from tb_business_ops_servers_202606.utils.sandbox_tools_system import (
-    STUB_DOMAIN,
     InMemoryDatabase,
-    Tool,
-    UnstableField,
 )
 
 

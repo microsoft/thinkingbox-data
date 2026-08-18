@@ -6,22 +6,9 @@
 from pathlib import Path
 
 import pytest
-from tb_business_ops_servers_202606.toolslib.external_booking.booking_api.models import (
-    Booking,
-    GroupBooking,
-    HotelInventory,
-)
-from tb_business_ops_servers_202606.toolslib.external_booking.corporate_api.models import (
-    CorporateAccount,
-)
-from tb_business_ops_servers_202606.toolslib.external_booking.crm_api.models import CustomerProfile
-from tb_business_ops_servers_202606.toolslib.external_booking.hotel_partner_api.models import Hotel
-from tb_business_ops_servers_202606.toolslib.external_booking.payment_api.models import Transaction
 from tb_business_ops_servers_202606.utils.sandbox_tools_system import (
     STUB_DOMAIN,
     InMemoryDatabase,
-    Tool,
-    UnstableField,
 )
 
 

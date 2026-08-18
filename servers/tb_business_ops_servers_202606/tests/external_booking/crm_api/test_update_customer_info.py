@@ -11,8 +11,6 @@ from tb_business_ops_servers_202606.toolslib.external_booking.crm_api.tools.upda
 from tb_business_ops_servers_202606.utils.sandbox_tools_system import (
     STUB_DOMAIN,
     InMemoryDatabase,
-    Tool,
-    UnstableField,
 )
 
 

@@ -5,14 +5,10 @@
 
 import pytest
 from tb_business_ops_servers_202606.toolslib.sandbox_neobank_support.zendesk.tools.update_item import (
-    UpdateItemInput,
     UpdateItemTool,
 )
 from tb_business_ops_servers_202606.utils.sandbox_tools_system import (
-    STUB_DOMAIN,
     InMemoryDatabase,
-    Tool,
-    UnstableField,
 )
 
 

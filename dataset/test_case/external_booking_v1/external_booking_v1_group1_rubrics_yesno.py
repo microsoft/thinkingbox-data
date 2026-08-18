@@ -4,7 +4,6 @@
 import json
 
 from thinkingbox.common import Judge, TestContext
-from thinkingbox.common.chat_types import Text
 
 """!
 scenario: external_booking_v1

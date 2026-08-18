@@ -8,7 +8,6 @@ from typing import Any, Dict, Type
 from tb_business_ops_servers_202606 import InMemoryDatabase, Tool, get_schema_without_refs
 from tb_business_ops_servers_202606.toolslib.external_retail_toolset.oms.models import (
     Order,
-    OrderStatus,
     ShippingSpeed,
 )
 from pydantic import BaseModel, ConfigDict, Field
