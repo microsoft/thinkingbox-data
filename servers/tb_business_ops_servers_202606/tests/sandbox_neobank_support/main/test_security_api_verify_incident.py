@@ -3,7 +3,7 @@
 
 """Tests for Security API - Verify Incident Tool."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 
 import pytest
 from tb_business_ops_servers_202606.toolslib.sandbox_neobank_support.main.models import (
@@ -16,10 +16,7 @@ from tb_business_ops_servers_202606.toolslib.sandbox_neobank_support.main.tools.
     SecurityVerifyIncidentTool,
 )
 from tb_business_ops_servers_202606.utils.sandbox_tools_system import (
-    STUB_DOMAIN,
     InMemoryDatabase,
-    Tool,
-    UnstableField,
 )
 
 

@@ -3,9 +3,8 @@
 
 """Data models for Zendesk MCP server."""
 
-from datetime import datetime
 from enum import Enum
-from typing import Annotated, ClassVar, List, Optional, Union
+from typing import Annotated, ClassVar, List, Optional
 
 from tb_business_ops_servers_202606.utils.sandbox_tools_system import UnstableField
 from pydantic import BaseModel, Field, field_validator

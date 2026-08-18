@@ -3,7 +3,6 @@
 
 """Create item tool for Zendesk MCP server."""
 
-from datetime import datetime
 from typing import Any, Dict, List, Optional, Type, Union
 
 from tb_business_ops_servers_202606 import InMemoryDatabase, Tool

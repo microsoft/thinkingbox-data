@@ -3,7 +3,6 @@
 
 """Models for hotel_partner_api."""
 
-from decimal import Decimal
 from enum import Enum
 from typing import ClassVar, List, Optional
 

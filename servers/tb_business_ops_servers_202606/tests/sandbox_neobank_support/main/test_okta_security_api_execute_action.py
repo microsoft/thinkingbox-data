@@ -3,7 +3,7 @@
 
 """Tests for Okta Security API - Execute Action Tool."""
 
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import pytest
 from tb_business_ops_servers_202606.toolslib.sandbox_neobank_support.main.models import (
@@ -16,10 +16,8 @@ from tb_business_ops_servers_202606.toolslib.sandbox_neobank_support.main.tools.
     OktaSecurityExecuteActionTool,
 )
 from tb_business_ops_servers_202606.utils.sandbox_tools_system import (
-    STUB_DOMAIN,
     InMemoryDatabase,
     Tool,
-    UnstableField,
 )
 
 

@@ -13,7 +13,7 @@ from tb_business_ops_servers_202606.toolslib.external_retail_toolset.extend.mode
 from tb_business_ops_servers_202606.toolslib.external_retail_toolset.extend.tools.check_warranty_coverage import (
     CheckWarrantyCoverageTool,
 )
-from tb_business_ops_servers_202606.utils.sandbox_tools_system import InMemoryDatabase, Tool
+from tb_business_ops_servers_202606.utils.sandbox_tools_system import InMemoryDatabase
 
 
 class TestCheckWarrantyCoverage:

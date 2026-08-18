@@ -5,7 +5,7 @@
 
 from decimal import Decimal
 from enum import Enum
-from typing import Annotated, ClassVar, List, Optional
+from typing import Annotated, ClassVar, Optional
 
 from tb_business_ops_servers_202606.utils.sandbox_tools_system import UnstableField
 from pydantic import BaseModel, Field

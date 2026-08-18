@@ -10,7 +10,7 @@ from tb_business_ops_servers_202606.toolslib.external_retail_toolset.promo.model
 from tb_business_ops_servers_202606.toolslib.external_retail_toolset.promo.tools.get_discount_application import (
     GetDiscountApplicationTool,
 )
-from tb_business_ops_servers_202606.utils.sandbox_tools_system import InMemoryDatabase, Tool
+from tb_business_ops_servers_202606.utils.sandbox_tools_system import InMemoryDatabase
 
 
 class TestGetDiscountApplication:
