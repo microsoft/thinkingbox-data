@@ -17,8 +17,11 @@ Citation:       Yao, S., Shinn, N., Razavi, P., & Narasimhan, K. (2024).
 Data files derived from tau-bench and modified for use within ThinkingBox:
 
     support/tau_bench/airline_data/flights.json
-    support/tau_bench/airline_data/reservations.json
     support/tau_bench/airline_data/users.json
+
+Data file copied verbatim from tau-bench:
+
+    support/tau_bench/airline_data/reservations.json
 
 (See support/tau_bench/readme.txt for the original upstream URLs.)
 
@@ -30,8 +33,8 @@ method signatures so external callers remain unaffected:
 
 Modifications by Microsoft Corporation:
 
-  - Modified the original tau-bench airline data files listed above for use
-    within ThinkingBox.
+  - Modified flights.json and users.json from the original tau-bench airline
+    data for use within ThinkingBox.
   - Refactored the original tau-bench airline env into a Pydantic-modeled
     business-logic engine (airline_tau_bench_system.py).
   - Wrapped airline tools as an MCP server for use with the ThinkingBox
