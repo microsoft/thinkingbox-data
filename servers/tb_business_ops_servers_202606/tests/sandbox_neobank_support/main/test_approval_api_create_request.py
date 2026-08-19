@@ -82,7 +82,7 @@ class TestApprovalCreateRequest:
         }
 
         # Act
-        result = await approval_tool.run_with_validation(db, request_data)
+        await approval_tool.run_with_validation(db, request_data)
 
         # Assert
         approvals = db.get_all(ApprovalRequest)

@@ -83,7 +83,7 @@ async def test_process_refund_creates_transaction(db_with_booking):
     """Test that refund creates a transaction record."""
     tool = ProcessRefund()
 
-    result = await tool.run_with_validation(
+    await tool.run_with_validation(
         db_with_booking,
         {
             "booking_reference": "BKG-00012345",
@@ -128,7 +128,7 @@ async def test_process_refund_partial_amount(db_with_booking):
     """Test processing a partial refund."""
     tool = ProcessRefund()
 
-    result = await tool.run_with_validation(
+    await tool.run_with_validation(
         db_with_booking,
         {
             "booking_reference": "BKG-00012345",

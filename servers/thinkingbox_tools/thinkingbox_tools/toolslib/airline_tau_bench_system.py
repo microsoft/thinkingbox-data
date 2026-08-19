@@ -114,7 +114,8 @@ class FlightInfo(BaseModel):
     dates: Dict[str, FlightDateData]
 
     @field_validator("origin", "destination")
-    def _uppercase(cls, v: str) -> str:  # noqa: N805
+    @classmethod
+    def _uppercase(cls, v: str) -> str:
         if not v.isupper():
             raise ValueError("Airport codes must be uppercase (e.g. LAX)")
         return v
@@ -237,6 +238,7 @@ class BookingRequest(BaseModel):
     insurance: str = Field("no", pattern=r"^(yes|no)$")
 
     @field_validator("payment_methods")
+    @classmethod
     def _non_empty(cls, v):
         if not v:
             raise ValueError("At least one payment method required")
@@ -277,6 +279,7 @@ class CalculationRequest(BaseModel):
     expression: str
 
     @field_validator("expression")
+    @classmethod
     def _safe_chars(cls, v):
         allowed = set("0123456789+-*/.() ")
         if not all(c in allowed for c in v):
@@ -458,34 +461,10 @@ class AirlineTauBenchSystem:  # noqa: WPS110
         if res.status == ReservationStatus.CANCELLED:
             raise AirlineTauBenchSystemError("Reservation already cancelled")
 
-        created_datetime = datetime.fromisoformat(res.created_at)
-        # Ensure the parsed datetime is timezone-aware
-        if created_datetime.tzinfo is None:
-            created_datetime = created_datetime.replace(tzinfo=timezone.utc)
-        # within24 = (
-        #     datetime.now(timezone.utc) - created_datetime
-        # ).total_seconds() < 86_400
-
-        # if (
-        #     not within24
-        #     or res.insurance == "no"
-        #     and (
-        #         res.cabin == CabinClass.BASIC_ECONOMY or res.cabin == CabinClass.ECONOMY
-        #     )
-        # ):
-        #     raise AirlineTauBenchSystemError("Cancellation not allowed")
-
         refund = self._refund_amount(res, reason)
 
         # cannot cancel if partially flown. but
         # seems like we should let the agent do it and fail the test
-        # for seg in res.flights:
-        #     date_info = self.flights[seg.flight_number].dates[seg.date]
-        #     if date_info.status is not FlightStatus.AVAILABLE:
-        #         raise AirlineTauBenchSystemError(
-        #             "Cancellation not allowed because flight"
-        #             + f" {seg.flight_number} has status {date_info.status.value}"
-        #         )
 
         # restore seats
         for seg in res.flights:

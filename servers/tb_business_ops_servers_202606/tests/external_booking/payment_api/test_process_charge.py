@@ -84,7 +84,7 @@ async def test_process_charge_creates_transaction(db_with_booking):
     """Test that charge creates a transaction record."""
     tool = ProcessCharge()
 
-    result = await tool.run_with_validation(
+    await tool.run_with_validation(
         db_with_booking,
         {
             "booking_reference": "BKG-00012345",

@@ -394,7 +394,7 @@ class TestCreateItem:
             "table": "tickets",
             "item": {"subject": "Second ticket", "status": "open"},
         }
-        result_2 = await create_item_tool.run_with_validation(test_db, request_data_2)
+        await create_item_tool.run_with_validation(test_db, request_data_2)
 
         # Create third ticket with status='hold'
         request_data_3 = {

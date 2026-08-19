@@ -208,7 +208,6 @@ class TypesenseIndex:
                 self.client.collections[self.collection_name].delete()
             except Exception as e:
                 print(f"Error deleting collection: {e}", file=sys.stderr)
-                pass
 
     def _typesense_multi_search(self, query: str, keywords: list[str]):
         common_search_params = {
