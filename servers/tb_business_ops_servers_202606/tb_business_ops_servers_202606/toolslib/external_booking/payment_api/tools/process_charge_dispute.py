@@ -37,8 +37,11 @@ class ProcessChargeDisputeInput(BaseModel):
     dispute_reason: str = Field(
         ..., description="Reason for the dispute", examples=["unauthorized_charge"]
     )
-    dispute_amount: Decimal = Field(
-        ..., description="Amount being disputed", examples=["150.00"]
+    dispute_amount: float = Field(
+        ...,
+        description="Amount being disputed",
+        examples=[150.00],
+        allow_inf_nan=False,
     )
 
 
@@ -99,13 +102,15 @@ class ProcessChargeDispute(Tool):
         dispute_num = len(dispute_transactions) + 1
         dispute_case_id = f"DSP-{dispute_num:08d}"
 
+        dispute_amount = Decimal(str(request.dispute_amount))
+
         # Create dispute transaction
         dispute_transaction = Transaction(
             id=dispute_case_id,
             transaction_id=dispute_case_id,
             booking_reference=original_transaction.booking_reference,
             customer_id=original_transaction.customer_id,
-            amount=request.dispute_amount.quantize(TWO_PLACES, rounding=ROUND_HALF_UP),
+            amount=dispute_amount.quantize(TWO_PLACES, rounding=ROUND_HALF_UP),
             currency="USD",
             transaction_type=TransactionType.DISPUTE,
             payment_status=PaymentStatus.PENDING,

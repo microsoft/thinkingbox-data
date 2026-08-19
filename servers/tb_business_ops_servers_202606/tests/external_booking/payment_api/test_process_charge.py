@@ -60,6 +60,29 @@ def db_with_booking():
     return db
 
 
+def test_process_charge_schema_uses_json_number():
+    """Test that the tool schema is compatible with the Responses API."""
+    amount_schema = ProcessCharge().input_schema["properties"]["charge_amount"]
+
+    assert amount_schema["type"] == "number"
+    assert "pattern" not in amount_schema
+
+
+@pytest.mark.parametrize("charge_amount", [float("nan"), float("inf"), float("-inf")])
+@pytest.mark.anyio
+async def test_process_charge_rejects_non_finite_amount(db_with_booking, charge_amount):
+    """Test that non-finite amounts fail input validation."""
+    with pytest.raises(Exception, match="finite number"):
+        await ProcessCharge().run_with_validation(
+            db_with_booking,
+            {
+                "booking_reference": "BKG-00012345",
+                "charge_amount": charge_amount,
+                "reason": "test",
+            },
+        )
+
+
 @pytest.mark.anyio
 async def test_process_charge_success(db_with_booking):
     """Test successfully processing a charge."""
@@ -81,14 +104,18 @@ async def test_process_charge_success(db_with_booking):
 
 @pytest.mark.anyio
 async def test_process_charge_creates_transaction(db_with_booking):
-    """Test that charge creates a transaction record."""
+    """Test that charge creates a transaction record, rounding the amount half-up.
+
+    2.675 is not exactly representable as a float, so this also pins the
+    decimal-string conversion that keeps rounding away from the binary value.
+    """
     tool = ProcessCharge()
 
     await tool.run_with_validation(
         db_with_booking,
         {
             "booking_reference": "BKG-00012345",
-            "charge_amount": 75.00,
+            "charge_amount": 2.675,
             "reason": "late_checkout_fee",
         },
     )
@@ -99,7 +126,9 @@ async def test_process_charge_creates_transaction(db_with_booking):
 
     txn = transactions[0]
     assert txn.transaction_type == TransactionType.CHARGE
-    assert txn.amount == Decimal("75.00")
+    # Decimal equality ignores scale, so also pin the exact 2-decimal-place repr.
+    assert txn.amount == Decimal("2.68")
+    assert str(txn.amount) == "2.68"
     assert txn.payment_status == PaymentStatus.SUCCESSFUL
     assert txn.reason == "late_checkout_fee"
 
