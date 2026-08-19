@@ -14,7 +14,7 @@ Citation:       Yao, S., Shinn, N., Razavi, P., & Narasimhan, K. (2024).
                 τ-bench: A Benchmark for Tool-Agent-User Interaction in
                 Real-World Domains.
 
-Files copied verbatim from tau-bench:
+Data files derived from tau-bench and modified for use within ThinkingBox:
 
     support/tau_bench/airline_data/flights.json
     support/tau_bench/airline_data/reservations.json
@@ -30,6 +30,8 @@ method signatures so external callers remain unaffected:
 
 Modifications by Microsoft Corporation:
 
+  - Modified the original tau-bench airline data files listed above for use
+    within ThinkingBox.
   - Refactored the original tau-bench airline env into a Pydantic-modeled
     business-logic engine (airline_tau_bench_system.py).
   - Wrapped airline tools as an MCP server for use with the ThinkingBox
