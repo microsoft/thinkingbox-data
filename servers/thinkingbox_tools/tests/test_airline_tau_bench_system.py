@@ -484,9 +484,7 @@ class TestAirlineTauBenchSystem:
             # Set up the mock to return our fixed times
             mock_datetime.now.return_value = current_time
             mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
-            mock_datetime.side_effect = lambda *args, **kwargs: datetime(
-                *args, **kwargs
-            )
+            mock_datetime.side_effect = datetime
 
             # Book a basic economy reservation without insurance
             result = configured_system.book_reservation(
@@ -921,9 +919,7 @@ class TestAirlineTauBenchSystem:
             # Set up the mock to return our fixed times
             mock_datetime.now.return_value = current_time
             mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
-            mock_datetime.side_effect = lambda *args, **kwargs: datetime(
-                *args, **kwargs
-            )
+            mock_datetime.side_effect = datetime
 
             # Book a basic economy reservation without insurance
             result = configured_system.book_reservation(
@@ -978,9 +974,7 @@ class TestAirlineTauBenchSystem:
             # Set up the mock to return our fixed times
             mock_datetime.now.return_value = current_time
             mock_datetime.fromisoformat.side_effect = datetime.fromisoformat
-            mock_datetime.side_effect = lambda *args, **kwargs: datetime(
-                *args, **kwargs
-            )
+            mock_datetime.side_effect = datetime
 
             # Book a basic economy reservation without insurance
             result = configured_system.book_reservation(

@@ -72,7 +72,7 @@ async def test_process_charge_dispute_creates_transaction(db_with_transaction):
     """Test that dispute creates a transaction record."""
     tool = ProcessChargeDispute()
 
-    result = await tool.run_with_validation(
+    await tool.run_with_validation(
         db_with_transaction,
         {
             "transaction_id": "TXN-00000001",
@@ -168,7 +168,7 @@ async def test_process_charge_dispute_partial_amount(db_with_transaction):
     """Test processing a partial amount dispute."""
     tool = ProcessChargeDispute()
 
-    result = await tool.run_with_validation(
+    await tool.run_with_validation(
         db_with_transaction,
         {
             "transaction_id": "TXN-00000001",
@@ -189,7 +189,7 @@ async def test_process_charge_dispute_full_amount(db_with_transaction):
     """Test processing a full amount dispute."""
     tool = ProcessChargeDispute()
 
-    result = await tool.run_with_validation(
+    await tool.run_with_validation(
         db_with_transaction,
         {
             "transaction_id": "TXN-00000001",

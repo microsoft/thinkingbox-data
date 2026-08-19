@@ -160,7 +160,7 @@ def validate_tags(dataset_path: str = "./dataset", agent_name: str = "think",
     
     # Load agent once
     try:
-        agent = dataset.get_agent_config(agent_name)
+        dataset.get_agent_config(agent_name)
     except Exception as e:
         error_details = capture_error_details(e, context=f"Loading agent '{agent_name}'")
         
@@ -293,7 +293,7 @@ def validate_tags(dataset_path: str = "./dataset", agent_name: str = "think",
                 if test_file_path:
                     try:
                         context += f" in file '{test_file_path.relative_to(dataset_path)}'"
-                    except:
+                    except ValueError:
                         context += f" in file '{test_file_path}'"
                 
                 error_details = capture_error_details(
