@@ -33,7 +33,12 @@ class ProcessChargeInput(BaseModel):
     booking_reference: str = Field(
         ..., description="Booking reference number", examples=["BKG-00012345"]
     )
-    charge_amount: Decimal = Field(..., description="Charge amount", examples=["50.00"])
+    charge_amount: float = Field(
+        ...,
+        description="Charge amount",
+        examples=[50.00],
+        allow_inf_nan=False,
+    )
     reason: str = Field(
         ..., description="Reason for charge", examples=["modification_fee"]
     )
@@ -87,8 +92,10 @@ class ProcessCharge(Tool):
         if not booking:
             raise Tool.ExecutionError(f"Booking not found: {request.booking_reference}")
 
+        charge_amount = Decimal(str(request.charge_amount))
+
         # Validate charge amount
-        if request.charge_amount <= 0:
+        if charge_amount <= 0:
             raise Tool.ExecutionError("Invalid charge amount - must be greater than 0")
 
         # Get existing transactions to generate sequential ID
@@ -102,7 +109,7 @@ class ProcessCharge(Tool):
             transaction_id=transaction_id,
             booking_reference=request.booking_reference,
             customer_id=booking.customer_id,
-            amount=request.charge_amount.quantize(TWO_PLACES, rounding=ROUND_HALF_UP),
+            amount=charge_amount.quantize(TWO_PLACES, rounding=ROUND_HALF_UP),
             currency="USD",
             transaction_type=TransactionType.CHARGE,
             payment_status=PaymentStatus.SUCCESSFUL,

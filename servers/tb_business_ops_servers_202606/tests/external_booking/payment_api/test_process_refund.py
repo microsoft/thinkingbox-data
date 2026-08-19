@@ -3,6 +3,8 @@
 
 """Tests for process_refund tool."""
 
+from decimal import Decimal
+
 import pytest
 from tb_business_ops_servers_202606.toolslib.external_booking.booking_api.models import (
     BoardType,
@@ -58,6 +60,29 @@ def db_with_booking():
     return db
 
 
+def test_process_refund_schema_uses_json_number():
+    """Test that the tool schema is compatible with the Responses API."""
+    amount_schema = ProcessRefund().input_schema["properties"]["refund_amount"]
+
+    assert amount_schema["type"] == "number"
+    assert "pattern" not in amount_schema
+
+
+@pytest.mark.parametrize("refund_amount", [float("nan"), float("inf"), float("-inf")])
+@pytest.mark.anyio
+async def test_process_refund_rejects_non_finite_amount(db_with_booking, refund_amount):
+    """Test that non-finite amounts fail input validation."""
+    with pytest.raises(Exception, match="finite number"):
+        await ProcessRefund().run_with_validation(
+            db_with_booking,
+            {
+                "booking_reference": "BKG-00012345",
+                "refund_amount": refund_amount,
+                "reason": "test",
+            },
+        )
+
+
 @pytest.mark.anyio
 async def test_process_refund_success(db_with_booking):
     """Test successfully processing a refund."""
@@ -80,14 +105,18 @@ async def test_process_refund_success(db_with_booking):
 
 @pytest.mark.anyio
 async def test_process_refund_creates_transaction(db_with_booking):
-    """Test that refund creates a transaction record."""
+    """Test that refund creates a transaction record, rounding the amount half-up.
+
+    2.675 is not exactly representable as a float, so this also pins the
+    decimal-string conversion that keeps rounding away from the binary value.
+    """
     tool = ProcessRefund()
 
     await tool.run_with_validation(
         db_with_booking,
         {
             "booking_reference": "BKG-00012345",
-            "refund_amount": 150.00,
+            "refund_amount": 2.675,
             "reason": "service issue",
         },
     )
@@ -98,7 +127,9 @@ async def test_process_refund_creates_transaction(db_with_booking):
 
     txn = transactions[0]
     assert txn.transaction_type == TransactionType.REFUND
-    assert txn.amount == 150.00
+    # Decimal equality ignores scale, so also pin the exact 2-decimal-place repr.
+    assert txn.amount == Decimal("2.68")
+    assert str(txn.amount) == "2.68"
     assert txn.payment_status == PaymentStatus.SUCCESSFUL
     assert txn.reason == "service issue"
 

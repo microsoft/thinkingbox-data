@@ -33,8 +33,11 @@ class ProcessRefundInput(BaseModel):
     booking_reference: str = Field(
         ..., description="Booking reference number", examples=["BKG-00012345"]
     )
-    refund_amount: Decimal = Field(
-        ..., description="Refund amount", examples=["250.00"]
+    refund_amount: float = Field(
+        ...,
+        description="Refund amount",
+        examples=[250.00],
+        allow_inf_nan=False,
     )
     reason: str = Field(..., description="Reason for refund", examples=["cancellation"])
 
@@ -89,6 +92,8 @@ class ProcessRefund(Tool):
         if not booking:
             raise Tool.ExecutionError(f"Booking not found: {request.booking_reference}")
 
+        refund_amount = Decimal(str(request.refund_amount))
+
         # Get existing transactions to generate sequential ID
         all_transactions = db.get_all(Transaction)
         transaction_num = len(all_transactions) + 1
@@ -100,7 +105,7 @@ class ProcessRefund(Tool):
             transaction_id=transaction_id,
             booking_reference=request.booking_reference,
             customer_id=booking.customer_id,
-            amount=request.refund_amount.quantize(TWO_PLACES, rounding=ROUND_HALF_UP),
+            amount=refund_amount.quantize(TWO_PLACES, rounding=ROUND_HALF_UP),
             currency="USD",
             transaction_type=TransactionType.REFUND,
             payment_status=PaymentStatus.SUCCESSFUL,
