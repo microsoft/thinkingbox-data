@@ -39,6 +39,52 @@ so these alternatives do not increase the task count.
 Other datasets and tests in this repository are not part of ThinkingBox-Bench
 v1.0.
 
+## Hugging Face Dataset Viewer
+
+Browse this release in the public
+[ThinkingBox-Bench dataset on Hugging Face](https://huggingface.co/datasets/microsoft/ThinkingBox-Bench).
+Its Viewer exposes three linked subsets:
+
+| Subset | Rows | Contents |
+| - | -: | - |
+| `tasks` | 507 | User goal, initial-state patch, expected tool interactions, and rubrics |
+| `scenarios` | 5 | Shared world state and available tools, linked by `scenario_id` |
+| `agents` | 1 | Agent instructions and built-in tools |
+
+### Maintainer workflow
+
+The generated [`huggingface/`](huggingface/) directory is a self-contained
+publishing bundle for a separate Hugging Face dataset repository. It provides
+the Viewer data without copying the executable benchmark.
+
+Regenerate the Parquet files from the canonical release sources:
+
+```bash
+uv run scripts/export_huggingface_viewer.py
+```
+
+Verify that the committed exports are current:
+
+```bash
+uv run scripts/export_huggingface_viewer.py --check
+```
+
+Publishing updates under `microsoft/` requires membership in the Microsoft
+Hugging Face organization with write access. Confirm the authenticated account
+before uploading:
+
+```bash
+hf auth login
+hf auth whoami
+hf upload microsoft/ThinkingBox-Bench \
+    releases/thinkingbox_bench_v1/huggingface . \
+    --repo-type dataset
+```
+
+The Hugging Face repository contains the dataset card, license, and derived
+Parquet tables. Users run the benchmark from the tagged GitHub sources
+documented below.
+
 ## Evaluation method
 
 Each task compares the final backend state with its golden expected state using

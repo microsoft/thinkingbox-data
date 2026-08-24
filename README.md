@@ -16,6 +16,11 @@ Each task runs in an isolated, stateful tool environment and is evaluated with
 executable checks over the final backend state and side effects. Some tasks
 also check required properties of the final response.
 
+Browse the 507 tasks, shared scenarios, and agent configuration in the
+[ThinkingBox-Bench dataset on Hugging Face](https://huggingface.co/datasets/microsoft/ThinkingBox-Bench).
+The Hugging Face dataset is a viewer-friendly representation; this GitHub
+repository remains the executable source.
+
 If your goal is to run the published benchmark, follow the complete
 [ThinkingBox-Bench v1.0 installation and run instructions](releases/thinkingbox_bench_v1/README.md#run-the-benchmark)
 directly. The remaining setup and examples in this README are intended for
