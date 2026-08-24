@@ -33,6 +33,29 @@ BUNDLE_DIR = RELEASE_DIR / "huggingface"
 DATA_DIR = BUNDLE_DIR / "data"
 LICENSE_SOURCE = ROOT / "LICENSE.txt"
 LICENSE_DESTINATION = BUNDLE_DIR / "LICENSE.txt"
+DATASET_CARD = BUNDLE_DIR / "README.md"
+EXPECTED_BUNDLE_FILES = {
+    Path("LICENSE.txt"),
+    Path("README.md"),
+    Path("data/agents.parquet"),
+    Path("data/scenarios.parquet"),
+    Path("data/tasks.parquet"),
+}
+EXPECTED_CONFIGS = [
+    {
+        "config_name": "tasks",
+        "default": True,
+        "data_files": [{"split": "test", "path": "data/tasks.parquet"}],
+    },
+    {
+        "config_name": "scenarios",
+        "data_files": [{"split": "test", "path": "data/scenarios.parquet"}],
+    },
+    {
+        "config_name": "agents",
+        "data_files": [{"split": "test", "path": "data/agents.parquet"}],
+    },
+]
 
 DOMAIN_BY_SCENARIO = {
     "sandbox_external_retail": "retail_and_ecommerce",
@@ -250,7 +273,27 @@ def build_tables() -> dict[str, pa.Table]:
             raise ValueError(
                 f"Expected {expected_count} exported {name}, found {actual_count}"
             )
+
+    scenario_rows = {
+        row["scenario_id"]: row["domain"] for row in tables["scenarios"].to_pylist()
+    }
+    for task in tables["tasks"].to_pylist():
+        if scenario_rows.get(task["scenario_id"]) != task["domain"]:
+            raise ValueError(
+                f"Task {task['task_ref']} has an invalid scenario or domain"
+            )
     return tables
+
+
+def load_dataset_card_metadata() -> dict[str, Any]:
+    content = DATASET_CARD.read_text(encoding="utf-8")
+    sections = content.split("---", 2)
+    if len(sections) != 3 or sections[0].strip():
+        raise ValueError("Dataset card must start with YAML front matter")
+    metadata = yaml.safe_load(sections[1])
+    if not isinstance(metadata, dict):
+        raise ValueError("Dataset card metadata must be a mapping")
+    return metadata
 
 
 def check_tables(tables: dict[str, pa.Table]) -> None:
@@ -268,6 +311,22 @@ def check_tables(tables: dict[str, pa.Table]) -> None:
         or LICENSE_DESTINATION.read_bytes() != LICENSE_SOURCE.read_bytes()
     ):
         errors.append(f"Outdated {LICENSE_DESTINATION.relative_to(ROOT)}")
+    actual_files = {
+        path.relative_to(BUNDLE_DIR)
+        for path in BUNDLE_DIR.rglob("*")
+        if path.is_file()
+    }
+    if actual_files != EXPECTED_BUNDLE_FILES:
+        errors.append(
+            "Unexpected Hugging Face bundle files: "
+            f"{sorted(str(path) for path in actual_files ^ EXPECTED_BUNDLE_FILES)}"
+        )
+    try:
+        metadata = load_dataset_card_metadata()
+        if metadata.get("configs") != EXPECTED_CONFIGS:
+            errors.append("Dataset card configs do not match the exported tables")
+    except (OSError, ValueError, yaml.YAMLError) as error:
+        errors.append(f"Invalid dataset card: {error}")
     if errors:
         raise SystemExit("\n".join(errors))
     print(f"Verified the Hugging Face publishing bundle ({len(tables)} tables).")
