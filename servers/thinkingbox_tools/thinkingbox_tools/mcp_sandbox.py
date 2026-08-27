@@ -23,7 +23,9 @@ from thinkingbox_tools.toolslib.sandbox.sandbox import Sandbox
 # reach the Node host through it (`import js`, cached JsProxy references, and
 # the Function constructor, which evaluates in global scope and therefore
 # survives jsglobals restriction or module hiding).  Host filesystem access,
-# process execution and environment variables are all reachable.
+# process execution and its own environment are all reachable.  The worker's
+# environment is allowlisted so the parent's secrets are not forwarded, but
+# that narrows the blast radius rather than preventing the escape.
 #
 # Run only trusted, first-party agent code here.  Do not route untrusted or
 # third-party input to this server until the worker is confined by an OS/

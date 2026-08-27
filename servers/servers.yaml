@@ -17,14 +17,16 @@ servers:
   #
   # SECURITY: Pyodide is not a privilege boundary.  Code executed here can reach
   # the Node host, the host filesystem, process execution, and this process's
-  # environment.  The server refuses to start without the opt-in below.  Set it
-  # only where the executed code is trusted and first-party, and keep secrets
-  # out of this process's environment.  See docs/sandbox_code_interpreter.md.
+  # environment.  The server fails closed: it refuses to start unless the
+  # operator sets THINKINGBOX_SANDBOX_ALLOW_UNCONFINED=1 in the *environment*
+  # that launches it.  That opt-in is deliberately NOT set here -- baking it
+  # into the shipped config would make the unsafe mode the default and defeat
+  # the gate.  Enable it only where the executed code is trusted and
+  # first-party, and keep secrets out of that environment.
+  # See docs/sandbox_code_interpreter.md ("Threat model").
   sandbox:
     type: mcp-process
     command: ["{python}", "-m", "thinkingbox_tools.mcp_sandbox"]
-    env:
-      THINKINGBOX_SANDBOX_ALLOW_UNCONFINED: "1"
 
   # TB BUSINESS OPS SERVERS 202606
   sandbox_external_retail:

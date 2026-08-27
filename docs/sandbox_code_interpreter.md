@@ -28,7 +28,9 @@ host is possible via several independent routes:
 - Any reachable `JsProxy` yields `.constructor.constructor` — the `Function`
   constructor — and `node:fs` / `node:child_process` are reachable from there
   via dynamic `import()`.
-- The full parent environment (every variable in `process.env`) is readable.
+- The full parent environment was readable. It is now allowlisted (see
+  "Controls currently in place" below), so an escape no longer yields whatever
+  secrets happened to be exported — but `process.env` itself remains readable.
 
 **In-process mitigations do not close this.** `jsglobals: {}` fails because
 `Function` bodies evaluate in the *global* scope, not the restricted object.
@@ -49,8 +51,8 @@ makes the boundary real, and none should be described as isolation:
 
 | Control | Effect |
 | ---- | ---- |
-| Fail-closed startup | `CodeInterpreter` refuses to spawn a worker unless `THINKINGBOX_SANDBOX_ALLOW_UNCONFINED=1` is set, so unconfined execution is a deliberate, auditable choice rather than the default. |
-| Allowlisted worker environment | The worker is spawned with a minimal environment (`PATH` and a few operational variables) instead of inheriting the parent's. An escape therefore does not automatically hand over exported secrets. |
+| Fail-closed startup | `CodeInterpreter` refuses to spawn a worker unless `THINKINGBOX_SANDBOX_ALLOW_UNCONFINED=1` is set **in the environment that launches the server**. It is deliberately not set in `servers/servers.yaml`, since baking it into the shipped config would make the unsafe mode the default. |
+| Allowlisted worker environment | The worker is spawned with a minimal environment (`PATH` and a few operational variables) instead of inheriting the parent's, and with `TMPDIR`/`TEMP`/`TMP` pointing at a directory the interpreter owns and removes on close. An escape therefore does not hand over exported secrets. `process.env` itself is still readable. |
 | Workspace link rejection | Links escaping `workspace_dir` are not seeded into the session (see [below](#links-in-the-source-workspace)). |
 
 **Required to lift these constraints:** confine the worker with an
@@ -61,10 +63,12 @@ pid/memory/CPU limits. The NODEFS copy-on-write layer described below is a
 does not mitigate any of the above.
 
 **Regression coverage.** `tests/test_sandbox_isolation.py` probes each of the
-capabilities above. They are not blanket-`xfail`ed: a probe that cannot run
-(worker fails to start, malformed result) fails the suite loudly, and only a
-*confirmed* reachable capability is recorded as an expected failure. When the
-worker is confined, those tests simply start passing.
+capabilities above. The probes assert on observable effects — bytes read, a
+file written, a uniquely-named secret retrieved — rather than on whether an API
+name happens to exist, and they catch only the specific errors a confining
+policy would raise. A probe that cannot run fails the suite loudly, only a
+*confirmed* reachable capability is recorded as an expected failure, and once
+the worker is confined those tests simply start passing.
 
 ---
 
@@ -380,16 +384,18 @@ If PyPI is unreachable, missing wheels fall back to runtime fetch
 (slower startup, still works).
 
 **Enabling execution.** The interpreter fails closed: it refuses to spawn a
-worker unless the operator opts in.
+worker unless the operator opts in, in the environment that launches the
+server.
 
 ```bash
 export THINKINGBOX_SANDBOX_ALLOW_UNCONFINED=1
 ```
 
-Set this only where the executed code is trusted and first-party, and keep
-secrets out of the environment of the process that launches the server. The
-entry in `servers/servers.yaml` sets it explicitly so the choice is visible in
-configuration rather than implied.
+This is deliberately **not** set in `servers/servers.yaml`. That file is the
+documented normal startup path, so setting it there would make the unsafe mode
+the default and defeat the gate. Export it only where the executed code is
+trusted and first-party, and keep secrets out of that environment — the worker
+is started from it.
 
 **Supported platforms.** CI covers Linux (`ubuntu-latest`) only, and that is
 the supported platform. The code paths are cross-platform and the Windows

@@ -4,6 +4,8 @@
 import asyncio
 import json
 import os
+import shutil
+import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
@@ -29,7 +31,7 @@ _ENV_ALLOWLIST = (
 )
 
 
-def _minimal_env() -> dict[str, str]:
+def _minimal_env(worker_tmp: str | None = None) -> dict[str, str]:
     """Build the worker environment from an allowlist.
 
     Defense-in-depth only.  A process that escapes Pyodide still runs with the
@@ -37,11 +39,14 @@ def _minimal_env() -> dict[str, str]:
     escape does not hand over whatever secrets happened to be exported.
     """
     env = {name: os.environ[name] for name in _ENV_ALLOWLIST if name in os.environ}
-    # Node reads TMPDIR/TEMP/TMP for os.tmpdir(); give it the session's own
-    # temp root rather than leaking the parent's.
-    for name in ("TMPDIR", "TEMP", "TMP"):
-        if name in os.environ:
-            env[name] = os.environ[name]
+    # Node reads TMPDIR/TEMP/TMP for os.tmpdir().  Point them at a directory
+    # this interpreter owns rather than forwarding the parent's values, so
+    # worker scratch files do not land in a shared temp location.  When no
+    # directory is supplied the variables are omitted entirely and Node falls
+    # back to its platform default.
+    if worker_tmp:
+        for name in ("TMPDIR", "TEMP", "TMP"):
+            env[name] = worker_tmp
     return env
 
 
@@ -91,6 +96,10 @@ class CodeInterpreter:
         self.effects: list[dict] = []
         self._process: asyncio.subprocess.Process | None = None
         self._worker_path = Path(__file__).parent / "pyodide_worker.mjs"
+        # Scratch directory handed to the worker as TMPDIR/TEMP/TMP, created on
+        # first start and removed on close so worker temp files do not outlive
+        # the interpreter or share the host's temp root.
+        self._worker_tmp: str | None = None
         # Serializes execute() and close() against the shared worker stdio.
         # The worker speaks a strict request/response protocol on a single
         # stdin/stdout pair, so two concurrent execute() coroutines would
@@ -145,6 +154,7 @@ class CodeInterpreter:
         """Gracefully stop the worker process."""
         async with self._lock:
             if self._process is None:
+                self._cleanup_worker_tmp()
                 return
             try:
                 self._process.stdin.close()
@@ -153,10 +163,16 @@ class CodeInterpreter:
                 await self._kill()
             finally:
                 self._process = None
+                self._cleanup_worker_tmp()
 
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+
+    def _cleanup_worker_tmp(self) -> None:
+        if self._worker_tmp:
+            shutil.rmtree(self._worker_tmp, ignore_errors=True)
+            self._worker_tmp = None
 
     async def _ensure_started(self) -> None:
         if self._process is None or self._process.returncode is not None:
@@ -199,6 +215,8 @@ class CodeInterpreter:
         cmd = ["node", str(self._worker_path)]
         if self.workspace_dir:
             cmd += ["--workspace", self.workspace_dir]
+        if self._worker_tmp is None:
+            self._worker_tmp = tempfile.mkdtemp(prefix="sandbox_worker_tmp_")
         self._process = await asyncio.create_subprocess_exec(
             *cmd,
             stdin=asyncio.subprocess.PIPE,
@@ -212,7 +230,7 @@ class CodeInterpreter:
             # the pyodide package in the sibling node_modules/ folder.
             cwd=str(self._worker_path.parent),
             # Withhold the parent environment (defense-in-depth, not isolation).
-            env=_minimal_env(),
+            env=_minimal_env(self._worker_tmp),
         )
 
         # Wait for the { "ready": true } handshake before accepting requests.

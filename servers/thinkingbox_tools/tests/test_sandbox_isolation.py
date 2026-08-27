@@ -10,20 +10,26 @@ Two groups:
    are a genuine regression guard: they fail against the pre-fix seeding logic.
 
 2. **Host capability audit** — asserts that host capabilities are unavailable to
-   agent-supplied Python. These are currently ``xfail(strict=True)``: Pyodide is
-   not a privilege boundary, so they genuinely fail today. They are recorded
-   here rather than omitted so the gap is visible in the suite, and ``strict``
-   means that once OS/container confinement lands they will XPASS and force the
-   marker to be removed. See docs/sandbox_code_interpreter.md ("Threat model").
+   agent-supplied Python. They currently fail, because Pyodide is not a
+   privilege boundary. They are *not* blanket-``xfail``ed: each probe fails
+   loudly if it cannot run, records an expected failure only when a capability
+   is *confirmed* reachable, and simply passes once the capability is gone.
+   See docs/sandbox_code_interpreter.md ("Threat model").
 
-The capability probes measure *reachability only*. They never read a real
-system or secret file — a sentinel the test itself creates is used instead —
-and they never execute a command or open a network connection.
+The capability probes assert on observable effects (bytes read, a file written,
+a secret retrieved) rather than on whether an API name exists, and they catch
+only the specific errors a confining policy would raise. An unexpected worker,
+import or loader error propagates and fails the test, so a broken probe is
+never mistaken for confinement. Probes stay inside directories pytest created:
+no real system or secret file is read, and nothing outside the temp directory
+is modified.
 """
 
+import json
 import os
 import subprocess
 import sys
+import uuid
 from types import SimpleNamespace
 
 import pytest
@@ -402,9 +408,25 @@ def test_worker_env_is_allowlisted(monkeypatch):
     )
     assert "PATH" in env, "PATH is required to locate the node binary"
     for name in env:
-        assert (
-            name in code_interpreter._ENV_ALLOWLIST or name in {"TMPDIR", "TEMP", "TMP"}
-        ), f"{name} is not on the allowlist"
+        assert name in code_interpreter._ENV_ALLOWLIST, f"{name} is not on the allowlist"
+
+
+def test_worker_tmp_is_not_inherited(monkeypatch, tmp_path):
+    """TMPDIR/TEMP/TMP must point at a worker-owned dir, not the parent's."""
+    monkeypatch.setenv("TMPDIR", "/parent/tmp")
+    monkeypatch.setenv("TEMP", r"C:\parent\temp")
+    monkeypatch.setenv("TMP", r"C:\parent\temp")
+
+    # Without a worker-owned directory the variables are omitted entirely.
+    env = code_interpreter._minimal_env()
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        assert name not in env, f"{name} was forwarded from the parent"
+
+    # With one, they point at it rather than at the parent's value.
+    worker_tmp = str(tmp_path / "worker_tmp")
+    env = code_interpreter._minimal_env(worker_tmp)
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        assert env[name] == worker_tmp, f"{name} did not point at the worker dir"
 
 
 # ---------------------------------------------------------------------------
@@ -439,6 +461,41 @@ async def sandbox_client(tmp_path):
                 "__reserved__init", {"config": {"workspace_dir": str(tmp_path)}}
             )
             yield client
+            await client.call_tool("__reserved__teardown", {})
+    finally:
+        (
+            mcp_sandbox._sandbox,
+            mcp_sandbox._interpreter,
+            mcp_sandbox._session_dir,
+        ) = original
+
+
+@pytest_asyncio.fixture
+async def sandbox_client_with_secret(tmp_path, monkeypatch):
+    """A session whose worker was started *after* a unique secret was exported.
+
+    The secret must be in the parent environment before the worker is spawned,
+    otherwise the probe would pass for the wrong reason.
+    """
+    secret_name = "SANDBOX_PARENT_SECRET_PROBE"
+    secret_value = f"parent-secret-{uuid.uuid4().hex}"
+    monkeypatch.setenv(secret_name, secret_value)
+
+    (tmp_path / "readme.txt").write_text("hello")
+    original = (
+        mcp_sandbox._sandbox,
+        mcp_sandbox._interpreter,
+        mcp_sandbox._session_dir,
+    )
+    try:
+        async with Client(mcp_sandbox.mcp) as client:
+            await client.call_tool(
+                "__reserved__init", {"config": {"workspace_dir": str(tmp_path)}}
+            )
+            # Force worker startup now, so it inherits (or does not inherit)
+            # the secret exported above.
+            await client.call_tool("code_interpreter", {"code": "1"})
+            yield SimpleNamespace(client=client, secret=(secret_name, secret_value))
             await client.call_tool("__reserved__teardown", {})
     finally:
         (
@@ -533,7 +590,10 @@ async def test_js_function_constructor_unavailable(sandbox_client):
 async def test_host_file_outside_session_unreadable(sandbox_client, tmp_path_factory):
     """A host file outside the session directory must not be readable.
 
-    Uses a sentinel this test creates; no real system or secret file is touched.
+    Asserts on the *effect* (bytes retrieved), not on whether an API exists.
+    Only the specific errors a confining policy would raise are treated as
+    ABSENT; anything else propagates and fails the test, so a broken probe is
+    never mistaken for confinement.
     """
     sentinel = tmp_path_factory.mktemp("sentinel") / "canary.txt"
     sentinel.write_text("CANARY_MARKER_DO_NOT_LEAK")
@@ -545,7 +605,9 @@ async def test_host_file_outside_session_unreadable(sandbox_client, tmp_path_fac
         "    import pyodide_js\n"
         f"    _buf = await pyodide_js._api.loadBinaryFile({as_posix!r})\n"
         "    _r = 'REACHABLE' if b'CANARY_MARKER' in bytes(_buf.to_py()) else 'ABSENT'\n"
-        "except (ImportError, AttributeError, OSError, Exception):\n"
+        # ImportError/AttributeError: the loader was removed from the surface.
+        # PermissionError/OSError: a policy refused the read.
+        "except (ImportError, AttributeError, PermissionError, OSError):\n"
         "    _r = 'ABSENT'\n"
         "_r",
     )
@@ -553,67 +615,117 @@ async def test_host_file_outside_session_unreadable(sandbox_client, tmp_path_fac
 
 
 @pytest.mark.asyncio
-async def test_environment_variables_unreadable(sandbox_client):
-    """The parent process environment must not be readable from user code.
+async def test_parent_environment_secret_not_visible(sandbox_client_with_secret):
+    """A secret exported to the parent must not be visible to agent code.
 
-    The worker is spawned with an allowlisted environment, so a small number of
-    operational variables (PATH and friends) are expected to remain visible.
-    This asserts that the *inherited* environment is not exposed wholesale.
+    Presence of *some* environment is expected and is not a failure: the worker
+    is deliberately given PATH and a few operational variables.  What must not
+    happen is the parent's own environment reaching agent code, so this looks
+    for a unique sentinel exported before the worker started.
     """
+    secret_name, secret_value = sandbox_client_with_secret.secret
     outcome = await _capability_probe(
-        sandbox_client,
+        sandbox_client_with_secret.client,
         "try:\n"
         "    import pyodide_js\n"
         "    _F = pyodide_js._api.loadBinaryFile.constructor.constructor\n"
-        "    _n = int(_F(\"return typeof process==='undefined' ? 0 :"
-        ' Object.keys(process.env).length")())\n'
-        "    _r = 'ABSENT' if _n == 0 else 'REACHABLE'\n"
-        "except (ImportError, AttributeError):\n"
+        f"    _v = _F(\"return typeof process==='undefined' ? '' :"
+        f" (process.env[{secret_name!r}] || '')\")()\n"
+        f"    _r = 'REACHABLE' if _v == {secret_value!r} else 'ABSENT'\n"
+        "except (ImportError, AttributeError, PermissionError):\n"
         "    _r = 'ABSENT'\n"
         "_r",
     )
-    _record("the worker process environment", outcome, "process.env")
+    _record(
+        "a secret exported in the parent environment",
+        outcome,
+        f"{secret_name} readable via process.env",
+    )
 
 
 @pytest.mark.asyncio
-async def test_node_filesystem_module_unreachable(sandbox_client):
-    """`node:fs` must not be resolvable from agent code.
+async def test_host_filesystem_write_unavailable(sandbox_client, tmp_path_factory):
+    """Agent code must not be able to write outside the session via node:fs.
 
-    Resolution only: nothing is read or written through the module.
+    Performs a harmless, test-owned write into a directory pytest created, then
+    checks the host for the effect.  A rejected dynamic import is *not* swallowed
+    here: if the import fails unexpectedly the probe returns something the
+    harness does not recognise and the test fails, rather than silently counting
+    as confinement.
     """
+    target = tmp_path_factory.mktemp("fs_probe") / "written_by_agent.txt"
+
+    js_src = (
+        "return import('node:fs').then(m => {"
+        f"  m.writeFileSync({json.dumps(str(target))}, 'FS_WRITE_MARKER');"
+        "  return 'REACHABLE';"
+        "})"
+    )
     outcome = await _capability_probe(
         sandbox_client,
         "try:\n"
         "    import pyodide_js\n"
         "    _F = pyodide_js._api.loadBinaryFile.constructor.constructor\n"
-        "    _fn = _F(\"return import('node:fs')"
-        ".then(m => typeof m.readFileSync === 'function' ? 'REACHABLE' : 'ABSENT')"
-        ".catch(() => 'ABSENT')\")\n"
+        f"    _fn = _F({js_src!r})\n"
         "    _r = await _fn()\n"
-        "except (ImportError, AttributeError):\n"
+        "except (ImportError, AttributeError, PermissionError):\n"
         "    _r = 'ABSENT'\n"
         "_r",
     )
-    _record("the node:fs module", outcome, "dynamic import('node:fs')")
+
+    if outcome == "REACHABLE":
+        assert target.exists(), (
+            "probe reported a successful write but no host file appeared; "
+            "the probe is not measuring what it claims"
+        )
+        assert "FS_WRITE_MARKER" in target.read_text()
+    else:
+        assert not target.exists(), "probe reported ABSENT but the host file was written"
+
+    _record("host filesystem writes via node:fs", outcome, "writeFileSync to a test-owned path")
 
 
 @pytest.mark.asyncio
-async def test_node_process_module_unreachable(sandbox_client):
-    """`node:child_process` must not be resolvable from agent code.
+async def test_process_execution_unavailable(sandbox_client, tmp_path_factory):
+    """Agent code must not be able to execute a process.
 
-    Resolution only: no process is ever spawned by this test.
+    Runs a harmless, test-owned command whose only effect is to create a file in
+    a directory pytest created, then checks the host for that file.  Nothing is
+    downloaded, no network is used, and no state outside that temp directory is
+    touched.
     """
+    marker = tmp_path_factory.mktemp("proc_probe") / "spawned.txt"
+
+    # A trivial node one-liner: write a marker file and exit.
+    inner = f"require('fs').writeFileSync({json.dumps(str(marker))}, 'SPAWN_MARKER')"
+    js_src = (
+        "return import('node:child_process').then(m => {"
+        f"  m.execFileSync(process.execPath, ['-e', {json.dumps(inner)}]);"
+        "  return 'REACHABLE';"
+        "})"
+    )
     outcome = await _capability_probe(
         sandbox_client,
         "try:\n"
         "    import pyodide_js\n"
         "    _F = pyodide_js._api.loadBinaryFile.constructor.constructor\n"
-        "    _fn = _F(\"return import('node:child_process')"
-        ".then(m => typeof m.execSync === 'function' ? 'REACHABLE' : 'ABSENT')"
-        ".catch(() => 'ABSENT')\")\n"
+        f"    _fn = _F({js_src!r})\n"
         "    _r = await _fn()\n"
-        "except (ImportError, AttributeError):\n"
+        "except (ImportError, AttributeError, PermissionError):\n"
         "    _r = 'ABSENT'\n"
         "_r",
     )
-    _record("the node:child_process module", outcome, "dynamic import('node:child_process')")
+
+    if outcome == "REACHABLE":
+        assert marker.exists(), (
+            "probe reported successful execution but no host file appeared; "
+            "the probe is not measuring what it claims"
+        )
+    else:
+        assert not marker.exists(), "probe reported ABSENT but the command ran"
+
+    _record(
+        "process execution via node:child_process",
+        outcome,
+        "execFileSync of a node one-liner",
+    )
