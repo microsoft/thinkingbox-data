@@ -31,6 +31,11 @@ from thinkingbox_tools.toolslib.sandbox.sandbox import Sandbox
 
 mcp = FastMCP("sandbox")
 
+# Win32 IsReparseTagNameSurrogate: bit 29 marks reparse tags that name another
+# filesystem location (junctions, symlinks) as opposed to tags describing
+# alternate backing storage for the same file (OneDrive placeholders, dedup).
+_IO_REPARSE_TAG_NAME_SURROGATE_BIT = 0x20000000
+
 _sandbox: Sandbox | None = None
 _interpreter: CodeInterpreter | None = None
 _session_dir: str | None = (
@@ -57,11 +62,20 @@ class ErrorResult(BaseModel):
 
 
 def _is_link(path: str) -> bool:
-    """True for symlinks and, on Windows, junctions and other reparse points.
+    """True for symlinks and for Windows reparse points that redirect by name.
 
-    ``os.path.islink`` returns False for Windows junctions, so the reparse-point
-    attribute is checked explicitly.  An unreadable entry is reported as a link
-    so callers fail closed rather than following something they can't inspect.
+    ``os.path.islink`` returns False for Windows junctions, so reparse points are
+    inspected explicitly.  Only *name surrogates* count: those are the reparse
+    tags that name another filesystem location (junctions, symlinks, mount
+    points) and are therefore traversal risks.  Non-surrogate reparse points
+    describe alternate backing storage for the same file -- OneDrive / Files
+    On-Demand placeholders, deduplication, WIM/container mappings -- and must be
+    treated as ordinary files, or a user with OneDrive-backed files would have
+    their whole workspace rejected.
+
+    This mirrors the Win32 ``IsReparseTagNameSurrogate`` macro, which tests bit
+    29 of the tag.  An entry that cannot be inspected is reported as a link so
+    callers fail closed.
     """
     try:
         st = os.lstat(path)
@@ -69,8 +83,16 @@ def _is_link(path: str) -> bool:
         return True
     if stat.S_ISLNK(st.st_mode):
         return True
-    reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
-    return bool(getattr(st, "st_file_attributes", 0) & reparse)
+
+    reparse_attr = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+    if not (getattr(st, "st_file_attributes", 0) & reparse_attr):
+        return False
+
+    tag = getattr(st, "st_reparse_tag", 0)
+    if not tag:
+        # Reparse point whose tag we can't read: fail closed.
+        return True
+    return bool(tag & _IO_REPARSE_TAG_NAME_SURROGATE_BIT)
 
 
 def _resolves_inside(path: str, root: str) -> bool:

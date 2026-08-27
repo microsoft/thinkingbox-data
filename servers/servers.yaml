@@ -13,10 +13,18 @@ servers:
   online_banking:
     type: mcp-process
     command: ["{python}", "-m", "thinkingbox_tools.mcp_online_banking"]
-  # Sandbox code interpreter (Pyodide-based)
+  # Sandbox code interpreter (Pyodide-based).
+  #
+  # SECURITY: Pyodide is not a privilege boundary.  Code executed here can reach
+  # the Node host, the host filesystem, process execution, and this process's
+  # environment.  The server refuses to start without the opt-in below.  Set it
+  # only where the executed code is trusted and first-party, and keep secrets
+  # out of this process's environment.  See docs/sandbox_code_interpreter.md.
   sandbox:
     type: mcp-process
     command: ["{python}", "-m", "thinkingbox_tools.mcp_sandbox"]
+    env:
+      THINKINGBOX_SANDBOX_ALLOW_UNCONFINED: "1"
 
   # TB BUSINESS OPS SERVERS 202606
   sandbox_external_retail:

@@ -10,6 +10,7 @@ import pytest_asyncio
 from fastmcp import Client
 
 from thinkingbox_tools import mcp_sandbox
+from thinkingbox_tools.toolslib.sandbox import code_interpreter
 
 # ---------------------------------------------------------------------------
 # Fixture
@@ -20,6 +21,17 @@ from thinkingbox_tools import mcp_sandbox
 # starts lazily on the first code_interpreter call, so filesystem-only tests
 # pay no startup cost.
 # ---------------------------------------------------------------------------
+
+
+@pytest.fixture(autouse=True)
+def _allow_unconfined_worker(monkeypatch):
+    """Opt in to unconfined execution for these tests.
+
+    The interpreter fails closed without this (Pyodide is not a privilege
+    boundary), so the test suite must opt in explicitly rather than the
+    production default being permissive.
+    """
+    monkeypatch.setenv(code_interpreter.UNCONFINED_OPT_IN_ENV, "1")
 
 
 @pytest_asyncio.fixture

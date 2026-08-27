@@ -3,8 +3,55 @@
 
 import asyncio
 import json
+import os
 from dataclasses import asdict, dataclass
 from pathlib import Path
+
+# Opt-in required to run the worker unconfined.  Pyodide is not a privilege
+# boundary (see docs/sandbox_code_interpreter.md "Threat model"), so the default
+# is to refuse to start rather than to silently execute agent code with the
+# permissions of the MCP server process.
+UNCONFINED_OPT_IN_ENV = "THINKINGBOX_SANDBOX_ALLOW_UNCONFINED"
+
+# Passed through to the worker when present.  Everything else in the parent
+# environment is withheld: the worker inherits the MCP server's environment
+# otherwise, and agent code can read all of it.  This narrows the blast radius
+# of an escape; it is NOT isolation, and does not stop an escape from happening.
+_ENV_ALLOWLIST = (
+    "PATH",  # required to locate the node binary
+    "SystemRoot",  # Windows: required by the CRT / winsock
+    "SystemDrive",
+    "COMSPEC",
+    "NUMBER_OF_PROCESSORS",  # libuv threadpool sizing
+    "LANG",
+    "LC_ALL",
+    "TZ",
+)
+
+
+def _minimal_env() -> dict[str, str]:
+    """Build the worker environment from an allowlist.
+
+    Defense-in-depth only.  A process that escapes Pyodide still runs with the
+    OS-level privileges of this user; withholding variables merely means the
+    escape does not hand over whatever secrets happened to be exported.
+    """
+    env = {name: os.environ[name] for name in _ENV_ALLOWLIST if name in os.environ}
+    # Node reads TMPDIR/TEMP/TMP for os.tmpdir(); give it the session's own
+    # temp root rather than leaking the parent's.
+    for name in ("TMPDIR", "TEMP", "TMP"):
+        if name in os.environ:
+            env[name] = os.environ[name]
+    return env
+
+
+def _unconfined_allowed() -> bool:
+    """True when the operator has explicitly opted in to unconfined execution."""
+    return os.environ.get(UNCONFINED_OPT_IN_ENV, "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+    }
 
 
 class CodeInterpreterError(Exception):
@@ -116,6 +163,22 @@ class CodeInterpreter:
             await self._start()
 
     async def _start(self) -> None:
+        # Fail closed.  Pyodide does not confine agent code, so refuse to spawn
+        # an unconfined worker unless the operator has explicitly accepted that.
+        # A documentation warning is not a control; this is.
+        if not _unconfined_allowed():
+            raise CodeInterpreterError(
+                "Refusing to start the code interpreter: it would run agent-supplied "
+                "Python unconfined.\n"
+                "Pyodide is NOT a security boundary -- code executed here can reach "
+                "the Node host, the host filesystem, process execution and this "
+                "process's environment variables.\n"
+                "Only enable this where the executed code is trusted and "
+                "first-party, by setting:\n"
+                f"  {UNCONFINED_OPT_IN_ENV}=1\n"
+                "See docs/sandbox_code_interpreter.md ('Threat model')."
+            )
+
         worker_dir = self._worker_path.parent
         if not self._worker_path.exists():
             raise CodeInterpreterError(
@@ -148,6 +211,8 @@ class CodeInterpreter:
             # Run from the worker's own directory so Node.js can resolve
             # the pyodide package in the sibling node_modules/ folder.
             cwd=str(self._worker_path.parent),
+            # Withhold the parent environment (defense-in-depth, not isolation).
+            env=_minimal_env(),
         )
 
         # Wait for the { "ready": true } handshake before accepting requests.

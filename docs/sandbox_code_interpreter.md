@@ -42,7 +42,16 @@ is not a substitute for an OS boundary.
 - Only trusted, first-party agent code may be executed.
 - The workspace must be treated as trusted input.
 - Secrets must not be present in the environment of the MCP server process,
-  because the worker inherits it.
+  because the worker is spawned from it.
+
+**Controls currently in place.** These narrow the blast radius. None of them
+makes the boundary real, and none should be described as isolation:
+
+| Control | Effect |
+| ---- | ---- |
+| Fail-closed startup | `CodeInterpreter` refuses to spawn a worker unless `THINKINGBOX_SANDBOX_ALLOW_UNCONFINED=1` is set, so unconfined execution is a deliberate, auditable choice rather than the default. |
+| Allowlisted worker environment | The worker is spawned with a minimal environment (`PATH` and a few operational variables) instead of inheriting the parent's. An escape therefore does not automatically hand over exported secrets. |
+| Workspace link rejection | Links escaping `workspace_dir` are not seeded into the session (see [below](#links-in-the-source-workspace)). |
 
 **Required to lift these constraints:** confine the worker with an
 owner-approved OS/container boundary — no host filesystem beyond the session
@@ -50,6 +59,12 @@ directory, no inherited environment, no network, no process spawning, plus
 pid/memory/CPU limits. The NODEFS copy-on-write layer described below is a
 *correctness* mechanism for workspace isolation, not a security control, and
 does not mitigate any of the above.
+
+**Regression coverage.** `tests/test_sandbox_isolation.py` probes each of the
+capabilities above. They are not blanket-`xfail`ed: a probe that cannot run
+(worker fails to start, malformed result) fails the suite loudly, and only a
+*confirmed* reachable capability is recorded as an expected failure. When the
+worker is confined, those tests simply start passing.
 
 ---
 
@@ -282,16 +297,24 @@ teardown.
 Seeding must not blindly re-point a link that already exists in
 `workspace_dir`. NODEFS reads follow host links transparently, so a link whose
 target sits outside the workspace would be readable from inside `/workspace`.
-Windows junctions matter here too: `os.path.islink` returns `False` for them,
-so the reparse-point attribute is checked explicitly, and an entry that cannot
-be `lstat`'d is treated as a link so the check fails closed.
+
+Windows needs care here. `os.path.islink` returns `False` for junctions, so the
+reparse point is inspected directly — but only *name surrogate* tags count.
+Those are the tags that name another filesystem location (junctions, symlinks),
+which is what makes them a traversal risk. Non-surrogate reparse points describe
+alternate backing storage for the same file — OneDrive / Files On-Demand
+placeholders, deduplication, WIM and container mappings — and must be treated as
+ordinary files, otherwise a OneDrive-backed workspace would be rejected wholesale.
+This mirrors the Win32 `IsReparseTagNameSurrogate` macro (bit 29 of the tag). An
+entry that cannot be `lstat`'d is treated as a link so the check fails closed.
 
 | Entry in `workspace_dir` | Seeding behavior |
 | ---- | ---- |
 | Regular file | Symlinked into the session dir (the O(files) fast path). |
+| Non-surrogate reparse point (OneDrive placeholder, dedup) | Treated as a regular file. |
 | Link whose target resolves **inside** `workspace_dir` | Materialized as a real copy — data preserved, no followable link. |
 | Link whose target resolves **outside** `workspace_dir` | **Rejected**, reported on stderr. |
-| Linked directory | **Rejected** — avoids both traversal and `copytree` recursion loops. |
+| Linked directory (junction or symlink) | **Rejected** — avoids both traversal and `copytree` recursion loops. |
 
 Note this is workspace hygiene, not a privilege boundary: a caller who can
 already execute code in the worker does not need a link to reach host files
@@ -355,6 +378,25 @@ The `postinstall` script vendors wheels into `./wheels/`. Idempotent —
 re-running keeps existing wheels; force a refresh by deleting `wheels/`.
 If PyPI is unreachable, missing wheels fall back to runtime fetch
 (slower startup, still works).
+
+**Enabling execution.** The interpreter fails closed: it refuses to spawn a
+worker unless the operator opts in.
+
+```bash
+export THINKINGBOX_SANDBOX_ALLOW_UNCONFINED=1
+```
+
+Set this only where the executed code is trusted and first-party, and keep
+secrets out of the environment of the process that launches the server. The
+entry in `servers/servers.yaml` sets it explicitly so the choice is visible in
+configuration rather than implied.
+
+**Supported platforms.** CI covers Linux (`ubuntu-latest`) only, and that is
+the supported platform. The code paths are cross-platform and the Windows
+reparse-point handling above is unit-tested, but Windows is not exercised end
+to end in CI: `micropip` mishandles the `file:///C:/...` URLs used for vendored
+wheels, so the worker does not start there without a workaround. Windows should
+not be treated as supported unless a Windows CI job is added.
 
 **Cost.** Cold start ~5–10 s with cached wheels, paid once per session.
 Memory ~250–400 MB resident per worker — each concurrent session needs
