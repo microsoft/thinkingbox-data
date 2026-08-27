@@ -3,6 +3,8 @@
 
 import os
 import shutil
+import stat
+import sys
 import tempfile
 import traceback
 from typing import Annotated, Literal, Union
@@ -15,6 +17,17 @@ from thinkingbox_tools.toolslib.sandbox.code_interpreter import (
     CodeInterpreterError,
 )
 from thinkingbox_tools.toolslib.sandbox.sandbox import Sandbox
+
+# SECURITY: Pyodide is NOT a security boundary.  It provides memory safety via
+# WASM, but deliberately exposes a Python<->JavaScript FFI, and Python code can
+# reach the Node host through it (`import js`, cached JsProxy references, and
+# the Function constructor, which evaluates in global scope and therefore
+# survives jsglobals restriction or module hiding).  Host filesystem access,
+# process execution and environment variables are all reachable.
+#
+# Run only trusted, first-party agent code here.  Do not route untrusted or
+# third-party input to this server until the worker is confined by an OS/
+# container boundary.  See docs/sandbox_code_interpreter.md ("Threat model").
 
 mcp = FastMCP("sandbox")
 
@@ -41,6 +54,33 @@ class ExecutionResult(BaseModel):
 class ErrorResult(BaseModel):
     status: Literal["error"] = "error"
     message: str
+
+
+def _is_link(path: str) -> bool:
+    """True for symlinks and, on Windows, junctions and other reparse points.
+
+    ``os.path.islink`` returns False for Windows junctions, so the reparse-point
+    attribute is checked explicitly.  An unreadable entry is reported as a link
+    so callers fail closed rather than following something they can't inspect.
+    """
+    try:
+        st = os.lstat(path)
+    except OSError:
+        return True
+    if stat.S_ISLNK(st.st_mode):
+        return True
+    reparse = getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0)
+    return bool(getattr(st, "st_file_attributes", 0) & reparse)
+
+
+def _resolves_inside(path: str, root: str) -> bool:
+    """True when ``path`` fully resolves to a location at or under ``root``."""
+    try:
+        real_root = os.path.realpath(root)
+        real_path = os.path.realpath(path)
+    except OSError:
+        return False
+    return real_path == real_root or real_path.startswith(real_root + os.sep)
 
 
 def _symlink_or_copy(src: str, dst: str) -> None:
@@ -71,9 +111,48 @@ async def initialize(config: dict):
         shutil.rmtree(_session_dir, ignore_errors=True)
     _session_dir = tempfile.mkdtemp(prefix="sandbox_session_")
     if workspace_dir and os.path.isdir(workspace_dir):
+        workspace_root = os.path.abspath(workspace_dir)
+        rejected: list[str] = []
+
+        def _seed(src: str, dst: str) -> None:
+            # A link in the *source* workspace would otherwise be re-pointed at
+            # its own target, and NODEFS reads follow host links transparently —
+            # so a link escaping workspace_dir would be readable from inside the
+            # sandbox.  In-workspace links are materialized as real copies so
+            # legitimate data is preserved without keeping a followable link.
+            if _is_link(src):
+                if _resolves_inside(src, workspace_root):
+                    shutil.copy2(src, dst, follow_symlinks=True)
+                else:
+                    rejected.append(src)
+                return
+            _symlink_or_copy(src, dst)
+
+        def _ignore(dirpath: str, names: list[str]) -> set[str]:
+            # Linked directories are rejected outright: following them risks both
+            # traversal outside the workspace and copytree recursion loops.
+            drop = set()
+            for name in names:
+                entry = os.path.join(dirpath, name)
+                if os.path.isdir(entry) and _is_link(entry):
+                    rejected.append(entry)
+                    drop.add(name)
+            return drop
+
         shutil.copytree(
-            workspace_dir, _session_dir, copy_function=_symlink_or_copy, dirs_exist_ok=True
+            workspace_dir,
+            _session_dir,
+            copy_function=_seed,
+            ignore=_ignore,
+            dirs_exist_ok=True,
         )
+        if rejected:
+            print(
+                f"[mcp_sandbox] refused to seed {len(rejected)} link(s) that "
+                f"escape the workspace: {', '.join(sorted(rejected)[:5])}"
+                + (" ..." if len(rejected) > 5 else ""),
+                file=sys.stderr,
+            )
 
     _sandbox = Sandbox(_session_dir)
     if _interpreter is not None:
@@ -144,7 +223,7 @@ async def search_files(
 @mcp.tool(
     name="code_interpreter",
     description=(
-        "Execute Python code in a sandboxed Pyodide (CPython-in-WebAssembly) interpreter. "
+        "Execute Python code in a Pyodide (CPython-in-WebAssembly) interpreter. "
         "Workspace files are accessible at /workspace/<path> using standard Python file I/O. "
         "Pre-installed: numpy, pandas, beautifulsoup4, jinja2, sympy, altair, mpmath, lxml, "
         "Pillow, openpyxl, xlsxwriter, markdownify, mammoth, pypdf, pdfminer.six, tabulate, "

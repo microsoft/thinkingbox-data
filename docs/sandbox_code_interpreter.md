@@ -1,8 +1,55 @@
 # Sandbox Code Interpreter (Pyodide)
 
-The `sandbox` MCP server runs agent-supplied Python in a sandboxed Pyodide
+The `sandbox` MCP server runs agent-supplied Python in a Pyodide
 (CPython-in-WebAssembly) interpreter, exposes the test's workspace files at
 `/workspace/`, and isolates writes via copy-on-write at the NODEFS layer.
+
+> [!WARNING]
+> **This is not a security boundary.** Pyodide provides memory safety, not
+> isolation: Python running here can reach the Node.js host, the host
+> filesystem, process execution and environment variables. Run only trusted,
+> first-party agent code. See [Threat model](#threat-model) before routing any
+> untrusted input to this server.
+
+---
+
+## Threat model
+
+Pyodide is explicitly **not** a security sandbox for untrusted code. WASM
+gives memory safety, but Pyodide deliberately exposes a Python↔JavaScript FFI,
+and that FFI is reachable from user code.
+
+Verified against the pinned `pyodide` version, escaping Python into the Node
+host is possible via several independent routes:
+
+- `import js` exposes the JavaScript global scope, including `process`.
+- `pyodide_js._api` is reachable from Python and exposes internals such as
+  `loadBinaryFile`, which reads host files outside the session directory.
+- Any reachable `JsProxy` yields `.constructor.constructor` — the `Function`
+  constructor — and `node:fs` / `node:child_process` are reachable from there
+  via dynamic `import()`.
+- The full parent environment (every variable in `process.env`) is readable.
+
+**In-process mitigations do not close this.** `jsglobals: {}` fails because
+`Function` bodies evaluate in the *global* scope, not the restricted object.
+Deleting or unregistering modules fails because Pyodide's internals hold live
+`JsProxy` references captured at load time. Node's `--permission` model is
+useful defense-in-depth but is experimental, does not gate `process.env`, and
+is not a substitute for an OS boundary.
+
+**Consequences for how this server may be used:**
+
+- Only trusted, first-party agent code may be executed.
+- The workspace must be treated as trusted input.
+- Secrets must not be present in the environment of the MCP server process,
+  because the worker inherits it.
+
+**Required to lift these constraints:** confine the worker with an
+owner-approved OS/container boundary — no host filesystem beyond the session
+directory, no inherited environment, no network, no process spawning, plus
+pid/memory/CPU limits. The NODEFS copy-on-write layer described below is a
+*correctness* mechanism for workspace isolation, not a security control, and
+does not mitigate any of the above.
 
 ---
 
@@ -46,15 +93,15 @@ variables and imports never leak between sessions.
 
 ## Why Pyodide
 
-Requirements for the sandbox:
+Requirements this choice was made against:
 
-- Run untrusted, agent-generated Python safely.
+- Run agent-generated Python with a **reproducible, pinned** package set.
 - Deterministic behavior across machines.
 - Minimized per-call cold-start cost.
 
-The WASM runtime is the trust boundary: user code cannot reach the host
-filesystem, network, or processes except through the FS bridges we
-explicitly expose.
+Note that "run untrusted code safely" is **not** on that list, and Pyodide
+does not provide it — see [Threat model](#threat-model). The WASM runtime is a
+*memory-safety* boundary, not a privilege boundary.
 
 Compared with seccomp'd subprocesses or per-session containers, Pyodide
 gives us:
@@ -62,6 +109,10 @@ gives us:
 - A **pinned package set** via the pyodide lock plus vendored wheels.
 - A **single dependency** to install (Node plus the `pyodide` npm package).
 - **REPL-style state** via a shared `_namespace` across calls in a session.
+
+What it costs us: containers and seccomp'd subprocesses would have given a
+real privilege boundary, which Pyodide does not. Recovering that requires
+wrapping the worker in OS-level confinement.
 
 Trade-off: ~5–10 s first start, paid once and amortized across all
 `code_interpreter` calls in the session.
@@ -225,6 +276,26 @@ A session directory rather than mounting `workspace_dir` directly because
 writes from one session must not affect the workspace or the next session.
 The session directory is what gets mutated below, and is `rmtree`'d on
 teardown.
+
+#### Links in the source workspace
+
+Seeding must not blindly re-point a link that already exists in
+`workspace_dir`. NODEFS reads follow host links transparently, so a link whose
+target sits outside the workspace would be readable from inside `/workspace`.
+Windows junctions matter here too: `os.path.islink` returns `False` for them,
+so the reparse-point attribute is checked explicitly, and an entry that cannot
+be `lstat`'d is treated as a link so the check fails closed.
+
+| Entry in `workspace_dir` | Seeding behavior |
+| ---- | ---- |
+| Regular file | Symlinked into the session dir (the O(files) fast path). |
+| Link whose target resolves **inside** `workspace_dir` | Materialized as a real copy — data preserved, no followable link. |
+| Link whose target resolves **outside** `workspace_dir` | **Rejected**, reported on stderr. |
+| Linked directory | **Rejected** — avoids both traversal and `copytree` recursion loops. |
+
+Note this is workspace hygiene, not a privilege boundary: a caller who can
+already execute code in the worker does not need a link to reach host files
+(see [Threat model](#threat-model)).
 
 ### NODEFS copy-on-write inside Pyodide
 
