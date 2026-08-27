@@ -1,0 +1,301 @@
+# Sandbox Code Interpreter (Pyodide)
+
+The `sandbox` MCP server runs agent-supplied Python in a sandboxed Pyodide
+(CPython-in-WebAssembly) interpreter, exposes the test's workspace files at
+`/workspace/`, and isolates writes via copy-on-write at the NODEFS layer.
+
+---
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────┐
+│  ThinkingBox Agent Loop                      │
+└────────────────────┬─────────────────────────┘
+                     │ stdio MCP (one per session)
+                     v
+┌──────────────────────────────────────────────┐
+│  mcp_sandbox.py        (Python, FastMCP)     │
+│    - per-session init/teardown               │
+│    - owns Sandbox + CodeInterpreter          │
+└────────────────────┬─────────────────────────┘
+                     │ asyncio subprocess
+                     │ stdin/stdout: newline-delimited JSON
+                     │ stderr: inherited (diagnostic logs)
+                     v
+┌──────────────────────────────────────────────┐
+│  pyodide_worker.mjs     (Node.js, long-lived)│
+│    - loadPyodide() — CPython compiled to WASM│
+│    - eager loadPackage / micropip.install    │
+│    - NODEFS mount + COW patches              │
+│    - _execute(code) request loop             │
+└────────────────────┬─────────────────────────┘
+                     │ NODEFS (Emscripten ↔ host fs)
+                     v
+┌──────────────────────────────────────────────┐
+│  /tmp/sandbox_session_XXXXXX/                │
+│    symlinks → configured workspace_dir       │
+└──────────────────────────────────────────────┘
+```
+
+Each session gets its own Node subprocess and its own `/tmp/sandbox_session_*`
+directory. The Pyodide global namespace lives inside that subprocess, so
+variables and imports never leak between sessions.
+
+---
+
+## Why Pyodide
+
+Requirements for the sandbox:
+
+- Run untrusted, agent-generated Python safely.
+- Deterministic behavior across machines.
+- Minimized per-call cold-start cost.
+
+The WASM runtime is the trust boundary: user code cannot reach the host
+filesystem, network, or processes except through the FS bridges we
+explicitly expose.
+
+Compared with seccomp'd subprocesses or per-session containers, Pyodide
+gives us:
+
+- A **pinned package set** via the pyodide lock plus vendored wheels.
+- A **single dependency** to install (Node plus the `pyodide` npm package).
+- **REPL-style state** via a shared `_namespace` across calls in a session.
+
+Trade-off: ~5–10 s first start, paid once and amortized across all
+`code_interpreter` calls in the session.
+
+---
+
+## Components
+
+| File | Role |
+| ---- | ---- |
+| [mcp_sandbox.py](../servers/thinkingbox_tools/thinkingbox_tools/mcp_sandbox.py) | FastMCP server: tool definitions, session lifecycle, owns the singletons. |
+| [toolslib/sandbox/code_interpreter.py](../servers/thinkingbox_tools/thinkingbox_tools/toolslib/sandbox/code_interpreter.py) | Spawns and supervises the Node subprocess; frames requests as JSON; enforces per-call timeouts; records an `effects` log. |
+| [toolslib/sandbox/sandbox.py](../servers/thinkingbox_tools/thinkingbox_tools/toolslib/sandbox/sandbox.py) | Host-side helpers for `list_sandbox_files` / `search_sandbox_files`, with lexical path-traversal rejection. |
+| [toolslib/sandbox/pyodide_worker.mjs](../servers/thinkingbox_tools/thinkingbox_tools/toolslib/sandbox/pyodide_worker.mjs) | The long-lived Node worker. Loads Pyodide, installs packages, mounts the workspace with COW, runs the request loop. |
+| [toolslib/sandbox/pypi-packages.mjs](../servers/thinkingbox_tools/thinkingbox_tools/toolslib/sandbox/pypi-packages.mjs) | Source of truth for PyPI packages (not in pyodide's lock) preinstalled in every session. |
+| [toolslib/sandbox/scripts/download-wheels.mjs](../servers/thinkingbox_tools/thinkingbox_tools/toolslib/sandbox/scripts/download-wheels.mjs) | `npm postinstall`: vendors pure-Python wheels into `./wheels/` so the worker installs from `file://` URLs. |
+
+---
+
+## Tools
+
+| Tool | Description |
+| ---- | ----------- |
+| `code_interpreter(code)` | Execute Python in the session's Pyodide interpreter. Returns `stdout`, `stderr`, `result` (repr of the last bare expression, Jupyter-style), and `error` (formatted traceback). Stateful — variables and imports persist across calls. |
+| `list_sandbox_files(prefix)` | List files under `workspace_dir/<prefix>` as workspace-relative paths. Dotfiles filtered out. |
+| `search_sandbox_files(pattern)` | Glob the workspace. Matches containing `..` segments are rejected. |
+| `__reserved__init(config)` | Per-session setup. `config = {"workspace_dir": str, "timeout": float}`. Idempotent — re-calling resets the interpreter and session directory. |
+| `__reserved__teardown()` | Stop the worker, remove the session directory. |
+| `__reserved__geteffects()` | Return the chronological list of `{type, code, result}` entries recorded during the session. Used by graders/replay. |
+
+Workspace files are addressable from user code as `/workspace/<relative>`.
+The list tools' descriptions instruct the agent to prepend `/workspace/`
+before calling `open(...)`.
+
+---
+
+## Python libraries
+
+Pre-installed in every session (eager-loaded at worker startup):
+
+| Category | Libraries |
+| -------- | --------- |
+| Data / math | `numpy`, `pandas`, `sympy`, `mpmath` |
+| Excel | `openpyxl`, `xlsxwriter` |
+| Word | `python-docx`, `mammoth` |
+| PowerPoint | `python-pptx` |
+| PDF | `pypdf`, `pdfminer.six`, `reportlab` |
+| HTML / XML / Markdown | `beautifulsoup4`, `lxml`, `markdownify` |
+| Imaging | `pillow` |
+| Plotting | `altair`, `plotly` |
+| Templating | `jinja2` |
+| Tabular output | `tabulate` |
+| Runtime install | `micropip` |
+
+Plus the CPython standard library.
+
+Other pyodide-lock packages (e.g. `matplotlib`, `scipy`) are auto-loaded
+on first `import` — they don't need to be in the eager set, they just
+pay their load cost the first time the agent imports them.
+
+Anything outside both sets the agent installs at runtime via
+`await micropip.install("name")` — pure-Python only.
+
+---
+
+## Protocol
+
+Newline-delimited JSON on stdin/stdout, strict request/response sequencing.
+
+```
+request:  { "code": "<python source>" }
+response: { "stdout": "...", "stderr": "...",
+            "result": "<repr>" | null,
+            "error":  "<traceback>" | null }
+```
+
+The worker writes a one-shot `{"ready": true}` line once Pyodide has loaded
+and packages are installed. `code_interpreter.py` blocks on this for up to
+`STARTUP_TIMEOUT = 300s`.
+
+**Stream discipline.** Stdout is reserved for protocol frames. The worker
+overrides `console.log/info/warn` and passes stdout/stderr callbacks to
+`loadPyodide` so Pyodide and micropip progress chatter goes to stderr.
+Stderr is inherited from the parent (`stderr=None`). Piping it without a
+drain task would deadlock once the ~64 KB pipe buffer fills during package
+loading. User-code stdout/stderr is captured separately inside `_execute`
+and returned in the response frame.
+
+**Timeouts.** `execute()` awaits the response with `asyncio.wait_for`. On
+timeout, the worker is killed (WASM is single-threaded with no external
+interrupt) and the next call respawns a fresh worker, losing session
+state. The returned error says so explicitly. Worker crashes surface as
+"closed unexpectedly" and recover the same way.
+
+---
+
+## The `_execute` helper
+
+[pyodide_worker.mjs:110–152](../servers/thinkingbox_tools/thinkingbox_tools/toolslib/sandbox/pyodide_worker.mjs#L110-L152)
+installs a Python helper that every request calls. Two non-obvious bits:
+
+- It `ast.parse`s the code and, if the last node is a bare `Expr`, splits
+  it off — `exec`s the rest, then `eval`s the trailing expression so its
+  `repr` lands in `result`. Jupyter "last-expression" behavior.
+- Everything runs in a module-level `_namespace` dict that lives for the
+  worker's lifetime, which is how state persists across `code_interpreter`
+  calls.
+
+Before each call, the worker also runs `pyodide.loadPackagesFromImports(code)`,
+which auto-loads any pyodide-lock package the user references (e.g.
+`matplotlib`, `scipy`) without needing it in the eager preload set.
+
+---
+
+## Package provisioning
+
+The "Python libraries" section above lists what's available. This
+section explains how each library gets there. Three populations, loaded
+in order:
+
+1. **Bundled** (`BUNDLED_PACKAGES` in `pyodide_worker.mjs`) —
+   pyodide-lock packages loaded eagerly at startup via
+   `pyodide.loadPackage`. Often include C extensions compiled to WASM.
+
+2. **PyPI** (`PYPI_PACKAGES` in `pypi-packages.mjs`) — pure-Python
+   wheels not in pyodide's lock, installed via `micropip.install`. At
+   `npm install` time, `download-wheels.mjs` vendors the pure-Python
+   wheel for each into `./wheels/`; the worker rewrites each spec to a
+   local `file://` URL when a vendored wheel matches, else falls back
+   to the bare name (micropip fetches from PyPI).
+
+3. **Auto-loaded by import** — `loadPackagesFromImports` runs before
+   every user request and pulls in any other pyodide-lock package
+   referenced by the code.
+
+To add a new library: drop it into `BUNDLED_PACKAGES` if pyodide ships
+a wheel for it, otherwise into `PYPI_PACKAGES` if a pure-Python wheel
+exists on PyPI. Anything else has to be installed by the agent itself
+via `await micropip.install(...)`.
+
+---
+
+## Workspace and copy-on-write
+
+The most non-obvious piece. Requirements:
+
+- The agent can read every file under the configured `workspace_dir`.
+- The agent's writes never mutate the source workspace.
+- Init cost is independent of file size — a 1 GB CSV shouldn't take
+  30 seconds to start a session.
+
+### Host-side symlink seeding
+
+`__reserved__init` populates `sandbox_session_*/` with `shutil.copytree`
+using a custom `copy_function` that calls `os.symlink(abspath(src), dst)`.
+The session directory mirrors `workspace_dir` structurally, but every
+leaf is a symlink to the original. Cost is O(files), not O(bytes). Falls
+back to `shutil.copy2` where symlinks aren't supported.
+
+A session directory rather than mounting `workspace_dir` directly because
+writes from one session must not affect the workspace or the next session.
+The session directory is what gets mutated below, and is `rmtree`'d on
+teardown.
+
+### NODEFS copy-on-write inside Pyodide
+
+NODEFS is Pyodide's bridge to Node's `fs` module. By default, when
+Emscripten's path resolver encounters a symlink, it calls `FS.readlink`
+to follow it — which tries to open the absolute target from *inside* the
+Emscripten filesystem and fails with `ENOENT`. The worker patches four
+NODEFS hooks ([pyodide_worker.mjs:173–254](../servers/thinkingbox_tools/thinkingbox_tools/toolslib/sandbox/pyodide_worker.mjs#L173-L254))
+to make seeded symlinks behave like regular files inside the sandbox
+while copy-on-writing host-side when the agent mutates them:
+
+| Hook | Behavior |
+| ---- | -------- |
+| `node_ops.lookup` | Rewrites a symlink node's `mode` to the target's file-type bits, so the resolver treats the entry as a regular file (no `readlink` follow). |
+| `node_ops.getattr` | Reports the target's size, mode, and timestamps — so `os.stat("/workspace/big.csv").st_size` returns the real byte count. |
+| `stream_ops.open` | On `O_WRONLY` / `O_RDWR`, materializes the symlink: `readFileSync` the source bytes (host follows the symlink), `unlink`, write the bytes back to the same path. The symlink is now a regular file in the session dir; subsequent writes go there. `O_TRUNC` skips the read. |
+| `node_ops.setattr` | Same materialization for `os.truncate` / `os.utime` / `os.chmod`, which don't go through `open`. |
+
+This catches every Python write path — `builtins.open`, `os.open`,
+`io.FileIO`, `mmap`, `sqlite3`, `numpy.save` — because they all bottom
+out in NODEFS. Reads never materialize: Node's `fs` follows host
+symlinks automatically.
+
+`node_ops.symlink` is overridden to raise `EPERM`, blocking
+`os.symlink("/etc/passwd", "/workspace/x")` attacks. Seeded symlinks
+were created on the host before the mount and are unaffected.
+
+### Path traversal in the listing tools
+
+The session directory is full of symlinks, so `Path.resolve()`-based
+checks would land outside `workspace_dir` for every legitimate match.
+`Sandbox.search_files` checks the **lexical** path (`p.parts`) and rejects
+any match containing `..`. `list_files` uses `os.walk` from a
+`resolve`-checked base and never accepts user paths that resolve outside
+the session root.
+
+---
+
+## Effects log
+
+Every successful execution is appended to `_interpreter.effects` as
+`{"type": "code_execution", "code": code, "result": asdict(result)}` and
+returned by `__reserved__geteffects`. Graders use this for replay and
+intermediate-step scoring; storing `result` as a plain dict (not the
+dataclass) keeps the JSON shape stable across versions.
+
+---
+
+## Setup and operations
+
+```bash
+cd servers/thinkingbox_tools/thinkingbox_tools/toolslib/sandbox
+npm install
+```
+
+The `postinstall` script vendors wheels into `./wheels/`. Idempotent —
+re-running keeps existing wheels; force a refresh by deleting `wheels/`.
+If PyPI is unreachable, missing wheels fall back to runtime fetch
+(slower startup, still works).
+
+**Cost.** Cold start ~5–10 s with cached wheels, paid once per session.
+Memory ~250–400 MB resident per worker — each concurrent session needs
+its own. Per-call overhead is low tens of ms for pure-Python code with
+no new imports; dominated by `loadPackagesFromImports` otherwise.
+
+**Upgrades.** The NODEFS hooks reach into `pyodide.FS.filesystems.NODEFS`
+internals and assume the shape of `node_ops` / `stream_ops` on the
+current pyodide version. If a `pyodide` upgrade silently breaks them,
+reads still work (Node follows symlinks transparently) but **writes leak
+to the source workspace**. The integration tests in
+[test_sandbox_server.py](../servers/thinkingbox_tools/tests/test_sandbox_server.py)
+exercise the COW write path (open / `os.open` / sqlite3 / truncate /
+utime) and the path-traversal guards — they're the most reliable canary
+for a pyodide bump.

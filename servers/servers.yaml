@@ -13,6 +13,10 @@ servers:
   online_banking:
     type: mcp-process
     command: ["{python}", "-m", "thinkingbox_tools.mcp_online_banking"]
+  # Sandbox code interpreter (Pyodide-based)
+  sandbox:
+    type: mcp-process
+    command: ["{python}", "-m", "thinkingbox_tools.mcp_sandbox"]
 
   # TB BUSINESS OPS SERVERS 202606
   sandbox_external_retail:
