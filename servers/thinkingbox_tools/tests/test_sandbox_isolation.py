@@ -463,14 +463,12 @@ async def _capability_probe(client, code):
         pytest.fail(f"probe raised inside the interpreter, inconclusive:\n{sc['error']}")
 
     value = sc.get("result")
-    if value == repr("REACHABLE"):
-        return "REACHABLE"
-    if value == repr("ABSENT"):
-        return "ABSENT"
-    pytest.fail(
-        "probe returned an unexpected value, so the harness is not measuring "
-        f"what it claims. got {value!r}, stdout={sc.get('stdout')!r}"
-    )
+    if value not in (repr("REACHABLE"), repr("ABSENT")):
+        pytest.fail(
+            "probe returned an unexpected value, so the harness is not measuring "
+            f"what it claims. got {value!r}, stdout={sc.get('stdout')!r}"
+        )
+    return "REACHABLE" if value == repr("REACHABLE") else "ABSENT"
 
 
 def _record(capability, outcome, detail):
