@@ -24,8 +24,16 @@ await mkdir(wheelsDir, { recursive: true });
 
 const PURE_PYTHON_WHEEL = /-py[23](\.py3)?-none-any\.whl$/;
 
+// A stalled connection would otherwise hang `npm install` indefinitely, since
+// fetch() has no default timeout.  Bounding it lets the script fail fast and
+// degrade to a runtime micropip fetch, as documented.
+const METADATA_TIMEOUT_MS = 30_000;
+const DOWNLOAD_TIMEOUT_MS = 120_000;
+
 async function downloadOne(name) {
-    const res = await fetch(`https://pypi.org/pypi/${encodeURIComponent(name)}/json`);
+    const res = await fetch(`https://pypi.org/pypi/${encodeURIComponent(name)}/json`, {
+        signal: AbortSignal.timeout(METADATA_TIMEOUT_MS),
+    });
     if (!res.ok) {
         console.warn(`[download-wheels] PyPI returned ${res.status} for ${name} — skipping`);
         return;
@@ -48,7 +56,9 @@ async function downloadOne(name) {
         // not present — download below
     }
     console.log(`[download-wheels] Downloading: ${wheel.filename}`);
-    const wRes = await fetch(wheel.url);
+    const wRes = await fetch(wheel.url, {
+        signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
+    });
     if (!wRes.ok) {
         console.warn(`[download-wheels] Download failed (${wRes.status}) for ${wheel.url} — skipping`);
         return;

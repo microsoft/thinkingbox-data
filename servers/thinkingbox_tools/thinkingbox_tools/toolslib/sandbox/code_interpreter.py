@@ -3,7 +3,7 @@
 
 import asyncio
 import json
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from pathlib import Path
 
 
@@ -180,6 +180,10 @@ class CodeInterpreter:
                 self._process.kill()
                 await self._process.wait()
             except Exception:
+                # Best effort: the worker may already be dead, or reaping it may
+                # race with the event loop shutting down.  Either way the process
+                # handle is dropped below and the next call spawns a fresh one,
+                # so there is nothing useful to recover or report here.
                 pass
             finally:
                 self._process = None
