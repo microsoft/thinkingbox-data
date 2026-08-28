@@ -1,6 +1,11 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT License.
 
+import csv
+import os
+import re
+from pathlib import Path
+
 from thinkingbox.common import Judge, TestContext
 
 """!
@@ -56,6 +61,35 @@ def test_reads_workspace_file_through_interpreter(x: TestContext, judge: Judge):
     )
 
 
+def _expected_revenue_by_region() -> dict[str, float]:
+    """Compute the ground truth from the fixture itself.
+
+    Derived rather than hard-coded so the assertion cannot drift from the data:
+    editing sales.csv changes what the test demands.
+    """
+    fixture = (
+        Path(os.environ.get("THINKINGBOX_DATA", "."))
+        / "support"
+        / "sandbox_workspace"
+        / "reports"
+        / "sales.csv"
+    )
+    totals: dict[str, float] = {}
+    with open(fixture, newline="") as handle:
+        for row in csv.DictReader(handle):
+            revenue = int(row["units"]) * float(row["unit_price"])
+            totals[row["region"]] = round(totals.get(row["region"], 0.0) + revenue, 2)
+    return totals
+
+
+def _numbers_in(text: str) -> set[float]:
+    """Every number in `text`, normalised so 7,312.50 and $7312.5 both match."""
+    if not text:
+        return set()
+    cleaned = text.replace(",", "").replace("$", "")
+    return {float(m) for m in re.findall(r"-?\d+\.\d+|-?\d+", cleaned)}
+
+
 def _reads_fixture(execution) -> bool:
     """True when the code actually opens the fixture rather than naming it.
 
@@ -70,14 +104,6 @@ def _reads_fixture(execution) -> bool:
     )
 
 
-def _states_total(text: str) -> bool:
-    """True when the text contains East's revenue in any plausible formatting."""
-    if not text:
-        return False
-    normalized = text.replace(",", "").replace("$", "")
-    return any(form in normalized for form in ("7312.5", "7312.50"))
-
-
 def test_computes_revenue_per_region(x: TestContext, judge: Judge):
     """!
     query: |
@@ -85,6 +111,10 @@ def test_computes_revenue_per_region(x: TestContext, judge: Judge):
         unit price, summed across quarters) and tell me which region has the
         highest revenue.
     """
+    expected = _expected_revenue_by_region()
+    assert expected, "fixture produced no ground truth; check THINKINGBOX_DATA"
+    top_region = max(expected, key=expected.__getitem__)
+
     executions = _executions(x)
     assert executions, "the agent did not use the code interpreter"
 
@@ -101,36 +131,43 @@ def test_computes_revenue_per_region(x: TestContext, judge: Judge):
         f"filename is not enough: {[e.get('code') for e in successful]}"
     )
 
-    # The decisive check: the figure must come *out* of the interpreter while
-    # being absent from the code that produced it.  A response is only credible
-    # if the number was computed from the fixture, and an execution such as
-    # `print("sales.csv: East 7312.50")` would satisfy every check above while
-    # reading nothing -- so require the value in the output and not in the source.
-    computed = [
-        e
-        for e in reading
-        if _states_total(
-            (e["result"].get("stdout") or "") + " " + (e["result"].get("result") or "")
+    # The decisive check: every per-region total derived from the fixture must
+    # appear in interpreter output, and none of them may appear in the code that
+    # produced it.  Reproducing four independent totals that match the file to
+    # the cent is not something a model can do by writing them into a print()
+    # without having read the data -- and if it does write them in, the second
+    # half of this check rejects it.
+    wanted = set(expected.values())
+    for execution in reading:
+        produced = _numbers_in(
+            (execution["result"].get("stdout") or "")
+            + " "
+            + (execution["result"].get("result") or "")
         )
-        and not _states_total(e.get("code", ""))
-    ]
-    assert computed, (
-        "East's revenue never appeared in interpreter output that did not "
-        "already contain it as a literal -- the figure was hard-coded rather "
-        "than computed from the fixture"
-    )
+        if not wanted.issubset(produced):
+            continue
+        if _numbers_in(execution.get("code", "")) & wanted:
+            continue  # the totals were literals in the source, not computed
+        break
+    else:
+        raise AssertionError(
+            "no execution produced all per-region totals "
+            f"{sorted(wanted)} as output without also containing them as "
+            "literals in its code -- the figures were not computed from the fixture"
+        )
 
-    # East is the correct answer (7312.50).
+    # And the reported answer must name the right region.
     assert judge.text_yesno(
         x.response,
-        "Does the response identify East as the region with the highest total "
-        "revenue?",
+        f"Does the response identify {top_region} as the region with the "
+        "highest total revenue?",
     )
 
-    # Guard against summing units instead of revenue, which would still put East
-    # first, by requiring the figure itself.
-    assert _states_total(x.response), (
-        f"the response did not report East's revenue as 7312.50: {x.response!r}"
+    # Guard against summing units instead of revenue, which would still put
+    # the same region first, by requiring the exact figure.
+    assert expected[top_region] in _numbers_in(x.response), (
+        f"the response did not report {top_region}'s revenue as "
+        f"{expected[top_region]}: {x.response!r}"
     )
 
 

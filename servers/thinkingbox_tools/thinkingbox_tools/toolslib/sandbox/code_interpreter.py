@@ -139,7 +139,7 @@ class CodeInterpreter:
                 self._process.stdin.write(request.encode())
                 await self._process.stdin.drain()
             except asyncio.CancelledError:
-                await self._kill()
+                await self._kill(during_cancellation=True)
                 raise
 
             try:
@@ -154,7 +154,7 @@ class CodeInterpreter:
                     "The interpreter has been reset."
                 )
             except asyncio.CancelledError:
-                await self._kill()
+                await self._kill(during_cancellation=True)
                 raise
             except (ValueError, asyncio.LimitOverrunError) as exc:
                 # readline() raises when a frame exceeds STREAM_LIMIT.  The
@@ -214,7 +214,13 @@ class CodeInterpreter:
             try:
                 self._process.stdin.close()
                 await asyncio.wait_for(self._process.wait(), timeout=5.0)
-            except (asyncio.TimeoutError, Exception):
+            except asyncio.CancelledError:
+                # Cancelled mid-teardown. CancelledError is a BaseException, so
+                # the handler below does not see it; without this the child
+                # would be dropped without ever being killed.
+                await self._kill(during_cancellation=True)
+                raise
+            except Exception:
                 await self._kill()
             finally:
                 self._process = None
@@ -308,7 +314,7 @@ class CodeInterpreter:
             # Cancelled mid-handshake: the child is spawned but never handed
             # over, so without this it would be orphaned entirely -- no
             # reference is stored anywhere the caller could reach.
-            await self._kill()
+            await self._kill(during_cancellation=True)
             raise
         except (ValueError, asyncio.LimitOverrunError) as exc:
             await self._kill()
@@ -336,10 +342,20 @@ class CodeInterpreter:
             await self._kill()
             raise CodeInterpreterError(f"Unexpected worker handshake: {ready}")
 
-    async def _kill(self) -> None:
+    async def _kill(self, *, during_cancellation: bool = False) -> None:
+        """Kill and reap the worker, detaching it first.
+
+        ``during_cancellation`` says whether the caller is already unwinding a
+        CancelledError.  It decides what happens if the shielded reap below is
+        itself interrupted: when the caller is about to re-raise that same
+        cancellation, swallowing here is correct; when the caller is raising a
+        CodeInterpreterError (timeout, malformed frame), a CancelledError
+        arriving now is a *new* external cancellation and must not be lost, or
+        the task keeps running after something asked it to stop.
+        """
         # Detach first: whatever happens below, the next execute() must not
-        # reuse this process.  If _kill() is itself interrupted, a dropped
-        # handle is recoverable; a retained one is not.
+        # reuse this process.  If _kill() is interrupted, a dropped handle is
+        # recoverable; a retained one is not.
         proc = self._process
         self._process = None
         if proc is None:
@@ -351,19 +367,18 @@ class CodeInterpreter:
             # Already exited; there is still a zombie to reap below on POSIX.
             pass
 
-        # Reap the child so it does not linger.  shield() matters here because
-        # _kill() is normally reached from a cancellation handler: a bare await
-        # would be cancelled again immediately and return before the process was
-        # reaped.  Shielding lets the wait() finish in the background even when
-        # our own await is interrupted.
+        # shield() matters because _kill() is usually reached from a
+        # cancellation handler: a bare await would be cancelled again
+        # immediately and return before the child was reaped.  Shielding lets
+        # wait() finish in the background regardless.
         waiter = asyncio.shield(proc.wait())
         try:
             await asyncio.wait_for(waiter, timeout=self.KILL_REAP_TIMEOUT)
         except asyncio.CancelledError:
-            # Our await was cancelled, not the reap. The shielded wait() keeps
-            # running and collects the child. Swallow rather than propagate:
-            # the caller re-raises the original cancellation.
-            pass
+            if not during_cancellation:
+                raise
+            # The caller re-raises the original cancellation; the shielded
+            # wait() continues and collects the child.
         except Exception:
             # Timed out, already reaped, or the loop is shutting down. Nothing
             # useful to recover or report; the handle is already dropped.

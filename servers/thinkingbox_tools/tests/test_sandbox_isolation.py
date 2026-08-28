@@ -28,9 +28,11 @@ is modified.
 import asyncio
 import json
 import os
+import shutil
 import subprocess
 import sys
 import uuid
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -588,29 +590,55 @@ async def test_cancelled_execute_resets_worker():
 
 
 @pytest.mark.asyncio
-async def test_cancelled_during_startup_resets_worker():
-    """Cancelling while the handshake is pending must not orphan the child.
+async def test_cancelled_during_startup_resets_worker(tmp_path, monkeypatch):
+    """Cancelling during the real _start() handshake must not orphan the child.
 
-    _start() has spawned the process but not yet returned it, so if the
-    cancellation escapes without a kill the child is unreachable from anywhere.
+    Exercises the actual _start(): only `create_subprocess_exec` is stubbed, so
+    the spawn, the handshake read and the cancellation handling are the real
+    code paths.  At that point the child exists but has not been handed back to
+    execute(), so a cancellation that escapes without a kill leaves a process
+    nothing can reach.
     """
-    interp = code_interpreter.CodeInterpreter(timeout=30.0)
+    # _start() refuses to run unless the worker script and node_modules exist.
+    worker_dir = tmp_path / "sandbox"
+    (worker_dir / "node_modules" / "pyodide").mkdir(parents=True)
+    (worker_dir / "pyodide_worker.mjs").write_text("// stub")
+
+    class _NeverReadyStdout:
+        async def readline(self):
+            await asyncio.Event().wait()  # handshake never arrives
+
+    class _SpawnedProc:
+        def __init__(self):
+            self.stdout = _NeverReadyStdout()
+            self.stdin = _FakeStdin()
+            self.returncode = None
+            self.killed = False
+            self.reaped = False
+
+        def kill(self):
+            self.killed = True
+            self.returncode = -9
+
+        async def wait(self):
+            self.reaped = True
+            return self.returncode
+
     spawned = {}
 
-    async def fake_start():
-        proc = _FakeProcess([])
+    async def fake_exec(*args, **kwargs):
+        proc = _SpawnedProc()
         spawned["proc"] = proc
-        interp._process = proc
-        try:
-            await asyncio.Event().wait()  # park, as the real handshake would
-        except asyncio.CancelledError:
-            await interp._kill()
-            raise
+        return proc
 
-    interp._start = fake_start
+    monkeypatch.setattr(asyncio, "create_subprocess_exec", fake_exec)
+
+    interp = code_interpreter.CodeInterpreter(timeout=30.0)
+    interp._worker_path = worker_dir / "pyodide_worker.mjs"
 
     task = asyncio.create_task(interp.execute("x"))
     await asyncio.sleep(0.05)
+    assert "proc" in spawned, "the stubbed spawn never happened; _start() bailed early"
     task.cancel()
 
     cancelled = False
@@ -618,8 +646,94 @@ async def test_cancelled_during_startup_resets_worker():
         await task
     except asyncio.CancelledError:
         cancelled = True
-    assert cancelled
-    assert spawned["proc"].killed, "child spawned during startup was orphaned"
+    assert cancelled, "cancellation did not propagate out of execute()"
+
+    proc = spawned["proc"]
+    assert proc.killed, "child spawned during the handshake was orphaned"
+    assert proc.reaped, "child was killed but never reaped"
+    assert interp._process is None
+
+    # _kill() deliberately keeps the worker temp dir so a restart can reuse it
+    # rather than accumulating one per failed attempt. The contract is that
+    # close() reclaims it, so verify that rather than expecting an eager delete.
+    leaked = interp._worker_tmp
+    assert leaked is not None and os.path.isdir(leaked)
+    await interp.close()
+    assert interp._worker_tmp is None
+    assert not os.path.exists(leaked), "close() did not reclaim the worker temp dir"
+
+
+@pytest.mark.asyncio
+async def test_kill_propagates_new_cancellation_outside_cancel_paths():
+    """A cancellation arriving during a non-cancellation kill must not be lost.
+
+    _kill() swallows CancelledError only when the caller is already unwinding
+    one and will re-raise it.  Called from a timeout or malformed-frame handler,
+    a cancellation arriving now is a new external request to stop, and dropping
+    it would let the task keep running.
+    """
+
+    class _UnreapableProc:
+        def __init__(self):
+            self.returncode = None
+            self.killed = False
+
+        def kill(self):
+            self.killed = True
+
+        async def wait(self):
+            await asyncio.Event().wait()  # never completes
+
+    interp = code_interpreter.CodeInterpreter(timeout=30.0)
+    proc = _UnreapableProc()
+    interp._process = proc
+
+    # during_cancellation defaults to False: the new cancellation must escape.
+    task = asyncio.create_task(interp._kill())
+    await asyncio.sleep(0.05)
+    task.cancel()
+
+    propagated = False
+    try:
+        await task
+    except asyncio.CancelledError:
+        propagated = True
+    assert propagated, "_kill() swallowed a cancellation from a non-cancellation path"
+    assert proc.killed
+    assert interp._process is None
+
+
+@pytest.mark.asyncio
+async def test_kill_swallows_cancellation_when_already_unwinding():
+    """The converse: during cancellation, _kill() must not mask the original."""
+
+    class _UnreapableProc:
+        def __init__(self):
+            self.returncode = None
+            self.killed = False
+
+        def kill(self):
+            self.killed = True
+
+        async def wait(self):
+            await asyncio.Event().wait()
+
+    interp = code_interpreter.CodeInterpreter(timeout=30.0)
+    proc = _UnreapableProc()
+    interp._process = proc
+
+    task = asyncio.create_task(interp._kill(during_cancellation=True))
+    await asyncio.sleep(0.05)
+    task.cancel()
+
+    # The task is cancelled from outside, so awaiting it still raises; what
+    # matters is that _kill() itself did not convert that into a different
+    # error and that the process was detached.
+    try:
+        await task
+    except asyncio.CancelledError:
+        pass
+    assert proc.killed
     assert interp._process is None
 
 
@@ -738,6 +852,121 @@ async def test_real_response_under_limit_is_returned():
         if proc.returncode is None:
             proc.kill()
             await proc.wait()
+
+
+# ---------------------------------------------------------------------------
+# Wheel vendoring integrity
+# ---------------------------------------------------------------------------
+
+_DOWNLOADER = (
+    Path(mcp_sandbox.__file__).parent
+    / "toolslib"
+    / "sandbox"
+    / "scripts"
+    / "download-wheels.mjs"
+)
+
+
+def _pinned_packages():
+    """The pinned manifest, read through node so the test uses the real source."""
+    out = subprocess.run(
+        [
+            "node",
+            "-e",
+            "import('./pypi-packages.mjs').then(m=>console.log(JSON.stringify(m.PYPI_PACKAGES)))",
+        ],
+        cwd=str(_DOWNLOADER.parent.parent),
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    return json.loads(out)
+
+
+def _run_downloader(tmp_path, *, serve_body: bytes):
+    """Run download-wheels.mjs against a local stub PyPI and a scratch wheels dir.
+
+    The stub advertises each package's pinned digest but serves `serve_body`,
+    so the "downloaded bytes disagree with the pin" path is exercised without
+    touching the network or the real wheels cache.
+    """
+    if shutil.which("node") is None:
+        pytest.skip("node is not available")
+
+    import http.server
+    import threading
+
+    by_name = {p["name"]: p for p in _pinned_packages()}
+    wheels_dir = tmp_path / "wheels"
+
+    class Handler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):  # noqa: N802
+            if self.path.endswith("/json"):
+                # /<name>/<version>/json
+                name = self.path.strip("/").split("/")[0]
+                pin = by_name.get(name)
+                if pin is None:
+                    self.send_response(404)
+                    self.end_headers()
+                    return
+                payload = json.dumps(
+                    {
+                        "urls": [
+                            {
+                                "filename": pin["filename"],
+                                "packagetype": "bdist_wheel",
+                                "digests": {"sha256": pin["sha256"]},
+                                "url": f"http://127.0.0.1:{self.server.server_port}/wheel",
+                            }
+                        ]
+                    }
+                ).encode()
+            else:
+                payload = serve_body
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, *args):
+            pass
+
+    server = http.server.HTTPServer(("127.0.0.1", 0), Handler)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    try:
+        env = {
+            **os.environ,
+            "THINKINGBOX_PYPI_BASE_URL": f"http://127.0.0.1:{server.server_port}",
+            "THINKINGBOX_WHEELS_DIR": str(wheels_dir),
+        }
+        result = subprocess.run(
+            ["node", str(_DOWNLOADER)],
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=120,
+        )
+        return result, wheels_dir
+    finally:
+        server.shutdown()
+
+
+def test_downloaded_bytes_failing_digest_abort_the_install(tmp_path):
+    """Bytes that disagree with the pinned digest must fail, not fall back.
+
+    Degrading to a runtime micropip fetch would silently install whatever PyPI
+    serves next instead of surfacing that the pinned artifact was unobtainable.
+    """
+    result, wheels_dir = _run_downloader(tmp_path, serve_body=b"NOT THE REAL WHEEL")
+
+    combined = result.stdout + result.stderr
+    assert result.returncode != 0, (
+        f"install succeeded despite a digest mismatch:\n{combined}"
+    )
+    assert "does not match its pinned digest" in combined, combined
+
+    written = list(wheels_dir.glob("*.whl")) if wheels_dir.exists() else []
+    assert not written, f"a wheel was written despite failing its digest: {written}"
 
 
 def test_search_files_tolerates_unusable_patterns(tmp_path):

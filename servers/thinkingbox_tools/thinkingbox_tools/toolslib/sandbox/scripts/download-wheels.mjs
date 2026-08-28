@@ -20,17 +20,22 @@ import { dirname, join } from "node:path";
 import { PYPI_PACKAGES } from "../pypi-packages.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const wheelsDir = join(__dirname, "..", "wheels");
+// Overridable only so tests can exercise the integrity paths against a scratch
+// directory and a local stub. Production uses the sibling wheels/ dir and PyPI.
+const wheelsDir = process.env.THINKINGBOX_WHEELS_DIR || join(__dirname, "..", "wheels");
 
 const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
 
 await mkdir(wheelsDir, { recursive: true });
 
-// A stalled connection would otherwise hang `npm install` indefinitely, since
-// fetch() has no default timeout.  Bounding it lets the script fail fast and
-// degrade to a runtime micropip fetch, as documented.
+// Bounded so a stalled connection cannot hang `npm install`; fetch() has no
+// default timeout.
 const METADATA_TIMEOUT_MS = 30_000;
 const DOWNLOAD_TIMEOUT_MS = 120_000;
+
+// Overridable only so the integrity paths can be exercised against a local
+// stub in tests.  Production always uses PyPI.
+const PYPI_BASE_URL = process.env.THINKINGBOX_PYPI_BASE_URL || "https://pypi.org/pypi";
 
 // Raised for conditions that must abort the install rather than degrade.
 class IntegrityError extends Error {}
@@ -81,7 +86,7 @@ async function downloadOne(pkg) {
     console.log(`[download-wheels] Downloading: ${filename}`);
     // Resolve the pinned release, not data.info.version: `npm install` must be
     // reproducible, and a digest is only meaningful against a fixed artifact.
-    const res = await fetch(`https://pypi.org/pypi/${encodeURIComponent(name)}/${encodeURIComponent(version)}/json`, {
+    const res = await fetch(`${PYPI_BASE_URL}/${encodeURIComponent(name)}/${encodeURIComponent(version)}/json`, {
         signal: AbortSignal.timeout(METADATA_TIMEOUT_MS),
     });
     if (!res.ok) {
@@ -114,14 +119,18 @@ async function downloadOne(pkg) {
 
     // These wheels are installed into the interpreter, so a corrupted or
     // substituted file is code execution.  Verify the bytes actually received.
+    // A mismatch here means the artifact served does not match the pin, which
+    // is an integrity failure and not a transport problem -- degrading to a
+    // runtime micropip fetch would silently install whatever PyPI serves next
+    // instead of surfacing that the pinned artifact could not be obtained.
     const body = Buffer.from(await wRes.arrayBuffer());
     const actual = sha256(body);
     if (actual !== expected) {
-        console.warn(
-            `[download-wheels] DIGEST MISMATCH for ${filename} ` +
-                `(expected ${expected}, got ${actual}) — refusing to write, leaving to runtime`,
+        throw new IntegrityError(
+            `Downloaded ${filename} does not match its pinned digest ` +
+                `(expected ${expected}, got ${actual}). Refusing to install. ` +
+                `Update pypi-packages.mjs deliberately if this is an intended bump.`,
         );
-        return;
     }
 
     // Write via a temp file and rename so an interrupted install cannot leave a
