@@ -589,15 +589,18 @@ def test_search_files_tolerates_unusable_patterns(tmp_path):
     (tmp_path / "a.txt").write_text("x")
     sandbox = Sandbox(str(tmp_path))
 
-    # These genuinely raise out of Path.glob and must be caught.
-    for pattern in ("", "***", "/etc/passwd", "C:\\Windows\\win.ini"):
-        with pytest.raises((ValueError, NotImplementedError)):
+    # Pattern-syntax errors: these raise on every platform, so the guard around
+    # Path.glob is provably load-bearing rather than decorative.
+    for pattern in ("", "***"):
+        with pytest.raises(ValueError):
             list(tmp_path.glob(pattern))
         assert sandbox.search_files(pattern) == [], f"pattern {pattern!r} leaked"
 
-    # These do not raise; they simply match nothing. Kept to pin that behavior.
-    for pattern in ("[", "a[b"):
-        assert sandbox.search_files(pattern) == []
+    # Whether a given string is "absolute" is platform-dependent -- a Windows
+    # drive path is just a relative name containing backslashes on POSIX -- so
+    # only require that the tool never raises and never returns a match.
+    for pattern in ("/etc/passwd", "C:\\Windows\\win.ini", "[", "a[b", "../*"):
+        assert sandbox.search_files(pattern) == [], f"pattern {pattern!r} leaked"
 
     # A valid pattern still works.
     assert sandbox.search_files("*.txt") == ["a.txt"]
