@@ -587,6 +587,159 @@ async def test_cancelled_execute_resets_worker():
     )
 
 
+@pytest.mark.asyncio
+async def test_cancelled_during_startup_resets_worker():
+    """Cancelling while the handshake is pending must not orphan the child.
+
+    _start() has spawned the process but not yet returned it, so if the
+    cancellation escapes without a kill the child is unreachable from anywhere.
+    """
+    interp = code_interpreter.CodeInterpreter(timeout=30.0)
+    spawned = {}
+
+    async def fake_start():
+        proc = _FakeProcess([])
+        spawned["proc"] = proc
+        interp._process = proc
+        try:
+            await asyncio.Event().wait()  # park, as the real handshake would
+        except asyncio.CancelledError:
+            await interp._kill()
+            raise
+
+    interp._start = fake_start
+
+    task = asyncio.create_task(interp.execute("x"))
+    await asyncio.sleep(0.05)
+    task.cancel()
+
+    cancelled = False
+    try:
+        await task
+    except asyncio.CancelledError:
+        cancelled = True
+    assert cancelled
+    assert spawned["proc"].killed, "child spawned during startup was orphaned"
+    assert interp._process is None
+
+
+@pytest.mark.asyncio
+async def test_cancelled_during_drain_resets_worker():
+    """Cancelling while flushing the request must reset the worker.
+
+    The request is partially written, so the worker's view of the stream no
+    longer matches ours; reusing it would desynchronize the protocol.
+    """
+
+    class _ParkingStdin:
+        def __init__(self):
+            self.written = []
+
+        def write(self, data):
+            self.written.append(data)
+
+        async def drain(self):
+            await asyncio.Event().wait()  # never completes
+
+        def close(self):
+            pass
+
+    interp = code_interpreter.CodeInterpreter(timeout=30.0)
+    proc = _FakeProcess([])
+    proc.stdin = _ParkingStdin()
+    interp._process = proc
+
+    task = asyncio.create_task(interp.execute("y"))
+    await asyncio.sleep(0.05)
+    task.cancel()
+
+    cancelled = False
+    try:
+        await task
+    except asyncio.CancelledError:
+        cancelled = True
+    assert cancelled
+    assert proc.killed, "worker survived cancellation with a half-written request"
+    assert interp._process is None
+
+
+@pytest.mark.asyncio
+async def test_real_oversized_response_is_rejected():
+    """A genuine over-limit frame must be reported and reset the worker.
+
+    Drives a real subprocess emitting a single line larger than the configured
+    limit, so this exercises asyncio's actual StreamReader behaviour rather than
+    a synthetic ValueError.
+    """
+    payload = 200_000
+    child = (
+        "import sys;"
+        f"sys.stdout.write('A' * {payload} + chr(10));"
+        "sys.stdout.flush()"
+    )
+
+    interp = code_interpreter.CodeInterpreter(timeout=30.0)
+    # A small limit keeps the test fast while exercising the same code path the
+    # 64 MiB production value protects.
+    interp.STREAM_LIMIT = 64 * 1024
+
+    proc = await asyncio.create_subprocess_exec(
+        sys.executable,
+        "-c",
+        child,
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+        limit=interp.STREAM_LIMIT,
+    )
+    interp._process = proc
+    try:
+        with pytest.raises(code_interpreter.CodeInterpreterError) as excinfo:
+            await interp.execute("irrelevant")
+        message = str(excinfo.value)
+        assert "larger than" in message, message
+        assert "reset" in message, message
+        assert interp._process is None, "oversized frame left the worker attached"
+    finally:
+        if proc.returncode is None:
+            proc.kill()
+            await proc.wait()
+
+
+@pytest.mark.asyncio
+async def test_real_response_under_limit_is_returned():
+    """Control for the test above: a large-but-permitted frame still works.
+
+    The child builds the payload itself; embedding 100 KB in the command line
+    exceeds the OS argument limit on Windows.
+    """
+    child = (
+        "import json,sys;"
+        "sys.stdout.write(json.dumps("
+        "{'stdout':'B'*100000,'stderr':'','result':None,'error':None}"
+        ") + chr(10));"
+        "sys.stdout.flush()"
+    )
+
+    interp = code_interpreter.CodeInterpreter(timeout=30.0)
+    proc = await asyncio.create_subprocess_exec(
+        sys.executable,
+        "-c",
+        child,
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+        limit=interp.STREAM_LIMIT,
+    )
+    interp._process = proc
+    try:
+        result = await interp.execute("irrelevant")
+        assert len(result.stdout) == 100_000, len(result.stdout)
+        assert result.stdout.startswith("B")
+    finally:
+        if proc.returncode is None:
+            proc.kill()
+            await proc.wait()
+
+
 def test_search_files_tolerates_unusable_patterns(tmp_path):
     """Model-supplied glob patterns must not raise out of the tool.
 

@@ -66,31 +66,28 @@ await pyodide.loadPackage(BUNDLED_PACKAGES, {
     errorCallback: (err) => process.stderr.write(err + "\n"),
 });
 
-// Resolve each PyPI package to a local wheel (file:// URL) when one was
-// vendored by `npm install` into ./wheels/ — avoids hitting PyPI on every
-// worker startup.  Anything without a local wheel falls back to a bare
-// package name, which micropip resolves via PyPI or via pyodide's own
-// bundled wheel set (e.g. reportlab).
+// Resolve each pinned package to its exact vendored wheel.  Only the filename
+// recorded in pypi-packages.mjs is accepted: matching on the distribution name
+// would let any file in wheels/ win on readdir() order, so a planted
+// "openpyxl-0.0.1-py3-none-any.whl" would be installed ahead of the real one.
+// A package whose exact wheel is absent falls back to the pinned
+// "name==version" spec rather than a bare name, so micropip still resolves a
+// known version instead of whatever is current.
 const wheelsDir = new URL("./wheels/", import.meta.url);
-const normalizePkg = (s) => s.toLowerCase().replace(/[-._]/g, "_");
-let localWheels = [];
+let localWheels = new Set();
 try {
-    localWheels = await readdir(wheelsDir);
+    localWheels = new Set(await readdir(wheelsDir));
 } catch {
     process.stderr.write("[pyodide_worker] No local wheels/ directory — micropip will fetch from PyPI\n");
 }
 const installSpecs = PYPI_PACKAGES.map((pkg) => {
-    const target = normalizePkg(pkg);
-    // PEP 427 wheel filename: {distribution}-{version}(-{build})?-{python}-{abi}-{platform}.whl
-    // Compare the normalized distribution segment, not a normalized prefix —
-    // normalizePkg(f) rewrites the "-" separators to "_", so a "-"-suffixed
-    // prefix could never match.
-    const match = localWheels.find((f) => {
-        if (!f.endsWith(".whl")) return false;
-        const dist = f.split("-")[0];
-        return normalizePkg(dist) === target;
-    });
-    return match ? new URL(match, wheelsDir).href : pkg;
+    if (localWheels.has(pkg.filename)) {
+        return new URL(pkg.filename, wheelsDir).href;
+    }
+    process.stderr.write(
+        `[pyodide_worker] No vendored ${pkg.filename} — falling back to ${pkg.name}==${pkg.version}\n`,
+    );
+    return `${pkg.name}==${pkg.version}`;
 });
 
 process.stderr.write("[pyodide_worker] Installing PyPI packages via micropip...\n");

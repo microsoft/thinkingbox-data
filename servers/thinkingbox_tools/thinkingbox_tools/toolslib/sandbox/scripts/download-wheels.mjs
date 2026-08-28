@@ -1,18 +1,19 @@
 #!/usr/bin/env node
-// Vendors pure-Python wheels for the PyPI packages listed in pypi-packages.mjs
-// into ../wheels/, so the pyodide worker can install them from local file://
-// URLs instead of fetching from PyPI on every startup.
+// Vendors the exact pinned wheels listed in pypi-packages.mjs into ../wheels/,
+// so the pyodide worker can install them from local file:// URLs instead of
+// fetching from PyPI on every startup.
 //
 // Runs automatically via `npm install` (see package.json "postinstall").
-// Idempotent: existing wheel files are kept.  To force a refresh, delete
-// the wheels/ directory and re-run `npm install`.
+// Idempotent: a cached wheel whose SHA-256 matches the pin is kept.
 //
-// Packages without a pure-Python (`*-none-any.whl`) wheel on PyPI are skipped
-// with a warning; the worker falls back to micropip at runtime for those
-// (which works because micropip resolves them via pyodide's own bundle when
-// available, e.g. reportlab).
+// Network failures degrade gracefully -- the wheel is skipped and the worker
+// falls back to the pinned `name==version` spec at runtime.  Integrity
+// failures do NOT degrade: if a bad file cannot be removed, or PyPI's digest
+// disagrees with the pin, the install fails rather than leaving something the
+// worker would load.
 
 import { mkdir, writeFile, readFile, rm, rename } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -25,59 +26,84 @@ const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
 
 await mkdir(wheelsDir, { recursive: true });
 
-const PURE_PYTHON_WHEEL = /-py[23](\.py3)?-none-any\.whl$/;
-
 // A stalled connection would otherwise hang `npm install` indefinitely, since
 // fetch() has no default timeout.  Bounding it lets the script fail fast and
 // degrade to a runtime micropip fetch, as documented.
 const METADATA_TIMEOUT_MS = 30_000;
 const DOWNLOAD_TIMEOUT_MS = 120_000;
 
-async function downloadOne(name) {
-    const res = await fetch(`https://pypi.org/pypi/${encodeURIComponent(name)}/json`, {
-        signal: AbortSignal.timeout(METADATA_TIMEOUT_MS),
-    });
-    if (!res.ok) {
-        console.warn(`[download-wheels] PyPI returned ${res.status} for ${name} — skipping`);
-        return;
-    }
-    const data = await res.json();
-    const version = data.info.version;
-    const wheel = (data.releases[version] || []).find(
-        (f) => f.packagetype === "bdist_wheel" && PURE_PYTHON_WHEEL.test(f.filename),
-    );
-    if (!wheel) {
-        console.log(`[download-wheels] No pure-Python wheel for ${name} ${version} — leaving to runtime`);
-        return;
-    }
-    const dest = join(wheelsDir, wheel.filename);
-    const expected = wheel.digests?.sha256;
-    if (!expected) {
-        console.warn(`[download-wheels] No sha256 published for ${wheel.filename} — leaving to runtime`);
-        return;
-    }
+// Raised for conditions that must abort the install rather than degrade.
+class IntegrityError extends Error {}
+
+async function downloadOne(pkg) {
+    const { name, version, filename, sha256: expected } = pkg;
+    const dest = join(wheelsDir, filename);
 
     // Re-verify a cached wheel rather than trusting the filename: the cache
     // lives in a working directory that anything on this machine can write to.
-    // A wheel that fails the check is removed immediately -- leaving it in
-    // place would mean the check detects a bad wheel and then lets the worker
-    // install it anyway, since the worker loads whatever readdir() returns.
+    // A wheel that fails the check must be removed -- leaving it in place would
+    // mean the check detects a bad wheel and the worker installs it anyway.
+    // If it cannot be removed, fail: continuing would leave a known-bad file
+    // where the worker will pick it up.
     try {
         const cached = await readFile(dest);
         if (sha256(cached) === expected) {
-            console.log(`[download-wheels] Cached: ${wheel.filename}`);
+            console.log(`[download-wheels] Cached: ${filename}`);
             return;
         }
-        console.warn(`[download-wheels] Cached ${wheel.filename} failed digest check — removing`);
+        console.warn(`[download-wheels] Cached ${filename} failed digest check — removing`);
         await rm(dest, { force: true });
     } catch (err) {
         if (err?.code !== "ENOENT") {
-            // Unreadable or undeletable: drop it rather than risk installing it.
-            await rm(dest, { force: true }).catch(() => {});
+            // Unreadable, or the removal above threw.  Try once more and fail
+            // loudly if the bad file survives.
+            try {
+                await rm(dest, { force: true });
+            } catch (rmErr) {
+                throw new IntegrityError(
+                    `Refusing to continue: ${dest} failed its integrity check and could ` +
+                        `not be removed (${rmErr.message}). Delete it manually before ` +
+                        `re-running, or the worker will install it.`,
+                );
+            }
         }
     }
 
-    console.log(`[download-wheels] Downloading: ${wheel.filename}`);
+    // Guard against a removal that silently did not happen (permissions, a
+    // read-only mount, or a file recreated by something else).
+    if (existsSync(dest)) {
+        throw new IntegrityError(
+            `Refusing to continue: ${dest} failed its integrity check and is still ` +
+                `present after removal. Delete it manually before re-running.`,
+        );
+    }
+
+    console.log(`[download-wheels] Downloading: ${filename}`);
+    // Resolve the pinned release, not data.info.version: `npm install` must be
+    // reproducible, and a digest is only meaningful against a fixed artifact.
+    const res = await fetch(`https://pypi.org/pypi/${encodeURIComponent(name)}/${encodeURIComponent(version)}/json`, {
+        signal: AbortSignal.timeout(METADATA_TIMEOUT_MS),
+    });
+    if (!res.ok) {
+        console.warn(`[download-wheels] PyPI returned ${res.status} for ${name} ${version} — leaving to runtime`);
+        return;
+    }
+    const data = await res.json();
+    const wheel = (data.urls || []).find((f) => f.filename === filename);
+    if (!wheel) {
+        console.warn(`[download-wheels] ${filename} not found in ${name} ${version} — leaving to runtime`);
+        return;
+    }
+    if (wheel.digests?.sha256 !== expected) {
+        // PyPI's own digest disagrees with the pin: either the pin is stale or
+        // the artifact changed. Either way, do not download it.
+        throw new IntegrityError(
+            `Refusing to download ${filename}: PyPI reports sha256 ` +
+                `${wheel.digests?.sha256}, pinned value is ${expected}. ` +
+                `Update pypi-packages.mjs deliberately if this is an intended bump.`,
+        );
+    }
+
     const wRes = await fetch(wheel.url, {
         signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
     });
@@ -87,13 +113,12 @@ async function downloadOne(name) {
     }
 
     // These wheels are installed into the interpreter, so a corrupted or
-    // substituted file is code execution.  PyPI publishes a sha256 in the
-    // metadata; refuse to write anything that does not match it.
+    // substituted file is code execution.  Verify the bytes actually received.
     const body = Buffer.from(await wRes.arrayBuffer());
     const actual = sha256(body);
     if (actual !== expected) {
         console.warn(
-            `[download-wheels] DIGEST MISMATCH for ${wheel.filename} ` +
+            `[download-wheels] DIGEST MISMATCH for ${filename} ` +
                 `(expected ${expected}, got ${actual}) — refusing to write, leaving to runtime`,
         );
         return;
@@ -113,16 +138,34 @@ async function downloadOne(name) {
     }
 }
 
-await Promise.all(
-    PYPI_PACKAGES.map((name) =>
+const results = await Promise.all(
+    PYPI_PACKAGES.map((pkg) =>
         // A network failure (offline, blocked host, TLS error) rejects fetch()
-        // rather than returning a non-ok response.  Without this catch the
-        // rejection propagates out of Promise.all and fails `npm install`
-        // outright, instead of degrading to the documented behavior: skip the
-        // wheel and let micropip fetch it at worker startup.
-        downloadOne(name).catch((err) => {
-            console.warn(`[download-wheels] ${name}: ${err.message} — leaving to runtime`);
-        }),
+        // rather than returning a non-ok response, and must degrade to the
+        // documented behavior: skip the wheel, let micropip fetch the pinned
+        // version at worker startup.  An IntegrityError is different in kind --
+        // it means a file the worker would load cannot be trusted -- so it is
+        // rethrown below and fails the install.
+        downloadOne(pkg).then(
+            () => null,
+            (err) => {
+                if (err instanceof IntegrityError) return err;
+                console.warn(`[download-wheels] ${pkg.name}: ${err.message} — leaving to runtime`);
+                return null;
+            },
+        ),
     ),
 );
+
+const integrityFailures = results.filter(Boolean);
+if (integrityFailures.length > 0) {
+    for (const err of integrityFailures) {
+        console.error(`[download-wheels] INTEGRITY FAILURE: ${err.message}`);
+    }
+    process.exitCode = 1;
+    throw new Error(
+        `${integrityFailures.length} wheel(s) failed integrity checks and could not be ` +
+            `quarantined. Refusing to complete installation.`,
+    );
+}
 console.log("[download-wheels] Done.");

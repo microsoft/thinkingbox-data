@@ -56,6 +56,28 @@ def test_reads_workspace_file_through_interpreter(x: TestContext, judge: Judge):
     )
 
 
+def _reads_fixture(execution) -> bool:
+    """True when the code actually opens the fixture rather than naming it.
+
+    Naming the file in a string literal is not evidence of reading it.
+    """
+    code = execution.get("code", "")
+    if "sales.csv" not in code:
+        return False
+    return any(
+        marker in code
+        for marker in ("open(", "read_csv", "Path(", "csv.", "loadtxt", "genfromtxt")
+    )
+
+
+def _states_total(text: str) -> bool:
+    """True when the text contains East's revenue in any plausible formatting."""
+    if not text:
+        return False
+    normalized = text.replace(",", "").replace("$", "")
+    return any(form in normalized for form in ("7312.5", "7312.50"))
+
+
 def test_computes_revenue_per_region(x: TestContext, judge: Judge):
     """!
     query: |
@@ -66,18 +88,37 @@ def test_computes_revenue_per_region(x: TestContext, judge: Judge):
     executions = _executions(x)
     assert executions, "the agent did not use the code interpreter"
 
-    # Every execution the agent kept should be error-free by the end; at minimum
-    # one must have succeeded, otherwise any correct-looking answer was invented.
     successful = [e for e in executions if e["result"].get("error") is None]
     assert successful, (
         "every code execution failed, so the answer was not computed: "
         f"{[e['result'].get('error') for e in executions]}"
     )
 
-    # The figures must come from code, not from the model doing mental math.
-    assert any(
-        "sales.csv" in e.get("code", "") for e in successful
-    ), "no successful execution referenced sales.csv"
+    # Naming the file is not reading it -- require an actual read call.
+    reading = [e for e in successful if _reads_fixture(e)]
+    assert reading, (
+        "no successful execution actually read sales.csv; mentioning the "
+        f"filename is not enough: {[e.get('code') for e in successful]}"
+    )
+
+    # The decisive check: the figure must come *out* of the interpreter while
+    # being absent from the code that produced it.  A response is only credible
+    # if the number was computed from the fixture, and an execution such as
+    # `print("sales.csv: East 7312.50")` would satisfy every check above while
+    # reading nothing -- so require the value in the output and not in the source.
+    computed = [
+        e
+        for e in reading
+        if _states_total(
+            (e["result"].get("stdout") or "") + " " + (e["result"].get("result") or "")
+        )
+        and not _states_total(e.get("code", ""))
+    ]
+    assert computed, (
+        "East's revenue never appeared in interpreter output that did not "
+        "already contain it as a literal -- the figure was hard-coded rather "
+        "than computed from the fixture"
+    )
 
     # East is the correct answer (7312.50).
     assert judge.text_yesno(
@@ -86,12 +127,10 @@ def test_computes_revenue_per_region(x: TestContext, judge: Judge):
         "revenue?",
     )
 
-    # Guard against the most likely wrong answer: summing units instead of
-    # revenue would still make East highest, so check the figure was reported.
-    assert judge.text_yesno(
-        x.response,
-        "Does the response report East's total revenue as approximately 7312.50 "
-        "(accepting 7312.5, 7,312.50 or $7312.50)?",
+    # Guard against summing units instead of revenue, which would still put East
+    # first, by requiring the figure itself.
+    assert _states_total(x.response), (
+        f"the response did not report East's revenue as 7312.50: {x.response!r}"
     )
 
 
