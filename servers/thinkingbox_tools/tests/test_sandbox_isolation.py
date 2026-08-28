@@ -726,13 +726,17 @@ async def test_kill_swallows_cancellation_when_already_unwinding():
     await asyncio.sleep(0.05)
     task.cancel()
 
-    # The task is cancelled from outside, so awaiting it still raises; what
-    # matters is that _kill() itself did not convert that into a different
-    # error and that the process was detached.
+    # The task is cancelled from outside, so awaiting it raises either way.
+    # What this test pins is that _kill() did not convert that cancellation
+    # into a different exception, and that the process was still detached.
+    raised = None
     try:
         await task
-    except asyncio.CancelledError:
-        pass
+    except BaseException as exc:  # noqa: BLE001 - the type is the assertion
+        raised = exc
+    assert isinstance(raised, asyncio.CancelledError), (
+        f"_kill() masked the cancellation with {type(raised).__name__}: {raised!r}"
+    )
     assert proc.killed
     assert interp._process is None
 
