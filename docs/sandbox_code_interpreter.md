@@ -36,9 +36,17 @@ host is possible via several independent routes:
 **In-process mitigations do not close this.** `jsglobals: {}` fails because
 `Function` bodies evaluate in the *global* scope, not the restricted object.
 Deleting or unregistering modules fails because Pyodide's internals hold live
-`JsProxy` references captured at load time. Node's `--permission` model is
-useful defense-in-depth but is experimental, does not gate `process.env`, and
-is not a substitute for an OS boundary.
+`JsProxy` references captured at load time.
+
+Node's own permission model (`--permission`) is not an option either, and not
+merely because it is weak: **Pyodide cannot start under it at all.** Pyodide
+calls `process.binding` during `staticInit`, which the permission system denies
+unconditionally — there is no flag to re-enable it. Verified on Node 24: the
+worker fails with `ERR_ACCESS_DENIED: process.binding` even when every
+permission flag is granted (`--allow-fs-read=* --allow-fs-write=*
+--allow-child-process --allow-worker --allow-wasi --allow-addons`). So the
+choice is not "weak in-process confinement versus strong OS confinement"; it is
+"no in-process confinement at all".
 
 **Consequences for how this server may be used:**
 
