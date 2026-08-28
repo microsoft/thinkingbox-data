@@ -570,8 +570,16 @@ async def test_cancelled_execute_resets_worker():
     task = asyncio.create_task(interp.execute("call_1()"))
     await asyncio.sleep(0.05)
     task.cancel()
-    with pytest.raises(asyncio.CancelledError):
+
+    # Await explicitly rather than relying on a bare `await task` inside
+    # pytest.raises: naming the outcome states what is being asserted, and a
+    # bare await reads as a no-op statement to static analysis.
+    cancelled = False
+    try:
         await task
+    except asyncio.CancelledError:
+        cancelled = True
+    assert cancelled, "execute() swallowed the cancellation instead of propagating it"
 
     assert proc.killed, "worker survived cancellation with an unread reply pending"
     assert interp._process is None, (
