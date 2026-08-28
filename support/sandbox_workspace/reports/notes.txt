@@ -1,0 +1,5 @@
+Q1-Q2 sales notes
+
+Unit prices are fixed per region for the period.
+Revenue is units * unit_price.
+The team wants revenue totalled per region, highest first.

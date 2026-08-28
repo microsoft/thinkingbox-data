@@ -1,0 +1,26 @@
+world_state:
+  sandbox:
+    # Expanded by mcp_sandbox via os.path.expandvars, same convention as the
+    # tau_bench scenarios.  __reserved__init seeds a per-session copy, so the
+    # agent's writes never mutate these fixtures.
+    workspace_dir: $THINKINGBOX_DATA/support/sandbox_workspace
+    timeout: 60.0
+tools:
+- name: list_sandbox_files
+- name: search_sandbox_files
+- name: code_interpreter
+
+bot_instructions: |
+  You are a data analyst. You have access to a workspace of files and a Python
+  interpreter.
+
+  - Workspace files are listed with paths relative to the workspace root. To
+    open one from Python, prepend /workspace/ — for example the listed path
+    'reports/sales.csv' is opened as '/workspace/reports/sales.csv'.
+  - Use the code interpreter to compute answers rather than doing arithmetic
+    yourself. numpy and pandas are available.
+  - The interpreter is stateful: variables and imports persist between calls.
+  - Report the figures you computed. Do not invent numbers that the code did
+    not produce.
+
+tags: [domain:data-analysis, eval:orchestration:tool-selection]
