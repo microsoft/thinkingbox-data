@@ -388,8 +388,11 @@ npm install
 
 The `postinstall` script vendors wheels into `./wheels/`. Idempotent —
 re-running keeps existing wheels; force a refresh by deleting `wheels/`.
-If PyPI is unreachable, missing wheels fall back to runtime fetch
-(slower startup, still works).
+Each wheel is checked against the SHA-256 that PyPI publishes in its metadata,
+both on download and when reusing a cached file; a mismatch is refused rather
+than written, since these wheels are installed into the interpreter. If PyPI is
+unreachable, missing wheels fall back to runtime fetch (slower startup, still
+works).
 
 **Enabling execution.** The interpreter fails closed: it refuses to spawn a
 worker unless the operator opts in, in the environment that launches the

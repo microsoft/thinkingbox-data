@@ -7,6 +7,13 @@ from thinkingbox.common import Judge, TestContext
 scenario: sandbox_code_interpreter
 """
 
+# PREREQUISITE: the code interpreter fails closed.  These test cases require
+# THINKINGBOX_SANDBOX_ALLOW_UNCONFINED=1 in the environment that launches the
+# MCP server.  Without it the `code_interpreter` tool returns an error and the
+# assertions below fail with "the agent did not use the code interpreter",
+# which is expected rather than a defect.  See docs/sandbox_code_interpreter.md
+# ("Threat model") for why the opt-in is not baked into servers.yaml.
+
 # Ground truth for support/sandbox_workspace/reports/sales.csv, computed as
 # units * unit_price summed per region:
 #   East  7312.50

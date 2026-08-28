@@ -1,3 +1,11 @@
+# Exercises the sandbox code interpreter over a small fixture workspace.
+#
+# PREREQUISITE: the interpreter fails closed.  Running this scenario requires
+# THINKINGBOX_SANDBOX_ALLOW_UNCONFINED=1 in the environment that launches the
+# MCP server; without it `code_interpreter` calls are rejected (the filesystem
+# tools still work).  This is deliberate -- see docs/sandbox_code_interpreter.md
+# ("Threat model").  The opt-in is not set in servers.yaml because that would
+# make the unconfined mode the default for every consumer of that file.
 world_state:
   sandbox:
     # Expanded by mcp_sandbox via os.path.expandvars, same convention as the

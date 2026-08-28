@@ -38,6 +38,7 @@ from fastmcp import Client
 
 from thinkingbox_tools import mcp_sandbox
 from thinkingbox_tools.toolslib.sandbox import code_interpreter
+from thinkingbox_tools.toolslib.sandbox.sandbox import Sandbox
 
 NOT_ISOLATED = (
     "Pyodide is not a privilege boundary; requires OS/container confinement. "
@@ -427,6 +428,134 @@ def test_worker_tmp_is_not_inherited(monkeypatch, tmp_path):
     env = code_interpreter._minimal_env(worker_tmp)
     for name in ("TMPDIR", "TEMP", "TMP"):
         assert env[name] == worker_tmp, f"{name} did not point at the worker dir"
+
+
+# ---------------------------------------------------------------------------
+# Worker protocol robustness
+# ---------------------------------------------------------------------------
+
+
+class _FakeStdout:
+    """Minimal StreamReader stand-in returning canned frames."""
+
+    def __init__(self, frames):
+        self._frames = list(frames)
+
+    async def readline(self):
+        if not self._frames:
+            return b""
+        frame = self._frames.pop(0)
+        if isinstance(frame, Exception):
+            raise frame
+        return frame
+
+
+class _FakeStdin:
+    def write(self, _data):
+        pass
+
+    async def drain(self):
+        pass
+
+    def close(self):
+        pass
+
+
+class _FakeProcess:
+    def __init__(self, frames):
+        self.stdout = _FakeStdout(frames)
+        self.stdin = _FakeStdin()
+        self.returncode = None
+        self.killed = False
+
+    def kill(self):
+        self.killed = True
+        self.returncode = -9
+
+    async def wait(self):
+        return self.returncode
+
+
+def _interp_with(frames):
+    """A CodeInterpreter wired to a fake worker emitting `frames`."""
+    interp = code_interpreter.CodeInterpreter(timeout=5.0)
+    proc = _FakeProcess(frames)
+    interp._process = proc
+    return interp, proc
+
+
+@pytest.mark.asyncio
+async def test_malformed_frame_resets_worker():
+    """A non-JSON frame must reset the worker, not desync the stream.
+
+    Without the reset, the malformed line raises while the real response stays
+    buffered, and the *next* execute() returns the previous call's result.
+    """
+    real = json.dumps({"stdout": "correct", "stderr": "", "result": None, "error": None})
+    interp, proc = _interp_with([b"not json at all\n", real.encode() + b"\n"])
+
+    with pytest.raises(code_interpreter.CodeInterpreterError) as excinfo:
+        await interp.execute("1")
+    assert "out of sync" in str(excinfo.value)
+    assert proc.killed, "worker was left running with a desynchronized stream"
+    assert interp._process is None, "next call would reuse the poisoned stream"
+
+
+@pytest.mark.asyncio
+async def test_non_object_frame_resets_worker():
+    """A JSON frame that is not an object is also a protocol violation."""
+    interp, proc = _interp_with([b'"just a string"\n'])
+    with pytest.raises(code_interpreter.CodeInterpreterError):
+        await interp.execute("1")
+    assert proc.killed
+    assert interp._process is None
+
+
+@pytest.mark.asyncio
+async def test_oversized_frame_resets_worker():
+    """An over-limit frame must surface a clear error and reset the worker.
+
+    asyncio's StreamReader raises ValueError rather than returning the line, and
+    the unread remainder would otherwise be parsed as the next response.
+    """
+    interp, proc = _interp_with(
+        [ValueError("Separator is found, but chunk is longer than limit")]
+    )
+    with pytest.raises(code_interpreter.CodeInterpreterError) as excinfo:
+        await interp.execute("print('x' * 10_000_000)")
+    message = str(excinfo.value)
+    assert "larger than" in message and "reset" in message
+    assert proc.killed
+    assert interp._process is None
+
+
+def test_stream_limit_exceeds_asyncio_default():
+    """The configured limit must be above asyncio's 64 KiB default.
+
+    A single print() of a large DataFrame exceeds 64 KiB, so the default would
+    make ordinary analysis fail.
+    """
+    import asyncio.streams
+
+    assert code_interpreter.CodeInterpreter.STREAM_LIMIT > asyncio.streams._DEFAULT_LIMIT
+    assert code_interpreter.CodeInterpreter.STREAM_LIMIT >= 8 * 1024 * 1024
+
+
+def test_search_files_tolerates_unusable_patterns(tmp_path):
+    """Model-supplied glob patterns must not raise out of the tool.
+
+    Path.glob rejects an empty pattern, a malformed '***', and absolute paths.
+    The pattern comes straight from the agent, so these must read as "no
+    matches" rather than crashing the call.
+    """
+    (tmp_path / "a.txt").write_text("x")
+    sandbox = Sandbox(str(tmp_path))
+
+    for pattern in ("", "***", "/etc/passwd", "C:\\Windows\\win.ini", "[", "a[b"):
+        assert sandbox.search_files(pattern) == [], f"pattern {pattern!r} returned matches"
+
+    # A valid pattern still works.
+    assert sandbox.search_files("*.txt") == ["a.txt"]
 
 
 # ---------------------------------------------------------------------------

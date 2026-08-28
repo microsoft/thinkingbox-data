@@ -42,7 +42,15 @@ class Sandbox:
         # files for COW isolation, and resolving those would land outside
         # workspace_dir for every legitimate match.
         results = []
-        for p in self.workspace_dir.glob(pattern):
+        try:
+            matches = list(self.workspace_dir.glob(pattern))
+        except (ValueError, NotImplementedError, OSError):
+            # Path.glob rejects some inputs outright -- an empty pattern, a
+            # malformed "***", or an absolute path all raise.  This tool is
+            # agent-facing and the pattern is model-supplied, so an unusable
+            # pattern must read as "no matches" rather than crash the call.
+            return []
+        for p in matches:
             if not p.is_file() or p.name.startswith("."):
                 continue
             if ".." in p.parts:

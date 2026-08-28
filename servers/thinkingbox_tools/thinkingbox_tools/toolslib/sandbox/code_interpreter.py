@@ -90,6 +90,14 @@ class CodeInterpreter:
     # fetches PyPI wheels over the network; subsequent runs use the local cache.
     STARTUP_TIMEOUT = 300.0
 
+    # asyncio's StreamReader defaults to a 64 KiB line limit, and the protocol
+    # puts one JSON frame per line.  A single print() of a moderately sized
+    # DataFrame exceeds that, and readline() then raises ValueError rather than
+    # returning the frame -- so a routine analysis would fail with an opaque
+    # error.  Raise the ceiling well above realistic output while still bounding
+    # memory for a runaway producer.
+    STREAM_LIMIT = 64 * 1024 * 1024
+
     def __init__(self, timeout: float = 30.0, workspace_dir: str | None = None):
         self.timeout = timeout
         self.workspace_dir = workspace_dir
@@ -129,6 +137,16 @@ class CodeInterpreter:
                     f"Execution timed out after {self.timeout}s. "
                     "The interpreter has been reset."
                 )
+            except (ValueError, asyncio.LimitOverrunError) as exc:
+                # readline() raises when a frame exceeds STREAM_LIMIT.  The
+                # unread remainder would be parsed as the *next* response, so
+                # the worker has to be reset rather than reused.
+                await self._kill()
+                raise CodeInterpreterError(
+                    f"Worker produced a response frame larger than "
+                    f"{self.STREAM_LIMIT} bytes ({exc}). The interpreter has "
+                    "been reset. Reduce the amount of data printed or returned."
+                )
 
             if not response_line:
                 await self._kill()
@@ -137,7 +155,25 @@ class CodeInterpreter:
                     "The interpreter has been reset."
                 )
 
-            data = json.loads(response_line)
+            # A frame that is not a JSON object means the stream is no longer in
+            # sync with the protocol -- anything still buffered would be read as
+            # the next response and silently returned for the wrong call.  Kill
+            # the worker so the next execute() starts from a known state.
+            try:
+                data = json.loads(response_line)
+            except ValueError:
+                await self._kill()
+                raise CodeInterpreterError(
+                    "Worker produced a malformed response frame; the protocol "
+                    "stream is out of sync. The interpreter has been reset."
+                )
+            if not isinstance(data, dict):
+                await self._kill()
+                raise CodeInterpreterError(
+                    "Worker produced an unexpected response frame; the protocol "
+                    "stream is out of sync. The interpreter has been reset."
+                )
+
             result = ExecutionResult(
                 stdout=data.get("stdout", ""),
                 stderr=data.get("stderr", ""),
@@ -232,6 +268,9 @@ class CodeInterpreter:
             cwd=str(self._worker_path.parent),
             # Withhold the parent environment (defense-in-depth, not isolation).
             env=_minimal_env(self._worker_tmp),
+            # Raise the StreamReader line limit above asyncio's 64 KiB default;
+            # response frames carry user stdout and can legitimately be large.
+            limit=self.STREAM_LIMIT,
         )
 
         # Wait for the { "ready": true } handshake before accepting requests.
@@ -246,6 +285,11 @@ class CodeInterpreter:
                 f"Worker timed out during startup (>{self.STARTUP_TIMEOUT}s). "
                 f"Make sure 'npm install' has been run in {worker_dir}."
             )
+        except (ValueError, asyncio.LimitOverrunError) as exc:
+            await self._kill()
+            raise CodeInterpreterError(
+                f"Worker emitted an oversized handshake frame ({exc})."
+            )
 
         if not ready_line:
             await self._kill()
@@ -253,8 +297,17 @@ class CodeInterpreter:
                 "Worker exited before sending ready signal. "
                 "See [pyodide_worker] output above for details."
             )
-        ready = json.loads(ready_line)
-        if not ready.get("ready"):
+        # A non-JSON handshake previously raised out of _start() with the child
+        # still running, leaking a Pyodide process on every retry.
+        try:
+            ready = json.loads(ready_line)
+        except ValueError:
+            await self._kill()
+            raise CodeInterpreterError(
+                "Worker sent a malformed handshake frame. "
+                "See [pyodide_worker] output above for details."
+            )
+        if not isinstance(ready, dict) or not ready.get("ready"):
             await self._kill()
             raise CodeInterpreterError(f"Unexpected worker handshake: {ready}")
 

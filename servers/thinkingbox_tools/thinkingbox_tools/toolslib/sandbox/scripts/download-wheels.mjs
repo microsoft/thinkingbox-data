@@ -12,13 +12,16 @@
 // (which works because micropip resolves them via pyodide's own bundle when
 // available, e.g. reportlab).
 
-import { mkdir, writeFile, access } from "node:fs/promises";
+import { mkdir, writeFile, readFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { PYPI_PACKAGES } from "../pypi-packages.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const wheelsDir = join(__dirname, "..", "wheels");
+
+const sha256 = (buf) => createHash("sha256").update(buf).digest("hex");
 
 await mkdir(wheelsDir, { recursive: true });
 
@@ -48,13 +51,25 @@ async function downloadOne(name) {
         return;
     }
     const dest = join(wheelsDir, wheel.filename);
-    try {
-        await access(dest);
-        console.log(`[download-wheels] Cached: ${wheel.filename}`);
+    const expected = wheel.digests?.sha256;
+    if (!expected) {
+        console.warn(`[download-wheels] No sha256 published for ${wheel.filename} — leaving to runtime`);
         return;
+    }
+
+    // Re-verify a cached wheel rather than trusting the filename: the cache
+    // lives in a working directory that anything on this machine can write to.
+    try {
+        const cached = await readFile(dest);
+        if (sha256(cached) === expected) {
+            console.log(`[download-wheels] Cached: ${wheel.filename}`);
+            return;
+        }
+        console.warn(`[download-wheels] Cached ${wheel.filename} failed digest check — refetching`);
     } catch {
         // not present — download below
     }
+
     console.log(`[download-wheels] Downloading: ${wheel.filename}`);
     const wRes = await fetch(wheel.url, {
         signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
@@ -63,7 +78,20 @@ async function downloadOne(name) {
         console.warn(`[download-wheels] Download failed (${wRes.status}) for ${wheel.url} — skipping`);
         return;
     }
-    await writeFile(dest, Buffer.from(await wRes.arrayBuffer()));
+
+    // These wheels are installed into the interpreter, so a corrupted or
+    // substituted file is code execution.  PyPI publishes a sha256 in the
+    // metadata; refuse to write anything that does not match it.
+    const body = Buffer.from(await wRes.arrayBuffer());
+    const actual = sha256(body);
+    if (actual !== expected) {
+        console.warn(
+            `[download-wheels] DIGEST MISMATCH for ${wheel.filename} ` +
+                `(expected ${expected}, got ${actual}) — refusing to write, leaving to runtime`,
+        );
+        return;
+    }
+    await writeFile(dest, body);
 }
 
 await Promise.all(
