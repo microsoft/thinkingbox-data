@@ -137,6 +137,15 @@ class CodeInterpreter:
                     f"Execution timed out after {self.timeout}s. "
                     "The interpreter has been reset."
                 )
+            except asyncio.CancelledError:
+                # The caller went away (client disconnect, MCP cancellation, an
+                # outer wait_for) while the request was in flight.  The worker
+                # will still write its reply, and that unread frame would be
+                # returned to the *next* execute() as its result -- a silently
+                # wrong answer rather than an error.  CancelledError is a
+                # BaseException, so nothing upstream catches this for us.
+                await self._kill()
+                raise
             except (ValueError, asyncio.LimitOverrunError) as exc:
                 # readline() raises when a frame exceeds STREAM_LIMIT.  The
                 # unread remainder would be parsed as the *next* response, so

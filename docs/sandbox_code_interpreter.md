@@ -397,10 +397,18 @@ npm install
 The `postinstall` script vendors wheels into `./wheels/`. Idempotent —
 re-running keeps existing wheels; force a refresh by deleting `wheels/`.
 Each wheel is checked against the SHA-256 that PyPI publishes in its metadata,
-both on download and when reusing a cached file; a mismatch is refused rather
-than written, since these wheels are installed into the interpreter. If PyPI is
+on download and when reusing a cached file; a file that fails the check is
+deleted rather than left in place, and writes go through a temp file plus
+rename so an interrupted install cannot leave a truncated wheel. If PyPI is
 unreachable, missing wheels fall back to runtime fetch (slower startup, still
 works).
+
+This is an integrity check against corruption and accidental substitution, not
+a trust boundary. The worker loads whatever `wheels/` contains by matching on
+the distribution name, so it does not re-verify at load time, and a file
+planted under a different version string would not be examined by the
+downloader at all. Anyone who can write to that directory can already run code
+as this user (see [Threat model](#threat-model)).
 
 **Enabling execution.** The interpreter fails closed: it refuses to spawn a
 worker unless the operator opts in, in the environment that launches the

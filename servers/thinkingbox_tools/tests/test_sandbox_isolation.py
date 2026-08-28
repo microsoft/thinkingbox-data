@@ -25,6 +25,7 @@ no real system or secret file is read, and nothing outside the temp directory
 is modified.
 """
 
+import asyncio
 import json
 import os
 import subprocess
@@ -541,6 +542,43 @@ def test_stream_limit_exceeds_asyncio_default():
     assert code_interpreter.CodeInterpreter.STREAM_LIMIT >= 8 * 1024 * 1024
 
 
+@pytest.mark.asyncio
+async def test_cancelled_execute_resets_worker():
+    """Cancelling a call must reset the worker, not leave its reply buffered.
+
+    The worker still writes a reply for the abandoned request.  If the process
+    stays attached, the next execute() reads that stale frame and returns the
+    previous call's output -- a silently wrong answer rather than an error.
+    CancelledError is a BaseException, so nothing upstream catches this.
+    """
+
+    class _ParkingStdout:
+        def __init__(self):
+            self.release = asyncio.Event()
+            self.queued = []
+
+        async def readline(self):
+            if not self.release.is_set():
+                await self.release.wait()
+            return self.queued.pop(0) if self.queued else b""
+
+    interp = code_interpreter.CodeInterpreter(timeout=30.0)
+    proc = _FakeProcess([])
+    proc.stdout = _ParkingStdout()
+    interp._process = proc
+
+    task = asyncio.create_task(interp.execute("call_1()"))
+    await asyncio.sleep(0.05)
+    task.cancel()
+    with pytest.raises(asyncio.CancelledError):
+        await task
+
+    assert proc.killed, "worker survived cancellation with an unread reply pending"
+    assert interp._process is None, (
+        "the next execute() would reuse a stream holding the cancelled call's reply"
+    )
+
+
 def test_search_files_tolerates_unusable_patterns(tmp_path):
     """Model-supplied glob patterns must not raise out of the tool.
 
@@ -551,8 +589,15 @@ def test_search_files_tolerates_unusable_patterns(tmp_path):
     (tmp_path / "a.txt").write_text("x")
     sandbox = Sandbox(str(tmp_path))
 
-    for pattern in ("", "***", "/etc/passwd", "C:\\Windows\\win.ini", "[", "a[b"):
-        assert sandbox.search_files(pattern) == [], f"pattern {pattern!r} returned matches"
+    # These genuinely raise out of Path.glob and must be caught.
+    for pattern in ("", "***", "/etc/passwd", "C:\\Windows\\win.ini"):
+        with pytest.raises((ValueError, NotImplementedError)):
+            list(tmp_path.glob(pattern))
+        assert sandbox.search_files(pattern) == [], f"pattern {pattern!r} leaked"
+
+    # These do not raise; they simply match nothing. Kept to pin that behavior.
+    for pattern in ("[", "a[b"):
+        assert sandbox.search_files(pattern) == []
 
     # A valid pattern still works.
     assert sandbox.search_files("*.txt") == ["a.txt"]

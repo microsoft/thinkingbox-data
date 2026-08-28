@@ -12,7 +12,7 @@
 // (which works because micropip resolves them via pyodide's own bundle when
 // available, e.g. reportlab).
 
-import { mkdir, writeFile, readFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile, rm, rename } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
@@ -59,15 +59,22 @@ async function downloadOne(name) {
 
     // Re-verify a cached wheel rather than trusting the filename: the cache
     // lives in a working directory that anything on this machine can write to.
+    // A wheel that fails the check is removed immediately -- leaving it in
+    // place would mean the check detects a bad wheel and then lets the worker
+    // install it anyway, since the worker loads whatever readdir() returns.
     try {
         const cached = await readFile(dest);
         if (sha256(cached) === expected) {
             console.log(`[download-wheels] Cached: ${wheel.filename}`);
             return;
         }
-        console.warn(`[download-wheels] Cached ${wheel.filename} failed digest check — refetching`);
-    } catch {
-        // not present — download below
+        console.warn(`[download-wheels] Cached ${wheel.filename} failed digest check — removing`);
+        await rm(dest, { force: true });
+    } catch (err) {
+        if (err?.code !== "ENOENT") {
+            // Unreadable or undeletable: drop it rather than risk installing it.
+            await rm(dest, { force: true }).catch(() => {});
+        }
     }
 
     console.log(`[download-wheels] Downloading: ${wheel.filename}`);
@@ -91,7 +98,19 @@ async function downloadOne(name) {
         );
         return;
     }
-    await writeFile(dest, body);
+
+    // Write via a temp file and rename so an interrupted install cannot leave a
+    // truncated wheel behind.  A truncated file would fail every later digest
+    // check, and with PyPI unreachable -- the case this vendoring exists for --
+    // `npm install` could never repair it.
+    const tmp = `${dest}.${process.pid}.tmp`;
+    try {
+        await writeFile(tmp, body);
+        await rename(tmp, dest);
+    } catch (err) {
+        await rm(tmp, { force: true }).catch(() => {});
+        throw err;
+    }
 }
 
 await Promise.all(
