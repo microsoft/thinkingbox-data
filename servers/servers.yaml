@@ -21,8 +21,10 @@ servers:
   # operator sets THINKINGBOX_SANDBOX_ALLOW_UNCONFINED=1 in the *environment*
   # that launches it.  That opt-in is deliberately NOT set here -- baking it
   # into the shipped config would make the unsafe mode the default and defeat
-  # the gate.  Enable it only where the executed code is trusted and
-  # first-party, and keep secrets out of that environment.
+  # the gate.  Enable it only where the executed code is trusted -- first-party
+  # provenance is not itself trust, since an agent can be induced to emit
+  # hostile code by attacker-controlled input -- and only in a secret-free
+  # execution context.
   # See docs/sandbox_code_interpreter.md ("Threat model").
   sandbox:
     type: mcp-process

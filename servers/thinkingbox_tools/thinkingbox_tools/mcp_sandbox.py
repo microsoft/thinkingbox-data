@@ -27,9 +27,13 @@ from thinkingbox_tools.toolslib.sandbox.sandbox import Sandbox
 # environment is allowlisted so the parent's secrets are not forwarded, but
 # that narrows the blast radius rather than preventing the escape.
 #
-# Run only trusted, first-party agent code here.  Do not route untrusted or
-# third-party input to this server until the worker is confined by an OS/
-# container boundary.  See docs/sandbox_code_interpreter.md ("Threat model").
+# Run only trusted code here.  Provenance is not trust: code emitted by a
+# first-party agent is not automatically trustworthy, since the agent can be
+# induced to produce hostile code by attacker-controlled input (this server
+# reads workspace documents, so those inputs are in scope).  Do not route
+# untrusted or third-party input to this server until the worker is confined
+# by an OS/container boundary.
+# See docs/sandbox_code_interpreter.md ("Threat model").
 
 mcp = FastMCP("sandbox")
 

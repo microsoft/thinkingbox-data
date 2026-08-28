@@ -189,8 +189,9 @@ class CodeInterpreter:
                 "Pyodide is NOT a security boundary -- code executed here can reach "
                 "the Node host, the host filesystem, process execution and this "
                 "process's environment variables.\n"
-                "Only enable this where the executed code is trusted and "
-                "first-party, by setting:\n"
+                "Only enable this where the executed code is trusted -- note "
+                "that first-party provenance is not itself trust -- and the "
+                "execution context is secret-free, by setting:\n"
                 f"  {UNCONFINED_OPT_IN_ENV}=1\n"
                 "See docs/sandbox_code_interpreter.md ('Threat model')."
             )
