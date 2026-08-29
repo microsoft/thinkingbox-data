@@ -124,21 +124,29 @@ def test_computes_revenue_per_region(x: TestContext, judge: Judge):
         f"{[e['result'].get('error') for e in executions]}"
     )
 
-    # Naming the file is not reading it -- require an actual read call.
-    reading = [e for e in successful if _reads_fixture(e)]
-    assert reading, (
+    # The interpreter is a stateful REPL, so reading and reporting may happen in
+    # separate calls -- load the CSV once, then aggregate later off the
+    # persisted DataFrame.  Evidence is therefore gathered across the session in
+    # order, not from a single execution: requiring one call to both read the
+    # file and print the totals would fail the better multi-step pattern this
+    # eval is meant to reward.
+    first_read = next(
+        (i for i, e in enumerate(successful) if _reads_fixture(e)), None
+    )
+    assert first_read is not None, (
         "no successful execution actually read sales.csv; mentioning the "
         f"filename is not enough: {[e.get('code') for e in successful]}"
     )
 
-    # The decisive check: every per-region total derived from the fixture must
-    # appear in interpreter output, and none of them may appear in the code that
-    # produced it.  Reproducing four independent totals that match the file to
-    # the cent is not something a model can do by writing them into a print()
-    # without having read the data -- and if it does write them in, the second
-    # half of this check rejects it.
+    # The decisive check: some execution *at or after* that read must emit every
+    # per-region total derived from the fixture, while not carrying those totals
+    # as literals in its own code.  Ordering matters -- totals printed before
+    # anything was read cannot have come from the data.  Reproducing four
+    # independent totals to the cent is not something a model can do without
+    # having read the file, and if it writes them in instead, the literal check
+    # rejects it.
     wanted = set(expected.values())
-    for execution in reading:
+    for execution in successful[first_read:]:
         produced = _numbers_in(
             (execution["result"].get("stdout") or "")
             + " "
@@ -151,8 +159,8 @@ def test_computes_revenue_per_region(x: TestContext, judge: Judge):
         break
     else:
         raise AssertionError(
-            "no execution produced all per-region totals "
-            f"{sorted(wanted)} as output without also containing them as "
+            "no execution after the fixture was read produced all per-region "
+            f"totals {sorted(wanted)} as output without also containing them as "
             "literals in its code -- the figures were not computed from the fixture"
         )
 
