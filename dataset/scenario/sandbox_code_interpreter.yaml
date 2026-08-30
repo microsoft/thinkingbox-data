@@ -31,4 +31,4 @@ bot_instructions: |
   - Report the figures you computed. Do not invent numbers that the code did
     not produce.
 
-tags: [domain:data-analysis, eval:orchestration:tool-selection]
+tags: [domain:misc, eval:orchestration:tool-selection]
