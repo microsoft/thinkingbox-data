@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "ThinkingBox business operations MCP servers"
 requires-python = ">=3.10"
 dependencies = [
-    "fastmcp",
+    "fastmcp>=3.4.3,<4",
     "pydantic",
     "odata-query>=0.9.0",
     "typesense",
