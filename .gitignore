@@ -203,3 +203,6 @@ support/search_sources/*/sources/
 support/search_sources/*/parsed/
 .memory_bank/
 .claude/
+
+# Node.js dependencies (pyodide worker for the sandbox/code-interpreter tool)
+node_modules/
