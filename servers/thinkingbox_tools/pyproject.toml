@@ -30,6 +30,17 @@ py-modules = []
 where = ["."]
 include = ["thinkingbox_tools*"]
 
+[tool.setuptools.package-data]
+thinkingbox_tools = [
+    # Sandbox worker assets — required at runtime by mcp_sandbox.  node_modules/
+    # and wheels/ are populated by `npm install` post-install and are NOT
+    # packaged; see docs/sandbox_code_interpreter.md.
+    "toolslib/sandbox/*.mjs",
+    "toolslib/sandbox/package.json",
+    "toolslib/sandbox/package-lock.json",
+    "toolslib/sandbox/scripts/*.mjs",
+]
+
 [tool.pytest.ini_options]
 markers = [
     "typesense: tests that require a running typesense server",

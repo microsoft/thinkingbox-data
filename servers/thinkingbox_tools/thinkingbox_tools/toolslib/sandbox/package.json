@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "scripts": {
+    "postinstall": "node scripts/download-wheels.mjs"
+  },
+  "dependencies": {
+    "pyodide": "^0.29.0"
+  }
+}

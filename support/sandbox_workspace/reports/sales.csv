@@ -1,0 +1,9 @@
+region,quarter,units,unit_price
+North,Q1,120,19.99
+North,Q2,145,19.99
+South,Q1,98,21.50
+South,Q2,131,21.50
+East,Q1,203,18.75
+East,Q2,187,18.75
+West,Q1,76,24.00
+West,Q2,92,24.00
